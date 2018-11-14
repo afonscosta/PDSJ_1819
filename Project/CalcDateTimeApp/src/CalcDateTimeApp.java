@@ -4,7 +4,6 @@ public final class CalcDateTimeApp {
 
     public static void main(String[] args) {
 
-        CalcDateTimeModel 
         System.out.println("Hello World!");
     }
 }
