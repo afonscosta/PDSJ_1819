@@ -59,3 +59,5 @@
 *** ControllerFusos
 *** ControllerAgenda
 ** Model
+* Obs
+- O model do local e da zone é o mesmo porque o local é um caso particular do zone.
