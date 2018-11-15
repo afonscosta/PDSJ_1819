@@ -1,32 +1,61 @@
 package Model.Class;
 
-import Model.Interface.InterfCalcDateTimeLocZonModel;
+import Utilities.EnumDateTimeShiftMode;
+import Model.Interface.InterfCalcDateTimeLocalModel;
 import Model.Interface.InterfCalcDateTimeModel;
 import Model.Interface.InterfCalcDateTimeScheduleModel;
-import Enum.EnumDateTimeShiftMode;
+import Model.Interface.InterfCalcDateTimeZoneModel;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
 
 public class CalcDateTimeModel implements InterfCalcDateTimeModel {
 
-    InterfCalcDateTimeLocZonModel modelLocZon;
+    InterfCalcDateTimeLocalModel modelLocal;
+    InterfCalcDateTimeZoneModel modelZone;
     InterfCalcDateTimeScheduleModel modelSchedule;
 
-    public CalcDateTimeModel(InterfCalcDateTimeLocZonModel modelLocZon,
+    public CalcDateTimeModel(InterfCalcDateTimeLocalModel modelLocal,
+                             InterfCalcDateTimeZoneModel modelZone,
                              InterfCalcDateTimeScheduleModel modelSchedule) {
-        this.modelLocZon = modelLocZon;
+        this.modelLocal = modelLocal;
+        this.modelZone = modelZone;
         this.modelSchedule = modelSchedule;
     }
 
     @Override
-    public ZonedDateTime getZonedDateTime() {
-        return modelLocZon.getZonedDateTime();
+    public Temporal getDateTimeLocal() {
+        return modelLocal.getDateTimeLocal();
     }
 
     @Override
-    public void shiftDateTime(int n, ChronoUnit cu, EnumDateTimeShiftMode mode) {
-        System.out.println("Calling modelLocZon - ShiftDays");
-        modelLocZon.shiftDateTime(n, cu, mode);
+    public Temporal getDateTimeZone() {
+        return modelZone.getDateTimeZone();
+    }
+
+    @Override
+    public void shiftDateTimeLocal(int n, ChronoUnit cu, EnumDateTimeShiftMode mode) {
+        modelLocal.shiftDateTimeLocal(n, cu, mode);
+    }
+
+    @Override
+    public void shiftWorkDaysDateTimeLocal(int n, EnumDateTimeShiftMode mode) {
+        modelLocal.shiftWorkDaysDateTimeLocal(n, mode);
+    }
+
+    @Override
+    public String diffDateTimeLocal(LocalDateTime toDateTime) {
+        return modelLocal.diffDateTimeLocal(toDateTime);
+    }
+
+    @Override
+    public void fromDateTimeLocal(LocalDateTime ldt) {
+        modelLocal.fromDateTimeLocal(ldt);
+    }
+
+    @Override
+    public void shiftDateTimeZone(int n, ChronoUnit cu, EnumDateTimeShiftMode mode) {
+        modelZone.shiftDateTimeZone(n, cu, mode);
     }
 }

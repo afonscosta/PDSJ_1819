@@ -4,11 +4,10 @@
   - Formata de apresentação das datas (DateTimeFormatter).
 * Funcionalidades
 ** Calculadora de datas e tempos locais:
-   - Somar/subtrair/diferença data/tempo.
-     + Opção: 
-       * nº de vezes que executa
-       * formato de saída (e.g. dif em horas...)
-   - Somar/subtrair/diferença dias úteis em data/tempo.
+   - [X] Somar/subtrair data/tempo.
+   - [X] Diferença data/tempo.
+   - [ ] Somar/subtrair dias úteis em data/tempo.
+   - [ ] Diferença dias úteis em data/tempo.
      + Opção: 
        * nº de vezes que executa
        * formato de saída (e.g. dif em horas...)

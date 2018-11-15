@@ -1,16 +1,16 @@
 package View.Class;
 
 import View.Interface.InterfCalcDateTimeView;
-import View.Menu;
-import View.Menus;
-import View.Opcao;
+import Utilities.Menu;
+import Utilities.Menus;
+import Utilities.Opcao;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class CalcDateTimeView implements InterfCalcDateTimeView {
 
-    private Menus menuMainViewTxt = new Menus();
+    private Menus menuMainViewTxt;
 
     public CalcDateTimeView() {
         menuMainViewTxt = initView();
@@ -23,8 +23,8 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         //------------------------
         // Menu principal
         //------------------------
-        op1 = new Opcao("Calculadora DateTime Local ........... ", "L");
-        op2 = new Opcao("Sair da Aplicação >>>>>>>>>>>>>>>>>>>> ", "S");
+        op1 = new Opcao("Calculadora DateTime Local ... ", "L");
+        op2 = new Opcao("Sair da Aplicação >>>>>>>>>>>> ", "S");
         List<Opcao> linhas = Arrays.asList(op1, op2);
         Menu menuPrincipal = new Menu(linhas, "   Menu Principal");
         menuMainTxt.addMenu(0, menuPrincipal);

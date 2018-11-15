@@ -1,4 +1,4 @@
-package View;
+package Utilities;
 
 import java.util.List;
 
@@ -16,14 +16,21 @@ public class Menu {
 
     }
 
+    private void clearConsole() {
+        //Só deve funcionar para linux
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
     public void show() {
+        clearConsole();
         System.out.println("====" + titulo);
 
         for (Opcao o : linhas) {
             System.out.println(o.toString());
         }
 
-        System.out.print("Insira a sua opcao: ");
+        System.out.print("Insira a sua opçao: ");
     }
 
     public void addDateTimeToTitle(String dt) {

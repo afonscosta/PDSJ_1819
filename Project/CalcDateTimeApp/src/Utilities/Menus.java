@@ -1,4 +1,4 @@
-package View;
+package Utilities;
 import java.util.HashMap;
 
 public class Menus {

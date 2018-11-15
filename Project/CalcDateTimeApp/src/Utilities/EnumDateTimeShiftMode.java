@@ -1,4 +1,4 @@
-package Enum;
+package Utilities;
 
 public enum EnumDateTimeShiftMode {
     ADD,SUB

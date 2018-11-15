@@ -1,4 +1,4 @@
-package View;
+package Utilities;
 
 public class Opcao {
     String texto;
@@ -10,6 +10,6 @@ public class Opcao {
     }
 
     public String toString () {
-        return texto + "\t" + tag;
+        return texto + tag;
     }
 }

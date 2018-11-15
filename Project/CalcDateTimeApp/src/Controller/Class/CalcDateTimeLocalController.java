@@ -1,20 +1,19 @@
 package Controller.Class;
 
 import Controller.Interface.InterfCalcDateTimeLocalController;
-import static Enum.EnumDateTimeShiftMode.ADD;
-import static Enum.EnumDateTimeShiftMode.SUB;
 import Model.Interface.InterfCalcDateTimeModel;
 import Utilities.Input;
 import View.Interface.InterfCalcDateTimeLocalView;
-import View.Menu;
+import Utilities.Menu;
 
-import static Utilities.BusinessUtils.clearConsole;
+import java.time.LocalDateTime;
+import java.time.temporal.Temporal;
+
+import static Utilities.EnumDateTimeShiftMode.ADD;
+import static Utilities.EnumDateTimeShiftMode.SUB;
+import static Utilities.BusinessUtils.localDateTimeToString;
 import static java.lang.Math.abs;
-import java.time.ZonedDateTime;
-import static java.time.temporal.ChronoUnit.DAYS;
-import static java.time.temporal.ChronoUnit.WEEKS;
-import static java.time.temporal.ChronoUnit.MONTHS;
-import static java.time.temporal.ChronoUnit.YEARS;
+import static java.time.temporal.ChronoUnit.*;
 
 public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalController {
     private InterfCalcDateTimeModel model;
@@ -35,6 +34,15 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
 
     }
 
+    private String buildDateTimeTitle() {
+        Temporal temp = model.getDateTimeLocal();
+        String ld = localDateTimeToString(temp);
+        return ld;
+    }
+
+    //------------------------
+    // FlowLocal
+    //------------------------
     @Override
     public void flowLocal() {
         // Início do fluxo de execução
@@ -44,12 +52,14 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         do {
             ld = buildDateTimeTitle();
             menu.addDateTimeToTitle(ld);
-            clearConsole();
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
                 case "A" : flowShiftDateTime(); break;
+                case "AU" : flowShiftWorkDaysDateTime(); break;
+                case "D" : flowDiffDateTime(); break;
+                case "DU" : flowDiffWorkDaysDateTime(); break;
                 case "S": break;
                 default: System.out.println("Opcão Inválida !"); break;
             }
@@ -57,26 +67,18 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         while(!opcao.equals("S"));
     }
 
-    private String buildDateTimeTitle() {
-        ZonedDateTime zld = model.getZonedDateTime();
-        String ld = zld.getDayOfMonth() + "/" +
-            zld.getMonth() + "/" +
-            zld.getYear() + "  " +
-            zld.getHour() + ":" +
-            zld.getMinute() + ":" +
-            zld.getSecond();
-        return ld;
-    }
 
+    //------------------------
+    // FlowShiftDateTime
+    //------------------------
     // Apresentar opções relativas a somar ou subtrair espaço de tempo a uma data
     private void flowShiftDateTime() {
-        String ld = null;
+        String ld;
         Menu menu = viewLocalTxt.getMenu(1);
         String opcao;
         do {
             ld = buildDateTimeTitle();
             menu.addDateTimeToTitle(ld);
-            clearConsole();
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -92,39 +94,192 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         while(!opcao.equals("S"));
     }
 
+
     private void shiftDays() {
         System.out.print("(+|-) número de dias: ");
         int n = Input.lerInt();
         if (n >= 0)
-            model.shiftDateTime(abs(n), DAYS, ADD);
+            model.shiftDateTimeLocal(abs(n), DAYS, ADD);
         else
-            model.shiftDateTime(abs(n), DAYS, SUB);
+            model.shiftDateTimeLocal(abs(n), DAYS, SUB);
     }
 
     private void shiftWeeks() {
         System.out.print("Número de semanas: ");
         int n = Input.lerInt();
         if (n >= 0)
-            model.shiftDateTime(abs(n), WEEKS, ADD);
+            model.shiftDateTimeLocal(abs(n), WEEKS, ADD);
         else
-            model.shiftDateTime(abs(n), WEEKS, SUB);
+            model.shiftDateTimeLocal(abs(n), WEEKS, SUB);
     }
 
     private void shiftMonths() {
         System.out.print("Número de meses: ");
         int n = Input.lerInt();
         if (n >= 0)
-            model.shiftDateTime(abs(n), MONTHS, ADD);
+            model.shiftDateTimeLocal(abs(n), MONTHS, ADD);
         else
-            model.shiftDateTime(abs(n), MONTHS, SUB);
+            model.shiftDateTimeLocal(abs(n), MONTHS, SUB);
     }
 
     private void shiftYears() {
         System.out.print("Número de anos: ");
         int n = Input.lerInt();
         if (n >= 0)
-            model.shiftDateTime(abs(n), YEARS, ADD);
+            model.shiftDateTimeLocal(abs(n), YEARS, ADD);
         else
-            model.shiftDateTime(abs(n), YEARS, SUB);
+            model.shiftDateTimeLocal(abs(n), YEARS, SUB);
+    }
+
+    //------------------------
+    // FlowShiftWorkDaysDateTime
+    //------------------------
+    private void flowShiftWorkDaysDateTime() {
+        String ld;
+        Menu menu = viewLocalTxt.getMenu(2);
+        String opcao;
+        do {
+            ld = buildDateTimeTitle();
+            menu.addDateTimeToTitle(ld);
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "DIA" : shiftWorkDays(); break;
+                case "S": break;
+                default: System.out.println("Opcão Inválida !"); break;
+            }
+        }
+        while(!opcao.equals("S"));
+    }
+
+    private void shiftWorkDays() {
+        System.out.print("(+|-) número de dias: ");
+        int n = Input.lerInt();
+        if (n >= 0)
+            model.shiftWorkDaysDateTimeLocal(abs(n), ADD);
+        else
+            model.shiftWorkDaysDateTimeLocal(abs(n), SUB);
+    }
+
+    //------------------------
+    // FlowDiffDateTime
+    //------------------------
+    private void flowDiffDateTime() {
+        String ld;
+        Menu menu = viewLocalTxt.getMenu(3);
+        String opcao;
+        do {
+            ld = buildDateTimeTitle();
+            menu.addDateTimeToTitle(ld);
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "I" : fromDateTimeLocal(); break;
+                case "F" : calcDiffDateTime(); break;
+                case "S": break;
+                default: System.out.println("Opcão Inválida !"); break;
+            }
+        }
+        while(!opcao.equals("S"));
+    }
+
+    private void fromDateTimeLocal() {
+        LocalDateTime ldt = (LocalDateTime) model.getDateTimeLocal();
+
+        System.out.print("Ano (default: " + ldt.getYear() + "): ");
+        int year = getIntFromInput(ldt.getYear());
+
+        System.out.print("Mês (default: " + ldt.getMonthValue() + "): ");
+        int month = getIntFromInput(ldt.getMonthValue());
+
+        System.out.print("Dia (default: " + ldt.getDayOfMonth() + "): ");
+        int day = getIntFromInput(ldt.getDayOfMonth());
+
+        System.out.print("Hora (default: " + ldt.getHour() + "): ");
+        int hour = getIntFromInput(ldt.getHour());
+
+        System.out.print("Minutos (default: " + ldt.getMinute() + "): ");
+        int minute = getIntFromInput(ldt.getMinute());
+
+        System.out.print("Segundos (default: " + ldt.getSecond() + "): ");
+        int second = getIntFromInput(ldt.getSecond());
+
+        System.out.print("Nanosegundos (default: " + ldt.getNano() + "): ");
+        int nano = getIntFromInput(ldt.getNano());
+
+        LocalDateTime newLDT = LocalDateTime.of(year, month, day, hour, minute, second, nano);
+        model.fromDateTimeLocal(newLDT);
+    }
+
+    private void calcDiffDateTime() {
+        LocalDateTime ldt = (LocalDateTime) model.getDateTimeLocal();
+
+        System.out.print("Ano (default: " + ldt.getYear() + "): ");
+        int year = getIntFromInput(ldt.getYear());
+
+        System.out.print("Mês (default: " + ldt.getMonthValue() + "): ");
+        int month = getIntFromInput(ldt.getMonthValue());
+
+        System.out.print("Dia (default: " + ldt.getDayOfMonth() + "): ");
+        int day = getIntFromInput(ldt.getDayOfMonth());
+
+        System.out.print("Hora (default: " + ldt.getHour() + "): ");
+        int hour = getIntFromInput(ldt.getHour());
+
+        System.out.print("Minutos (default: " + ldt.getMinute() + "): ");
+        int minute = getIntFromInput(ldt.getMinute());
+
+        System.out.print("Segundos (default: " + ldt.getSecond() + "): ");
+        int second = getIntFromInput(ldt.getSecond());
+
+        System.out.print("Nanosegundos (default: " + ldt.getNano() + "): ");
+        int nano = getIntFromInput(ldt.getNano());
+
+        LocalDateTime toDateTime = LocalDateTime.of(year, month, day, hour, minute, second, nano);
+        String resDiff = model.diffDateTimeLocal(toDateTime);
+
+        System.out.println("\nResultado: " + resDiff);
+        System.out.print("Prima Enter para continuar.");
+        String str = Input.lerString();
+    }
+
+    //------------------------
+    // FlowDiffWorkDaysDateTime
+    //------------------------
+    private void flowDiffWorkDaysDateTime() {
+        String ld;
+        Menu menu = viewLocalTxt.getMenu(3);
+        String opcao;
+        do {
+            ld = buildDateTimeTitle();
+            menu.addDateTimeToTitle(ld);
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "I" : fromDateTimeLocal(); break;
+                case "F" : calcDiffWorkDaysDateTime(); break;
+                case "S": break;
+                default: System.out.println("Opcão Inválida !"); break;
+            }
+        }
+        while(!opcao.equals("S"));
+    }
+
+    private void calcDiffWorkDaysDateTime() {
+        System.out.println("Funcionalidade DiffWorkDays em desenvolvimento! (Enter para continuar)");
+        String str = Input.lerString();
+    }
+
+    // Pede ao utilizador uma string.
+    // Se a string for vazia então devolve o valor passado como argumento.
+    private int getIntFromInput(int def) {
+        String str = Input.lerString();
+        int num = def;
+        if (!str.isEmpty())
+            num = Integer.parseInt(str);
+        return num;
     }
 }

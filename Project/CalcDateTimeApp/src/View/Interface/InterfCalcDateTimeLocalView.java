@@ -1,6 +1,6 @@
 package View.Interface;
 
-import View.Menu;
+import Utilities.Menu;
 
 public interface InterfCalcDateTimeLocalView {
 

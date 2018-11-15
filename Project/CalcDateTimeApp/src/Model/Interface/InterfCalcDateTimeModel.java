@@ -2,5 +2,5 @@ package Model.Interface;
 
 
 public interface InterfCalcDateTimeModel
-        extends InterfCalcDateTimeLocZonModel, InterfCalcDateTimeScheduleModel {
+        extends InterfCalcDateTimeLocalModel, InterfCalcDateTimeZoneModel, InterfCalcDateTimeScheduleModel {
 }
