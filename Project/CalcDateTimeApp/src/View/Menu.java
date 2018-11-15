@@ -25,4 +25,8 @@ public class Menu {
 
         System.out.print("Insira a sua opcao: ");
     }
+
+    public void addDateTimeToTitle(String dt) {
+        this.titulo = this.titulo.substring(0, 9) + dt;
+    }
 }

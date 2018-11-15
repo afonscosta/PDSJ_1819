@@ -4,6 +4,7 @@ import Controller.Interface.InterfCalcDateTimeController;
 import Controller.Interface.InterfCalcDateTimeLocalController;
 import Controller.Interface.InterfCalcDateTimeScheduleController;
 import Controller.Interface.InterfCalcDateTimeZoneController;
+import static Utilities.BusinessUtils.clearConsole;
 import Utilities.Input;
 import View.Interface.InterfCalcDateTimeView;
 import View.Menu;
@@ -34,6 +35,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         Menu menu = viewMainTxt.getMenu(0);
         String opcao;
         do {
+            clearConsole();
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
