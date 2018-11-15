@@ -1,9 +1,16 @@
 package Controller.Interface;
 
+import Model.Interface.InterfCalcDateTimeModel;
+import View.Interface.InterfCalcDateTimeLocalView;
+
 public interface InterfCalcDateTimeLocalController {
 
     // Apresentar opções que podem ser feitas na calculadora local (somar, subtrair, diferença)
     public void flowLocal();
+
+    void setModel(InterfCalcDateTimeModel model);
+
+    void setView(InterfCalcDateTimeLocalView viewLocal);
 
     /*
     // Apresentar opções relativas a somar ou subtrair espaço de tempo a uma data

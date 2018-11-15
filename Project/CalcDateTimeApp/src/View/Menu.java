@@ -1,3 +1,5 @@
+package View;
+
 import java.util.List;
 
 public class Menu {
@@ -21,6 +23,6 @@ public class Menu {
             System.out.println(o.toString());
         }
 
-        System.out.println("Insira a sua opcao:");
+        System.out.print("Insira a sua opcao: ");
     }
 }

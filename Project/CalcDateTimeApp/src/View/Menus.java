@@ -1,7 +1,8 @@
+package View;
 import java.util.HashMap;
 
 public class Menus {
-    HashMap<Integer,Menu> menus;
+    HashMap<Integer, Menu> menus;
 
     public Menus () {
         menus = new HashMap<Integer,Menu>();

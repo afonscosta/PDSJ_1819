@@ -1,9 +1,16 @@
 package Controller.Interface;
 
+import Model.Interface.InterfCalcDateTimeModel;
+import View.Interface.InterfCalcDateTimeZoneView;
+
 public interface InterfCalcDateTimeZoneController {
 
     // Apresentar opções que podem ser feitas na calculadora local (conversão entre timeZones, somar e subtrair, diferença entre tempos)
     public void flowZone();
+
+    void setModel(InterfCalcDateTimeModel model);
+
+    void setView(InterfCalcDateTimeZoneView viewZone);
 
     /*
     // Mostra diferença de tempo entre o tempo do buffer e o tempo a pedir

@@ -1,9 +1,16 @@
 package Controller.Interface;
 
+import Model.Interface.InterfCalcDateTimeModel;
+import View.Interface.InterfCalcDateTimeScheduleView;
+
 public interface InterfCalcDateTimeScheduleController {
 
     // Mostrar opções que podem ser feitas na agenda
     public void flowSchedule();
+
+    void setView(InterfCalcDateTimeScheduleView viewSchedule);
+
+    void setModel(InterfCalcDateTimeModel model);
 
     /*
 
