@@ -13,9 +13,6 @@ public interface InterfCalcDateTimeLocalController {
     void setView(InterfCalcDateTimeLocalView viewLocal);
 
     /*
-    // Apresentar opções relativas a somar ou subtrair espaço de tempo a uma data
-    private void flowShiftDateTime(EnumDateTimeShiftMode mode);
-
     // Pedir data de fim e efetuar diferença
     private void flowDiffBetweenDateTimes();
 

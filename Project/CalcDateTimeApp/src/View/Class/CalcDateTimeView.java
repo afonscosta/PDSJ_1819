@@ -10,7 +10,7 @@ import java.util.List;
 
 public class CalcDateTimeView implements InterfCalcDateTimeView {
 
-    private Menus menuMainViewTxt = new Menus();
+    private Menus menuMainViewTxt;
 
     public CalcDateTimeView() {
         menuMainViewTxt = initView();
