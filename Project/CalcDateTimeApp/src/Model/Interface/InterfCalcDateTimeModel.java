@@ -1,5 +1,6 @@
-package Model;
+package Model.Interface;
+
 
 public interface InterfCalcDateTimeModel
-        extends InterfCalcDateTimeLocalModule, InterfCalcDateTimeZoneModule, InterfCalcDateTimeScheduleModule {
+        extends InterfCalcDateTimeLocZonModel, InterfCalcDateTimeScheduleModel {
 }
