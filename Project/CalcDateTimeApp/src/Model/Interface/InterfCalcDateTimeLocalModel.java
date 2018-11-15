@@ -10,11 +10,13 @@ public interface InterfCalcDateTimeLocalModel {
 
     Temporal getDateTimeLocal();
 
+    void fromDateTimeLocal(LocalDateTime ldt);
+
     void shiftDateTimeLocal(int n, ChronoUnit cu, EnumDateTimeShiftMode mode);
+
+    void shiftWorkDaysDateTimeLocal(int n, EnumDateTimeShiftMode mode);
 
     String diffDateTimeLocal(LocalDateTime toDateTime);
 
-    void fromDateTimeLocal(LocalDateTime ldt);
-
-    void shiftWorkDaysDateTimeLocal(int n, EnumDateTimeShiftMode mode);
+    String diffWorkDaysDateTimeLocal(LocalDateTime toDateTime);
 }

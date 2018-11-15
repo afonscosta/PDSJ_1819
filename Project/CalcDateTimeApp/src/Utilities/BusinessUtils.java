@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 
+import static java.lang.Math.abs;
 import static java.time.DayOfWeek.SATURDAY;
 import static java.time.DayOfWeek.SUNDAY;
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -70,5 +71,61 @@ public class BusinessUtils {
             }
         }
         return ldt;
+    }
+
+    // LocalDateTime, LocalDateTime -> long
+    // Calcula o número de dias úteis entre duas LocalDateTime's.
+    public static long countWorkDays(LocalDateTime start, LocalDateTime stop) {
+        // Code taken from Answer by Roland.
+        // https://stackoverflow.com/a/44942039/642706
+        long count = 0;
+        final DayOfWeek startW = start.getDayOfWeek();
+        final DayOfWeek stopW = stop.getDayOfWeek();
+
+        final long days = ChronoUnit.DAYS.between( start , stop );
+        final long daysWithoutWeekends = days - 2 * ( ( days + startW.getValue() ) / 7 );
+
+        //adjust for starting and ending on a Sunday:
+        count = daysWithoutWeekends + ( startW == DayOfWeek.SUNDAY ? 1 : 0 ) + ( stopW == DayOfWeek.SUNDAY ? 1 : 0 );
+
+        return count;
+    }
+
+    // LocalDateTime, LocalDateTime -> String
+    // Calcula a diferença temporal entre duas LocalDateTime's.
+    // Formato do output: X anos Y meses Z dias W horas V minutos U segundos D nanosegundos
+    public static String diffBetweenLocalDateTime(LocalDateTime start, LocalDateTime stop) {
+        StringBuilder sb = new StringBuilder();
+
+        LocalDateTime tempLDT = LocalDateTime.from(start);
+
+        long years = tempLDT.until( stop, ChronoUnit.YEARS);
+        tempLDT = tempLDT.plusYears( years );
+        sb.append(abs(years)).append(" anos ");
+
+        long months = tempLDT.until( stop, ChronoUnit.MONTHS);
+        tempLDT = tempLDT.plusMonths( months );
+        sb.append(abs(months)).append(" meses ");
+
+        long days = tempLDT.until( stop, DAYS);
+        tempLDT = tempLDT.plusDays( days );
+        sb.append(abs(days)).append(" dias ");
+
+        long hours = tempLDT.until( stop, ChronoUnit.HOURS);
+        tempLDT = tempLDT.plusHours( hours );
+        sb.append(abs(hours)).append(" horas ");
+
+        long minutes = tempLDT.until( stop, ChronoUnit.MINUTES);
+        tempLDT = tempLDT.plusMinutes( minutes );
+        sb.append(abs(minutes)).append(" minutos ");
+
+        long seconds = tempLDT.until( stop, ChronoUnit.SECONDS);
+        tempLDT = tempLDT.plusSeconds( seconds );
+        sb.append(abs(seconds)).append(" segundos ");
+
+        long nanos = tempLDT.until( stop, ChronoUnit.NANOS);
+        sb.append(abs(nanos)).append(" nanosegundos ");
+
+        return sb.toString();
     }
 }
