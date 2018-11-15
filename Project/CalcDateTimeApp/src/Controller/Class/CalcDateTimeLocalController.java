@@ -4,14 +4,13 @@ import Controller.Interface.InterfCalcDateTimeLocalController;
 import Model.Interface.InterfCalcDateTimeModel;
 import Utilities.Input;
 import View.Interface.InterfCalcDateTimeLocalView;
-import View.Menu;
+import Utilities.Menu;
 
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 
-import static Enum.EnumDateTimeShiftMode.ADD;
-import static Enum.EnumDateTimeShiftMode.SUB;
-import static Utilities.BusinessUtils.clearConsole;
+import static Utilities.EnumDateTimeShiftMode.ADD;
+import static Utilities.EnumDateTimeShiftMode.SUB;
 import static Utilities.BusinessUtils.localDateTimeToString;
 import static java.lang.Math.abs;
 import static java.time.temporal.ChronoUnit.*;
@@ -53,7 +52,6 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         do {
             ld = buildDateTimeTitle();
             menu.addDateTimeToTitle(ld);
-            clearConsole();
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -81,7 +79,6 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         do {
             ld = buildDateTimeTitle();
             menu.addDateTimeToTitle(ld);
-            clearConsole();
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -144,7 +141,6 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         do {
             ld = buildDateTimeTitle();
             menu.addDateTimeToTitle(ld);
-            clearConsole();
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -158,8 +154,12 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     }
 
     private void shiftWorkDays() {
-        System.out.println("Funcionalidade ShiftWorkDays em desenvolvimento! (Enter para continuar)");
-        String str = Input.lerString();
+        System.out.print("(+|-) número de dias: ");
+        int n = Input.lerInt();
+        if (n >= 0)
+            model.shiftWorkDaysDateTimeLocal(abs(n), ADD);
+        else
+            model.shiftWorkDaysDateTimeLocal(abs(n), SUB);
     }
 
     //------------------------
@@ -172,7 +172,6 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         do {
             ld = buildDateTimeTitle();
             menu.addDateTimeToTitle(ld);
-            clearConsole();
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -241,7 +240,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         LocalDateTime toDateTime = LocalDateTime.of(year, month, day, hour, minute, second, nano);
         String resDiff = model.diffDateTimeLocal(toDateTime);
 
-        System.out.println("Resultado: " + resDiff);
+        System.out.println("\nResultado: " + resDiff);
         System.out.print("Prima Enter para continuar.");
         String str = Input.lerString();
     }
@@ -256,7 +255,6 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         do {
             ld = buildDateTimeTitle();
             menu.addDateTimeToTitle(ld);
-            clearConsole();
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();

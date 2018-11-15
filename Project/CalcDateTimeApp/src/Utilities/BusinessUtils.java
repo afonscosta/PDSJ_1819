@@ -1,11 +1,14 @@
 package Utilities;
 
-import Enum.EnumDateTimeShiftMode;
-
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+
+import static java.time.DayOfWeek.SATURDAY;
+import static java.time.DayOfWeek.SUNDAY;
+import static java.time.temporal.ChronoUnit.DAYS;
 
 // Metodos estáticos aqui
 public class BusinessUtils {
@@ -18,12 +21,6 @@ public class BusinessUtils {
             case SUB: temp = temp.minus(n, cu); break;
         }
         return temp;
-    }
-
-    public static void clearConsole() {
-        //Só deve funcionar para linux
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
     }
 
     // O temp ou é uma ZonedDateTime ou uma LocalDateTime.
@@ -58,5 +55,20 @@ public class BusinessUtils {
                     zdt.getNano() +
                     " [" + zdt.getZone() + "]";
         return dt;
+    }
+
+    // LocalDateTime, int, EnumDateTimeShiftMode -> LocalDateTime
+    // Soma ou subtrai, dependendo do valor do mode, n dias úteis ao ldt.
+    public static LocalDateTime shiftWorkDaysLocal(LocalDateTime ldt, int n, EnumDateTimeShiftMode mode) {
+        int conta = 0;  // conta dias úteis
+        while (conta < n) {
+            DayOfWeek dia = ldt.getDayOfWeek();
+            if (!(dia.equals(SATURDAY) || dia.equals(SUNDAY))) conta++;
+            switch (mode) {
+                case ADD: ldt = ldt.plus(1, DAYS); break;
+                case SUB: ldt = ldt.minus(1, DAYS); break;
+            }
+        }
+        return ldt;
     }
 }

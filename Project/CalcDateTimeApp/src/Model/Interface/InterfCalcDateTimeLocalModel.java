@@ -1,6 +1,6 @@
 package Model.Interface;
 
-import Enum.EnumDateTimeShiftMode;
+import Utilities.EnumDateTimeShiftMode;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -15,4 +15,6 @@ public interface InterfCalcDateTimeLocalModel {
     String diffDateTimeLocal(LocalDateTime toDateTime);
 
     void fromDateTimeLocal(LocalDateTime ldt);
+
+    void shiftWorkDaysDateTimeLocal(int n, EnumDateTimeShiftMode mode);
 }

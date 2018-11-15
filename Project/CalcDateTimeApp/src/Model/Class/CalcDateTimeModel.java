@@ -1,13 +1,12 @@
 package Model.Class;
 
-import Enum.EnumDateTimeShiftMode;
+import Utilities.EnumDateTimeShiftMode;
 import Model.Interface.InterfCalcDateTimeLocalModel;
-import Model.Interface.InterfCalcDateTimeZoneModel;
 import Model.Interface.InterfCalcDateTimeModel;
 import Model.Interface.InterfCalcDateTimeScheduleModel;
+import Model.Interface.InterfCalcDateTimeZoneModel;
 
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 
@@ -38,6 +37,11 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     @Override
     public void shiftDateTimeLocal(int n, ChronoUnit cu, EnumDateTimeShiftMode mode) {
         modelLocal.shiftDateTimeLocal(n, cu, mode);
+    }
+
+    @Override
+    public void shiftWorkDaysDateTimeLocal(int n, EnumDateTimeShiftMode mode) {
+        modelLocal.shiftWorkDaysDateTimeLocal(n, mode);
     }
 
     @Override

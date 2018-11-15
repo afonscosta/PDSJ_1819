@@ -1,12 +1,15 @@
 package Model.Class;
 
-import Enum.EnumDateTimeShiftMode;
 import Model.Interface.InterfCalcDateTimeLocalModel;
 import Utilities.BusinessUtils;
+import Utilities.EnumDateTimeShiftMode;
+import static Utilities.BusinessUtils.shiftWorkDaysLocal;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 
@@ -40,7 +43,7 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
         tempLDT = tempLDT.plusMonths( months );
         sb.append(months + " meses ");
 
-        long days = tempLDT.until( toDateTime, ChronoUnit.DAYS);
+        long days = tempLDT.until( toDateTime, DAYS);
         tempLDT = tempLDT.plusDays( days );
         sb.append(days + " dias ");
 
@@ -66,5 +69,10 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
     @Override
     public void fromDateTimeLocal(LocalDateTime newLDT) {
         this.ldt = LocalDateTime.from(newLDT);
+    }
+
+    @Override
+    public void shiftWorkDaysDateTimeLocal(int n, EnumDateTimeShiftMode mode) {
+        ldt = shiftWorkDaysLocal(ldt, n, mode);
     }
 }

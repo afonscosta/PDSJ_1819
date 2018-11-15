@@ -1,7 +1,7 @@
 package Model.Class;
 
 import Model.Interface.InterfCalcDateTimeZoneModel;
-import Enum.EnumDateTimeShiftMode;
+import Utilities.EnumDateTimeShiftMode;
 import Utilities.BusinessUtils;
 
 import java.time.ZonedDateTime;
