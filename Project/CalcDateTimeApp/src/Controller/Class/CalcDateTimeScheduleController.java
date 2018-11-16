@@ -6,6 +6,12 @@ import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeScheduleView;
 
+import java.time.ZonedDateTime;
+import java.time.temporal.Temporal;
+
+import static Utilities.BusinessUtils.localDateTimeToString;
+import static Utilities.BusinessUtils.zoneDateTimeToString;
+
 public class CalcDateTimeScheduleController implements InterfCalcDateTimeScheduleController {
 
     private InterfCalcDateTimeModel model;
@@ -44,9 +50,36 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         while(!opcao.equals("S"));
     }
 
-    // Adicionar um slot de trabalho
+    //Escolha da data a inserir
     private void flowAddSlot(){
-        System.out.println("Add slot");
+        //isto vai transitar para o menu depois
+        Temporal tempLocal = model.getDateTimeLocal();
+        Temporal tempZone = model.getDateTimeZone();
+        String ldt = localDateTimeToString(tempLocal);
+        String zdt = zoneDateTimeToString((ZonedDateTime)tempZone);
+        System.out.println("Data calculadora datas/tempos local:" + ldt);
+        System.out.println("Data calculadora datas/tempos com fusos:" + zdt);
+        Menu menu = viewScheduleTxt.getMenu(3);
+        String opcao;
+        do {
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "L" : addSlot(tempLocal); break;
+                case "Z" : addSlot(tempZone); break;
+                case "M" : addSlot(null); break;
+                case "S": break;
+                default: System.out.println("Opcão Inválida !"); break;
+            }
+        }
+        while(!opcao.equals("S"));
+    }
+    private void addSlot(Temporal date){
+        if(date==null){
+            System.out.println("Introduza a data:");
+
+        }
     }
 
     // Remover um slot de trabalho
