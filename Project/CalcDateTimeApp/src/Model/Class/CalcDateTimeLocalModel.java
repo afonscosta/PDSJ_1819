@@ -3,13 +3,12 @@ package Model.Class;
 import Model.Interface.InterfCalcDateTimeLocalModel;
 import Utilities.BusinessUtils;
 import Utilities.EnumDateTimeShiftMode;
-import static Utilities.BusinessUtils.shiftWorkDaysLocal;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 
-import static java.time.temporal.ChronoUnit.DAYS;
+import static Utilities.BusinessUtils.*;
 
 public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 
@@ -25,54 +24,27 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
     }
 
     @Override
-    public void shiftDateTimeLocal(int n, ChronoUnit cu, EnumDateTimeShiftMode mode) {
-        ldt = (LocalDateTime) BusinessUtils.shiftDateTime(ldt, n, cu, mode);
-    }
-
-    @Override
-    public String diffDateTimeLocal(LocalDateTime toDateTime) {
-        StringBuilder sb = new StringBuilder();
-
-        LocalDateTime tempLDT = LocalDateTime.from(ldt);
-
-        long years = tempLDT.until( toDateTime, ChronoUnit.YEARS);
-        tempLDT = tempLDT.plusYears( years );
-        sb.append(years + " anos ");
-
-        long months = tempLDT.until( toDateTime, ChronoUnit.MONTHS);
-        tempLDT = tempLDT.plusMonths( months );
-        sb.append(months + " meses ");
-
-        long days = tempLDT.until( toDateTime, DAYS);
-        tempLDT = tempLDT.plusDays( days );
-        sb.append(days + " dias ");
-
-        long hours = tempLDT.until( toDateTime, ChronoUnit.HOURS);
-        tempLDT = tempLDT.plusHours( hours );
-        sb.append(hours + " horas ");
-
-        long minutes = tempLDT.until( toDateTime, ChronoUnit.MINUTES);
-        tempLDT = tempLDT.plusMinutes( minutes );
-        sb.append(minutes + " minutos ");
-
-        long seconds = tempLDT.until( toDateTime, ChronoUnit.SECONDS);
-        tempLDT = tempLDT.plusSeconds( seconds );
-        sb.append(seconds + " segundos ");
-
-        long nanos = tempLDT.until( toDateTime, ChronoUnit.NANOS);
-        tempLDT = tempLDT.plusNanos( nanos );
-        sb.append(nanos + " nanosegundos ");
-
-        return sb.toString();
-    }
-
-    @Override
     public void fromDateTimeLocal(LocalDateTime newLDT) {
         this.ldt = LocalDateTime.from(newLDT);
     }
 
     @Override
+    public void shiftDateTimeLocal(int n, ChronoUnit cu, EnumDateTimeShiftMode mode) {
+        ldt = (LocalDateTime) BusinessUtils.shiftDateTime(ldt, n, cu, mode);
+    }
+
+    @Override
     public void shiftWorkDaysDateTimeLocal(int n, EnumDateTimeShiftMode mode) {
         ldt = shiftWorkDaysLocal(ldt, n, mode);
+    }
+
+    @Override
+    public String diffDateTimeLocal(LocalDateTime toDateTime) {
+        return diffBetweenLocalDateTime(ldt, toDateTime);
+    }
+
+    @Override
+    public String diffWorkDaysDateTimeLocal(LocalDateTime toDateTime) {
+        return countWorkDays(ldt, toDateTime) + " dias úteis";
     }
 }
