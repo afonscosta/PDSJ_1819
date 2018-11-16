@@ -50,6 +50,11 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     }
 
     @Override
+    public String diffWorkDaysDateTimeLocal(LocalDateTime toDateTime) {
+        return modelLocal.diffWorkDaysDateTimeLocal(toDateTime);
+    }
+
+    @Override
     public void fromDateTimeLocal(LocalDateTime ldt) {
         modelLocal.fromDateTimeLocal(ldt);
     }

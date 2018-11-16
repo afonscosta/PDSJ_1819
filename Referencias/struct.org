@@ -6,13 +6,10 @@
 ** Calculadora de datas e tempos locais:
    - [X] Somar/subtrair data/tempo.
    - [X] Diferença data/tempo.
-   - [ ] Somar/subtrair dias úteis em data/tempo.
-   - [ ] Diferença dias úteis em data/tempo.
-     + Opção: 
-       * nº de vezes que executa
-       * formato de saída (e.g. dif em horas...)
-   - Dado um # mês, # semana e # dia, devolver a data/tempo.
-   - Opção ANS: se não for dito nada usa a data calculada anteriormente.
+   - [X] Somar/subtrair dias úteis em data/tempo.
+   - [X] Diferença dias úteis em data/tempo.
+   - [ ] Dado um # mês, # semana e # dia, devolver a data/tempo.
+   - [X] Opção ANS: se não for dito nada usa a data calculada anteriormente.
 ** Calculadora de datas e tempos com fusos:
    - Converter data/tempo entre fusos diferentes.
    - Somar/subtrair/diferença data/tempo com fusos.
