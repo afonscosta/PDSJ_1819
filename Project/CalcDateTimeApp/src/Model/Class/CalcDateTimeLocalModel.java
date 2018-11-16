@@ -4,15 +4,11 @@ import Model.Interface.InterfCalcDateTimeLocalModel;
 import Utilities.BusinessUtils;
 import Utilities.EnumDateTimeShiftMode;
 
-import static Utilities.BusinessUtils.diffBetweenLocalDateTime;
-import static Utilities.BusinessUtils.shiftWorkDaysLocal;
-import static Utilities.BusinessUtils.countWorkDays;
-
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 
-import static java.time.temporal.ChronoUnit.DAYS;
+import static Utilities.BusinessUtils.*;
 
 public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 

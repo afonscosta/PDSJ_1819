@@ -3,21 +3,23 @@ package Controller.Class;
 import Controller.Interface.InterfCalcDateTimeLocalController;
 import Model.Interface.InterfCalcDateTimeModel;
 import Utilities.Input;
-import View.Interface.InterfCalcDateTimeLocalView;
 import Utilities.Menu;
+import View.Interface.InterfCalcDateTimeLocalView;
 
-import java.time.DateTimeException;
 import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.time.temporal.ChronoField;
 import java.time.temporal.Temporal;
 
+import static Utilities.BusinessUtils.localDateTimeToString;
+import static Utilities.BusinessUtils.validatePosNumber;
+import static Utilities.BusinessUtils.validateMonth;
+import static Utilities.BusinessUtils.validateDay;
+import static Utilities.BusinessUtils.validateHour;
+import static Utilities.BusinessUtils.validateMinSec;
 import static Utilities.EnumDateTimeShiftMode.ADD;
 import static Utilities.EnumDateTimeShiftMode.SUB;
-import static Utilities.BusinessUtils.localDateTimeToString;
 import static java.lang.Math.abs;
-import static java.time.temporal.ChronoUnit.*;
 import static java.lang.System.out;
+import static java.time.temporal.ChronoUnit.*;
 
 public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalController {
     private InterfCalcDateTimeModel model;
@@ -260,73 +262,6 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         return num;
     }
 
-    // Lê um inteiro positivo (0 inclusive)
-    private Integer getPosNumberFromInput(int def) {
-        String str = Input.lerString();
-        Integer num = null;
-        if (str.matches("^\\d+$")) {
-            num = Integer.parseInt(str);
-        }
-        if (str.isEmpty())
-            num = def;
-        return num;
-    }
-
-    // Lê um valor entre 1 e 12
-    private Integer getMonthFromInput(int def) {
-        String str = Input.lerString();
-        Integer num = null;
-        if (str.matches("^([1-9]|1[0-2])$")) {
-            num = Integer.parseInt(str);
-        }
-        else if (str.isEmpty())
-            num = def;
-        return num;
-    }
-
-    // Lê um dia que esteja presente num dado ano e mês.
-    private Integer getDayFromInput(int def, int year, int month) {
-        String str = Input.lerString();
-        int end = YearMonth.of(year, month).lengthOfMonth();
-        Integer num = null;
-        if (str.matches("^([1-9]|1[0-9]|2[0-9]|3[01])$")) {
-            num = Integer.parseInt(str);
-            if (num > end) // O dia escolhido não existe no mês
-                num = null;
-        }
-        else if (str.isEmpty()) {
-            num = def;
-        }
-        return num;
-    }
-
-    // Lê um valor entre 0 e 23
-    private Integer getHourFromInput(int def) {
-        String str = Input.lerString();
-        Integer num = null;
-        if (str.matches("^([0-9]|1[0-9]|2[0-3])$")) {
-            num = Integer.parseInt(str);
-        }
-        else if (str.isEmpty()) {
-            num = def;
-        }
-        return num;
-    }
-
-    // Lê um valor entre 0 e 59
-    // Devolve def caso seja lida a string vazia
-    // Devolve null caso tenha lido
-    private Integer getMinSecFromInput(int def) {
-        String str = Input.lerString();
-        Integer num = null;
-        if (str.matches("^([0-9]|[1-5][0-9])$")) {
-            num = Integer.parseInt(str);
-        }
-        else if (str.isEmpty()) {
-            num = def;
-        }
-        return num;
-    }
 
     // Pede ao utilizador uma data.
     // Se não disser nada fica a que se encontra no modelLocal.
@@ -340,42 +275,62 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         Integer minute = null;
         Integer second = null;
         Integer nano = null;
+        String str = null;
 
         while (year == null) {
             out.print("Ano (default: " + ldt.getYear() + "): ");
-            year = getPosNumberFromInput(ldt.getYear());
+            str = Input.lerString();
+            year = validatePosNumber(str, ldt.getYear());
             if (year == null)
                 out.println("[!] Ano invalido.");
         }
 
         while (month == null) {
             out.print("Mês (default: " + ldt.getMonthValue() + "): ");
-            month = getMonthFromInput(ldt.getMonthValue());
+            str = Input.lerString();
+            month = validateMonth(str, ldt.getMonthValue());
+            if (month == null)
+                out.println("[!] Mes invalido.");
         }
 
         while (day == null) {
             out.print("Dia (default: " + ldt.getDayOfMonth() + "): ");
-            day = getDayFromInput(ldt.getDayOfMonth(), year, month);
+            str = Input.lerString();
+            day = validateDay(str, ldt.getDayOfMonth(), year, month);
+            if (day == null)
+                out.println("[!] Dia invalido.");
         }
 
         while (hour == null) {
             out.print("Hora (default: " + ldt.getHour() + "): ");
-            hour = getHourFromInput(ldt.getHour());
+            str = Input.lerString();
+            hour = validateHour(str, ldt.getHour());
+            if (hour == null)
+                out.println("[!] Hora invalida.");
         }
 
         while (minute == null) {
             out.print("Minutos (default: " + ldt.getMinute() + "): ");
-            minute = getMinSecFromInput(ldt.getMinute());
+            str = Input.lerString();
+            minute = validateMinSec(str, ldt.getMinute());
+            if (minute == null)
+                out.println("[!] Minutos invalidos.");
         }
 
         while (second == null) {
             out.print("Segundos (default: " + ldt.getSecond() + "): ");
-            second = getMinSecFromInput(ldt.getSecond());
+            str = Input.lerString();
+            second = validateMinSec(str, ldt.getSecond());
+            if (second == null)
+                out.println("[!] Segundos invalidos.");
         }
 
         while (nano == null) {
             out.print("Nanosegundos (default: " + ldt.getNano() + "): ");
-            nano = getPosNumberFromInput(ldt.getNano());
+            str = Input.lerString();
+            nano = validatePosNumber(str, ldt.getNano());
+            if (nano == null)
+                out.println("[!] Nanosegundos invalidos.");
         }
 
         LocalDateTime newLDT = LocalDateTime.of(year, month, day, hour, minute, second, nano);
