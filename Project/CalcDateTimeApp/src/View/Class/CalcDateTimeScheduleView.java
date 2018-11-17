@@ -54,6 +54,17 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         Menu menuShiftBusySlots = new Menu(linhas, "   Reunioes ");
         menusScheduleTxt.addMenu(2, menuShiftBusySlots);
 
+        //------------------------
+        // Menu date choice
+        //------------------------
+        op1 = new Opcao("Usar a data da calculadora data/tempo local ......... ", "L");
+        op2 = new Opcao("Usar a data da calculadora data/tempo com fusos ..... ", "Z");
+        op3 = new Opcao("Inserir data manualmente ............................ ", "M");
+        op4 = new Opcao("Voltar ao Menu Agenda >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", "S");
+        linhas = Arrays.asList(op1, op2,op3,op4);
+        Menu menuDateChoice = new Menu(linhas, "   Data da reuniao a inserir ");
+        menusScheduleTxt.addMenu(3, menuDateChoice);
+
         return menusScheduleTxt;
     }
 
