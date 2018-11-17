@@ -34,6 +34,10 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
         return modelZone.getDateTimeZone();
     }
 
+    public void convertZoneDateTimeToZone(String zoneId) {
+        modelZone.convertZoneDateTimeToZone(zoneId);
+    }
+
     @Override
     public void shiftDateTimeLocal(int n, ChronoUnit cu, EnumDateTimeShiftMode mode) {
         modelLocal.shiftDateTimeLocal(n, cu, mode);
