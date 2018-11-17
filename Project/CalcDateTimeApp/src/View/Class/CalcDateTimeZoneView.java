@@ -22,26 +22,37 @@ public class CalcDateTimeZoneView implements InterfCalcDateTimeZoneView {
         //------------------------
         // CaldDateTimeZone
         //------------------------
-        op1 = new Opcao("Deslocar data ............. ", "D");
-        op2 = new Opcao("Tempo atual numa região ... ", "A");
-        op3 = new Opcao("Converter para fuso ....... ", "C");
-        op4 = new Opcao("Sair da aplicacao >>>>>>>>> ", "S");
+        op1 = new Opcao("Deslocar data", "D");
+        op2 = new Opcao("Tempo atual numa região", "A");
+        op3 = new Opcao("Converter para fuso", "C");
+        op4 = new Opcao("Sair da aplicacao", "S");
         List<Opcao> linhas = Arrays.asList(op1,op2,op3,op4);
-        Menu menuCalcDateTimeZone = new Menu(linhas,"   Data: ");
+        Menu menuCalcDateTimeZone = new Menu(linhas,"Menu Calculadora de Zonas");
         menusZoneTxt.addMenu(0,menuCalcDateTimeZone);
 
         //------------------------
         // Menu Shift ZoneDateTime
         //------------------------
-        op1 = new Opcao("Deslocar dia ........... ", "Dia");
-        op2 = new Opcao("Deslocar semana ........ ", "Sem");
-        op3 = new Opcao("Deslocar mes ........... ", "Mes");
-        op4 = new Opcao("Deslocar ano ........... ", "Ano");
-        op5 = new Opcao("Voltar a Calc. Local >>> ", "S");
+        op1 = new Opcao("Deslocar dia", "Dia");
+        op2 = new Opcao("Deslocar semana", "Sem");
+        op3 = new Opcao("Deslocar mes", "Mes");
+        op4 = new Opcao("Deslocar ano", "Ano");
+        op5 = new Opcao("Voltar a Calc. de Zonas", "S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5);
-        Menu menuShiftDateTime = new Menu(linhas, "   Data: ");
+        Menu menuShiftDateTime = new Menu(linhas, "Alterar Data");
         menusZoneTxt.addMenu(1, menuShiftDateTime);
 
+        //------------------------
+        // Menu Navegador de ZoneIds
+        //------------------------
+        op1 = new Opcao("Pagina anterior", "-");
+        op2 = new Opcao("Procurar", "/<palavra>");
+        op3 = new Opcao("Pagina seguinte", "+");
+        op4 = new Opcao("Selecionar", "=<palavra>");
+        op5 = new Opcao("Voltar para Calc. de Zonas", "S");
+        linhas = Arrays.asList(op1, op2, op3, op4, op5);
+        Menu menuZoneIdNavigator = new Menu(linhas, "Navegador de ZoneIds");
+        menusZoneTxt.addMenu(2, menuZoneIdNavigator);
         return menusZoneTxt;
     }
 

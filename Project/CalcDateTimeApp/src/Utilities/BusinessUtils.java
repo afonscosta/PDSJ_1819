@@ -6,10 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import static java.lang.Math.abs;
 import static java.time.DayOfWeek.*;
@@ -365,33 +362,33 @@ public class BusinessUtils {
         return ldt;
     }
 
-    // Retornar todos os zoneIds disponiveis, X em cada página
-    public static List<List<String>> getAvailableTimeZoneIdsByPage(int zoneIdsPerPage) {
-        List<List<String>> ret = new ArrayList<>();
-        List<String> allZoneIds = new ArrayList<>(ZoneId.getAvailableZoneIds());
-        allZoneIds.sort(Comparator.naturalOrder());
-        int zoneIdIndex = 0;
-        int zoneIdPerPageCounter = 0;
+    public static <T> List<List<T>> partitionIntoPages(List<T> list, int elementsPerPage) {
+        List<List<T>> ret = new ArrayList<>();
 
+        int totalListIndex = 0;
+        int pageListIndex = 0;
 
-        while (zoneIdIndex < allZoneIds.size()) {
+        while (totalListIndex < list.size()) {
+            List<T> currentPage = new ArrayList<>();
+            pageListIndex = 0;
 
-            List<String> zoneIdPage = new ArrayList<>();
-            zoneIdPerPageCounter = 0;
-
-            while ((zoneIdPerPageCounter < zoneIdsPerPage) && (zoneIdIndex < allZoneIds.size())) {
-                zoneIdPage.add(allZoneIds.get(zoneIdIndex++));
-                zoneIdPerPageCounter++;
+            while ((pageListIndex < elementsPerPage) && (totalListIndex < list.size())) {
+                currentPage.add(list.get(totalListIndex++));
+                pageListIndex++;
             }
 
-            ret.add(zoneIdPage);
-
+            ret.add(currentPage);
         }
-
 
         return ret;
     }
 
+    public static List<String> getSortedAvailableZoneIds() {
+        List<String> ret = new ArrayList<>(ZoneId.getAvailableZoneIds());
+        ret.sort(Comparator.naturalOrder());
+
+        return ret;
+    }
 
     /**
      * TODO: VERIFICAR SE É CORRETO USAR CLEARCONSOLE COMO UM MÉTODO ESTÁTICO

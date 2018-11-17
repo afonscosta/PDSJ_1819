@@ -6,20 +6,18 @@ import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeZoneView;
 
-import static Utilities.EnumDateTimeShiftMode.ADD;
-import static Utilities.EnumDateTimeShiftMode.SUB;
-import static Utilities.BusinessUtils.zoneDateTimeToString;
-import static Utilities.BusinessUtils.getAvailableTimeZoneIdsByPage;
-import static Utilities.BusinessUtils.clearConsole;
-
-import static java.time.temporal.ChronoUnit.*;
-
-import static java.lang.Math.abs;
-import static java.lang.System.out;
-
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static Utilities.BusinessUtils.*;
+import static Utilities.EnumDateTimeShiftMode.ADD;
+import static Utilities.EnumDateTimeShiftMode.SUB;
+import static java.lang.Math.abs;
+import static java.lang.System.out;
+import static java.time.temporal.ChronoUnit.*;
 
 public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneController {
     private InterfCalcDateTimeModel model;
@@ -73,9 +71,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     //------------------------
     // Saber que data atual é numa certa região
     private void flowShowCurrentTimeInZone() {
-        flowShowAllAvailableTimezones();
-        out.print("Zona a escolher(S para Sair): ");
-        String answerZone = Input.lerString();
+        String answerZone = flowShowAllAvailableTimezonesAndGetZoneId();
 
         if (!answerZone.equals(("S"))) {
             model.changeZoneDateTimeToCurrentDateInZone(answerZone);
@@ -90,8 +86,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
             ld = buildZoneDateTimeTitle();
             menu.addDateTimeToTitle(ld);
             menu.show();
-            opcao = Input.lerString();
-            opcao = opcao.toUpperCase();
+            opcao = Input.lerString().toUpperCase();
             switch(opcao) {
                 case "DIA" : shiftDays(); break;
                 case "SEM" : shiftWeeks(); break;
@@ -147,9 +142,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     //------------------------
     // Pedir para que zona queremos mudar a data
     private void flowConvertZone() {
-        flowShowAllAvailableTimezones();
-        out.print("Zona para qual converter(S para sair): ");
-        String answerZone = Input.lerString();
+        String answerZone = flowShowAllAvailableTimezonesAndGetZoneId();
 
         if (!answerZone.equals(("S"))) {
             model.convertZoneDateTimeToZone(answerZone);
@@ -161,24 +154,60 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     // FlowShowAllAvailableTimeZones
     //------------------------
     // Buscar todos os ZoneIds alfabeticamente e fazer display por páginas
-    private void flowShowAllAvailableTimezones() {
-        List<List<String>> allZoneidsByPage = getAvailableTimeZoneIdsByPage(45);
-        int pageIndex = 0;
+    private String flowShowAllAvailableTimezonesAndGetZoneId() {
+        Boolean flowDone = false;
+        List<List<String>> chosenZoneIdsByPage = partitionIntoPages(getSortedAvailableZoneIds(),25); // If someone looks for "europe", place matches it here
 
+        int pageIndex = 0;
+        int totalPages = chosenZoneIdsByPage.size();
+        Menu menu = viewZoneTxt.getMenu(2);
+        List<String> description;
         String opcao;
         do {
-            clearConsole();
-            allZoneidsByPage.get(pageIndex).forEach((String s) -> out.println("." + s));
-            out.println("Pagina (" + (pageIndex+1) + "/" + allZoneidsByPage.size() + ")");
-            out.println("(+) Proxima pagina (-) Previa pagina (S) Sair da listagem");
-            opcao = Input.lerString().toUpperCase();
-            switch(opcao) {
-                case "+": if ((pageIndex + 1) < allZoneidsByPage.size()) { pageIndex++; } break;
-                case "-": if ((pageIndex - 1) >= 0) { pageIndex--; } break;
-                case "S": break;
-                default: out.println("Opcao Invalida!"); break;
+
+            // Mais complexo do que necessário para o caso em que a lista de procuras está vazia,
+            // e assim não acontece indexOuto
+            try {
+                description = new ArrayList(chosenZoneIdsByPage.get(pageIndex));
+            } catch (IndexOutOfBoundsException e) {
+                description = new ArrayList<>();
             }
 
-        } while(!opcao.equals("S"));
+            description.add(""); // Linha branca na descrição
+            description.add(String.format("Page (%s/%s)", pageIndex+1, totalPages));
+
+            menu.addDescToTitle(description);
+
+            menu.show();
+            opcao = Input.lerString();
+            switch (opcao) {
+                case "+": if ((pageIndex + 1) < totalPages) { pageIndex++; } break;
+                case "-": if ((pageIndex - 1) >= 0) { pageIndex--; } break;
+                case "S": flowDone = true; break;
+                case "s": flowDone = true; break;
+                default:
+                    if (opcao.matches("\\/.*")) {
+                        List<String> matches = new ArrayList<>();
+                        pageIndex = 0;
+                        String searchedWordNormalized = opcao.substring(1).toLowerCase(); // Remover o "?" e lowercase
+
+                        for (String zoneId : getSortedAvailableZoneIds()) {
+                            if (zoneId.toLowerCase().contains(searchedWordNormalized)) {
+                                matches.add(zoneId);
+                            }
+                        }
+
+                        chosenZoneIdsByPage = partitionIntoPages(matches,25);
+                        totalPages = chosenZoneIdsByPage.size();
+                    } else if (opcao.matches("=.*")) {
+                        opcao = opcao.substring(1); // Remover o "="
+                        flowDone = true;
+                    }
+                    break;
+            }
+        } while(!flowDone);
+
+        return opcao;
     }
+
 }
