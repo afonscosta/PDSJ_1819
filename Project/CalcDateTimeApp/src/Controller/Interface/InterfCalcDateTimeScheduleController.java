@@ -12,6 +12,8 @@ public interface InterfCalcDateTimeScheduleController {
 
     void setModel(InterfCalcDateTimeModel model);
 
+    void saveState();
+
     /*
 
     // Adicionar um slot de trabalho

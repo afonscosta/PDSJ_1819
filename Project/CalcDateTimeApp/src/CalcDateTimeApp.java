@@ -23,6 +23,8 @@ import View.Interface.InterfCalcDateTimeScheduleView;
 import View.Interface.InterfCalcDateTimeView;
 import View.Interface.InterfCalcDateTimeZoneView;
 
+import java.io.IOException;
+
 public final class CalcDateTimeApp {
 
     public static void main(String[] args) {
@@ -30,8 +32,11 @@ public final class CalcDateTimeApp {
         //--------------------------------
         InterfCalcDateTimeLocalModel modelLocal = new CalcDateTimeLocalModel();
         InterfCalcDateTimeZoneModel modelZone = new CalcDateTimeZoneModel();
-        InterfCalcDateTimeScheduleModel modelSchedule = CalcDateTimeScheduleModel.of();
-        InterfCalcDateTimeModel model = new CalcDateTimeModel(modelLocal, modelZone, modelSchedule);
+        try {
+            //InterfCalcDateTimeScheduleModel modelSchedule = CalcDateTimeScheduleModel.of();
+
+            InterfCalcDateTimeScheduleModel modelSchedule = InterfCalcDateTimeScheduleModel.pushState("AgendaReunioes");
+            InterfCalcDateTimeModel model = new CalcDateTimeModel(modelLocal, modelZone, modelSchedule);
 
         //--------------------------------
         InterfCalcDateTimeLocalView viewLocal = new CalcDateTimeLocalView();
@@ -57,7 +62,13 @@ public final class CalcDateTimeApp {
         control.setView(view);
         control.startFlow();
 
-        //--------------------------------
+        } catch (IOException|ClassNotFoundException e) {
+            e.printStackTrace();
+            System.out.println("Problemas a trazer os dados para o tree set");
+        }
+
+
+            //--------------------------------
         System.out.println("Fim da Aplicação >> "
             + java.time.LocalDateTime.now());
 

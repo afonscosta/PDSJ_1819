@@ -40,11 +40,12 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             switch(opcao) {
                 case "L" : controlLocal.flowLocal(); break;
                 case "A" : controlSchedule.flowSchedule(); break;
-                case "S": break;
+                case "S": controlSchedule.saveState(); break;
                 default: System.out.println("Opcão Inválida !"); break;
             }
         }
         while(!opcao.equals("S"));
 
     }
+
 }
