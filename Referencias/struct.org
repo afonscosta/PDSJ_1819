@@ -12,16 +12,16 @@
    - [X] Opção ANS: se não for dito nada usa a data calculada anteriormente.
    - [ ] Quando for para inserir datas, fazer clean da interface.
 ** Calculadora de datas e tempos com fusos:
-   - Converter data/tempo entre fusos diferentes.
-   - Somar/subtrair/diferença data/tempo com fusos.
+   - [X] Converter data/tempo entre fusos diferentes.
+   - [X] Somar/subtrair/diferença data/tempo com fusos.
      + Opção: 
        * nº de vezes que executa
        * formato de saída (e.g. dif em horas...)
-   - Somar/subtrair/diferença dias úteis em data/tempo com fusos.
+   - []Somar/subtrair/diferença dias úteis em data/tempo com fusos.
      + Opção: 
        * nº de vezes que executa
        * formato de saída (e.g. dif em horas...)
-   - Dado um país, saber a sua hora atual.
+   - [X]Dado um país, saber a sua hora atual.
    - Opção ANS: se não for dito nada usa a data calculada anteriormente.
 ** Agenda de reuniões:
    - Duração das slots é arbitrária
