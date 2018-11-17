@@ -25,6 +25,17 @@ import View.Interface.InterfCalcDateTimeZoneView;
 
 public final class CalcDateTimeApp {
 
+    /*
+    TODO Global:
+
+    ClearConsole cross-platform
+
+    TODO Zone:
+
+    Validar input incorreto para Sair de paginação
+    Set data
+     */
+
     public static void main(String[] args) {
 
         //--------------------------------

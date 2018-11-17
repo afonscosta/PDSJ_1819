@@ -65,7 +65,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     // Pedir para que zona queremos mudar a data
     private void flowConvertZone() {
         flowShowAllAvailableTimezones();
-        System.out.println("Zona para qual converter(S para sair): ");
+        System.out.print("Zona para qual converter(S para sair): ");
         String answerZone = Input.lerString();
 
         if (!answerZone.equals(("S"))) {
@@ -79,7 +79,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     //------------------------
     // Buscar todos os ZoneIds alfabeticamente e fazer display por páginas
     private void flowShowAllAvailableTimezones() {
-        List<List<String>> allZoneidsByPage = getAvailableTimeZoneIdsByPage(50);
+        List<List<String>> allZoneidsByPage = getAvailableTimeZoneIdsByPage(45);
         int pageIndex = 0;
 
         String opcao;

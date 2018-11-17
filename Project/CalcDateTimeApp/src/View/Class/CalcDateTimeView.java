@@ -25,7 +25,7 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         //------------------------
         op1 = new Opcao("Calculadora DateTime Local ....... ", "L");
         op2 = new Opcao("Calculadora DateTime com Zonas ... ", "Z");
-        op3 = new Opcao("Agenda de Reunioes............ ","A");
+        op3 = new Opcao("Agenda de Reunioes................ ","A");
         op4 = new Opcao("Sair da Aplicação >>>>>>>>>>>>>>>> ", "S");
         List<Opcao> linhas = Arrays.asList(op1, op2, op3, op4);
         Menu menuPrincipal = new Menu(linhas, "   Menu Principal");
