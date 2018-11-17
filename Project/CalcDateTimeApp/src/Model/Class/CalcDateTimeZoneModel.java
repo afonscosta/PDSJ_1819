@@ -31,14 +31,27 @@ public class CalcDateTimeZoneModel implements InterfCalcDateTimeZoneModel {
     }
 
     @Override
-    public void convertZoneDateTimeToZone(String zoneIdtxt) {
-        System.out.println("Before " + zdt);
+    public void convertZoneDateTimeToZone(String zoneIdTxt) {
         try {
-            ZoneId chosenZoneId = ZoneId.of(zoneIdtxt);
-            LocalDateTime currentZoneTime = zdt.toLocalDateTime();
+            ZoneId chosenZoneId = ZoneId.of(zoneIdTxt);
+
             zdt = zdt.withZoneSameInstant(chosenZoneId);
         } catch (ZoneRulesException e) {
+            // Zona inexistente? Ignorar..
         }
-        System.out.println("After " + zdt);
+    }
+
+    @Override
+    public void changeZoneDateTimeToCurrentDateInZone(String zoneIdTxt) {
+        try {
+            ZoneId chosenZoneId = ZoneId.of(zoneIdTxt);
+
+            ZonedDateTime nowInChosenZone = ZonedDateTime.now().withZoneSameInstant(chosenZoneId);
+
+            zdt = nowInChosenZone;
+        } catch (ZoneRulesException e) {
+            // Zona inexistente? Ignorar..
+        }
+
     }
 }

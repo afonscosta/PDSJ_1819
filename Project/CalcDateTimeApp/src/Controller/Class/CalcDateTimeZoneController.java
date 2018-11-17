@@ -58,13 +58,28 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
             menu.show();
             opcao = Input.lerString().toUpperCase();
             switch(opcao) {
-                case "C": flowConvertZone(); break;
                 case "D": flowShiftZoneDateTime(); break;
+                case "A": flowShowCurrentTimeInZone(); break;
+                case "C": flowConvertZone(); break;
                 case "S": break;
                 default: out.println("Opcao Invalida!"); break;
             }
 
         } while(!opcao.equals("S"));
+    }
+
+    //------------------------
+    // FlowShowCurrentTimeInZone
+    //------------------------
+    // Saber que data atual é numa certa região
+    private void flowShowCurrentTimeInZone() {
+        flowShowAllAvailableTimezones();
+        out.print("Zona a escolher(S para Sair): ");
+        String answerZone = Input.lerString();
+
+        if (!answerZone.equals(("S"))) {
+            model.changeZoneDateTimeToCurrentDateInZone(answerZone);
+        }
     }
 
     private void flowShiftZoneDateTime() {

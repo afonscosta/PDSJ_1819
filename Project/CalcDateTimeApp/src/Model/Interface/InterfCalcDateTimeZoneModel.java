@@ -13,4 +13,6 @@ public interface InterfCalcDateTimeZoneModel {
     void shiftDateTimeZone(int n, ChronoUnit cu, EnumDateTimeShiftMode mode);
 
     void convertZoneDateTimeToZone(String zoneId);
+
+    void changeZoneDateTimeToCurrentDateInZone(String zoneId);
 }
