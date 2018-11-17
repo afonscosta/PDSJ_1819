@@ -25,12 +25,23 @@ import View.Interface.InterfCalcDateTimeZoneView;
 
 public final class CalcDateTimeApp {
 
+    /*
+    TODO Global:
+
+    ClearConsole cross-platform
+
+    TODO Zone:
+
+    Validar input incorreto para Sair de paginação
+    Set data
+     */
+
     public static void main(String[] args) {
 
         //--------------------------------
         InterfCalcDateTimeLocalModel modelLocal = new CalcDateTimeLocalModel();
         InterfCalcDateTimeZoneModel modelZone = new CalcDateTimeZoneModel();
-        InterfCalcDateTimeScheduleModel modelSchedule = new CalcDateTimeScheduleModel();
+        InterfCalcDateTimeScheduleModel modelSchedule = CalcDateTimeScheduleModel.of();
         InterfCalcDateTimeModel model = new CalcDateTimeModel(modelLocal, modelZone, modelSchedule);
 
         //--------------------------------

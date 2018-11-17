@@ -28,8 +28,8 @@ public class Menu {
     }
 
     public void show() {
-        String tag = null;
-        String txt = null;
+        String tag;
+        String txt;
         clearConsole();
         int max = biggestString();
         buildHeader();
@@ -37,7 +37,9 @@ public class Menu {
         for (Opcao o : linhas) {
             tag = o.getTag();
             txt = o.getTexto();
-            System.out.println("| " + txt + " " + repeatStringN(".", max-2-txt.length()-tag.length())+ " " + tag + " |");
+            System.out.println("| " + txt + " " +
+                               repeatStringN(".", max-2-txt.length()-tag.length()) +
+                               " " + tag + " |");
         }
         System.out.println("+" + repeatStringN("=", max+2) + "+");
         System.out.print("Insira a sua opçao: ");
@@ -65,11 +67,17 @@ public class Menu {
 
     private int biggestString() {
         int max = 0;
+        int lenTxt = 0;
+        int lenTag = 0;
         if (titulo.length() > max) max = titulo.length();
         for (String str : desc)
             if (str.length() > max) max = str.length();
-        for (Opcao op : linhas)
-            if (op.toString().length() > max) max = op.toString().length()+5;
+        for (Opcao op : linhas) {
+            lenTxt = op.getTexto().length();
+            lenTag = op.getTag().length();
+            if (lenTxt + lenTag + 3 > max)
+                max = lenTag + lenTxt + 3 + 6;
+        }
         return max;
     }
 

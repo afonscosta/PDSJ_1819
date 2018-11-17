@@ -6,7 +6,10 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import static java.lang.Math.abs;
 import static java.time.DayOfWeek.*;
@@ -61,13 +64,15 @@ public class BusinessUtils {
      * Formato de saída: dd/mm/aaaa  hh:mm:ss [zona]
      */
     public static String zoneDateTimeToString(ZonedDateTime zdt) {
-        String dt = zdt.getDayOfMonth() + "/" +
-                    zdt.getMonth().getValue() + "/" +
-                    zdt.getYear() + " " +
-                    zdt.getHour() + ":" +
-                    zdt.getMinute() + ":" +
-                    zdt.getSecond() + ":" +
-                    zdt.getNano() +
+        LocalDateTime ldt = zdt.toLocalDateTime();
+
+        String dt = ldt.getDayOfMonth() + "/" +
+                    ldt.getMonth().getValue() + "/" +
+                    ldt.getYear() + " " +
+                    ldt.getHour() + ":" +
+                    ldt.getMinute() + ":" +
+                    ldt.getSecond() + ":" +
+                    ldt.getNano() +
                     " [" + zdt.getZone() + "]";
         return dt;
     }
@@ -360,6 +365,42 @@ public class BusinessUtils {
         return ldt;
     }
 
+    // Retornar todos os zoneIds disponiveis, X em cada página
+    public static List<List<String>> getAvailableTimeZoneIdsByPage(int zoneIdsPerPage) {
+        List<List<String>> ret = new ArrayList<>();
+        List<String> allZoneIds = new ArrayList<>(ZoneId.getAvailableZoneIds());
+        allZoneIds.sort(Comparator.naturalOrder());
+        int zoneIdIndex = 0;
+        int zoneIdPerPageCounter = 0;
+
+
+        while (zoneIdIndex < allZoneIds.size()) {
+
+            List<String> zoneIdPage = new ArrayList<>();
+            zoneIdPerPageCounter = 0;
+
+            while ((zoneIdPerPageCounter < zoneIdsPerPage) && (zoneIdIndex < allZoneIds.size())) {
+                zoneIdPage.add(allZoneIds.get(zoneIdIndex++));
+                zoneIdPerPageCounter++;
+            }
+
+            ret.add(zoneIdPage);
+
+        }
+
+
+        return ret;
+    }
+
+
+    /**
+     * TODO: VERIFICAR SE É CORRETO USAR CLEARCONSOLE COMO UM MÉTODO ESTÁTICO
+     */
+    public static void clearConsole() {
+        //Só deve funcionar para linux
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
 
     /*
      * StringBuilder, int -> StringBuilder

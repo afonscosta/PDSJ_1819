@@ -1,10 +1,23 @@
 package Controller.Class;
 
 import Controller.Interface.InterfCalcDateTimeScheduleController;
+import Model.Class.Slot;
 import Model.Interface.InterfCalcDateTimeModel;
 import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeScheduleView;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
+import java.util.Arrays;
+
+import static Utilities.BusinessUtils.*;
+import static Utilities.BusinessUtils.validateMinSec;
+import static Utilities.BusinessUtils.validatePosNumber;
+import static java.lang.System.out;
 
 public class CalcDateTimeScheduleController implements InterfCalcDateTimeScheduleController {
 
@@ -44,9 +57,131 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         while(!opcao.equals("S"));
     }
 
-    // Adicionar um slot de trabalho
+    //Escolha da data a inserir
     private void flowAddSlot(){
-        System.out.println("Add slot");
+        //isto vai transitar para o menu depois
+        Menu menu = viewScheduleTxt.getMenu(3);
+        String opcao;
+        do {
+            Temporal tempLocal = model.getDateTimeLocal();
+            Temporal tempZone = model.getDateTimeZone();
+            String ldt = localDateTimeToString(tempLocal);
+            String zdt = zoneDateTimeToString((ZonedDateTime)tempZone);
+            menu.addDescToTitle(Arrays.asList("Data calc. local: " + ldt,
+                                              "Data calc. zona: " + zdt));
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "L" : addSlot(tempLocal); break;
+                case "Z" : addSlot(tempZone); break;
+                case "M" : addSlot(null); break;
+                case "S": break;
+                default: System.out.println("Opcão Inválida !"); break;
+            }
+        }
+        //Come back to init menu of Agenda
+        while(!(opcao.equals("S")| opcao.equals("L") | opcao.equals("Z") | opcao.equals("M")));
+    }
+    private void addSlot(Temporal date){
+        if(date==null){
+            System.out.println("->Introduza a data da nova reuniao:");
+            date = getLocalDateTimeFromInput();
+        }
+        System.out.println("->Duracao da nova reuniao:");
+        System.out.println("Horas irá demorar:");
+        int horas = Input.lerInt();
+        System.out.println("Minutos irá demorar:");
+        int minutos = Input.lerInt();
+        Duration duration = Duration.of(horas, ChronoUnit.HOURS);
+        duration = duration.plus(minutos,ChronoUnit.MINUTES);
+
+        System.out.println("->Introduza o local da nova reuniao:");
+        String local = Input.lerString();
+
+        System.out.println("->Introduza uma descrição da nova reuniao:");
+        String description= Input.lerString();
+        Slot newSlot = new Slot(date,duration,local,description);
+        boolean res =model.addSlot(newSlot);
+        if(res == true){
+            System.out.println("Reuniao adicionada com sucesso!");
+        }
+        else
+            System.out.println("Já existe uma reunião agendada ou a decorrer nesse data");
+    }
+
+    // Pede ao utilizador uma data.
+    // Se não disser nada fica a que se encontra no modelLocal.
+    // Devolve null caso dê uma exceção.
+    private LocalDateTime getLocalDateTimeFromInput() {
+        LocalDateTime ldt = (LocalDateTime) model.getDateTimeLocal();
+        Integer year = null;
+        Integer month = null;
+        Integer day = null;
+        Integer hour = null;
+        Integer minute = null;
+        Integer second = null;
+        Integer nano = null;
+        String str = null;
+
+        while (year == null) {
+            out.print("Ano (default: " + ldt.getYear() + "): ");
+            str = Input.lerString();
+            year = validatePosNumber(str, ldt.getYear());
+            if (year == null)
+                out.println("[!] Ano invalido.");
+        }
+
+        while (month == null) {
+            out.print("Mês (default: " + ldt.getMonthValue() + "): ");
+            str = Input.lerString();
+            month = validateMonth(str, ldt.getMonthValue());
+            if (month == null)
+                out.println("[!] Mes invalido.");
+        }
+
+        while (day == null) {
+            out.print("Dia (default: " + ldt.getDayOfMonth() + "): ");
+            str = Input.lerString();
+            day = validateDay(str, ldt.getDayOfMonth(), year, month);
+            if (day == null)
+                out.println("[!] Dia invalido.");
+        }
+
+        while (hour == null) {
+            out.print("Hora (default: " + ldt.getHour() + "): ");
+            str = Input.lerString();
+            hour = validateHour(str, ldt.getHour());
+            if (hour == null)
+                out.println("[!] Hora invalida.");
+        }
+
+        while (minute == null) {
+            out.print("Minutos (default: " + ldt.getMinute() + "): ");
+            str = Input.lerString();
+            minute = validateMinSec(str, ldt.getMinute());
+            if (minute == null)
+                out.println("[!] Minutos invalidos.");
+        }
+
+        while (second == null) {
+            out.print("Segundos (default: " + ldt.getSecond() + "): ");
+            str = Input.lerString();
+            second = validateMinSec(str, ldt.getSecond());
+            if (second == null)
+                out.println("[!] Segundos invalidos.");
+        }
+
+        while (nano == null) {
+            out.print("Nanosegundos (default: " + ldt.getNano() + "): ");
+            str = Input.lerString();
+            nano = validatePosNumber(str, ldt.getNano());
+            if (nano == null)
+                out.println("[!] Nanosegundos invalidos.");
+        }
+
+        LocalDateTime newLDT = LocalDateTime.of(year, month, day, hour, minute, second, nano);
+        return newLDT;
     }
 
     // Remover um slot de trabalho
@@ -83,7 +218,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         while(!opcao.equals("S"));
     }
 
-    private void flowResultsBusySlots(String op ){
+    private void flowResultsBusySlots(String op){
         //chamada ao metodo que irá devolver as slots pedidas
         //apresentar as slots pedidas
         Menu menu = viewScheduleTxt.getMenu(2);

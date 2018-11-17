@@ -39,6 +39,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             opcao = opcao.toUpperCase();
             switch(opcao) {
                 case "L" : controlLocal.flowLocal(); break;
+                case "Z" : controlZone.flowZone(); break;
                 case "A" : controlSchedule.flowSchedule(); break;
                 case "S": break;
                 default: System.out.println("Opcão Inválida !"); break;
