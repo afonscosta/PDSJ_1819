@@ -17,7 +17,7 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
 
     private Menus initView() {
         Menus menusLocalTxt = new Menus();
-        Opcao op1, op2, op3, op4, op5;
+        Opcao op1, op2, op3, op4, op5, op6;
 
         //------------------------
         // CalcDateTimeLocal
@@ -26,8 +26,9 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
         op2 = new Opcao("Alterar data (dias uteis)............. ", "AU");
         op3 = new Opcao("Diferenca entre datas ................ ", "D");
         op4 = new Opcao("Diferenca entre datas (dias uteis) ... ", "DU");
-        op5 = new Opcao("Voltar ao Menu Principal >>>>>>>>>>>>> ", "S");
-        List<Opcao> linhas = Arrays.asList(op1, op2, op3, op4, op5);
+        op5 = new Opcao("Obter um mes, semana ou dia .......... ", "O");
+        op6 = new Opcao("Voltar ao Menu Principal >>>>>>>>>>>>> ", "S");
+        List<Opcao> linhas = Arrays.asList(op1, op2, op3, op4, op5, op6);
         Menu menuCalcDateTime = new Menu(linhas, "   Data: ");
         menusLocalTxt.addMenu(0, menuCalcDateTime);
 
