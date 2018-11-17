@@ -58,8 +58,9 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "A" : flowShiftDateTime(); break;
-                case "AU" : flowShiftWorkDaysDateTime(); break;
+                case "A" : setDateTimeLocal(); break;
+                case "M" : flowShiftDateTime(); break;
+                case "MU" : flowShiftWorkDaysDateTime(); break;
                 case "D" : flowDiffDateTime(); break;
                 case "DU" : flowDiffWorkDaysDateTime(); break;
                 case "O" : getDateTimeLocal(); break;
@@ -70,7 +71,13 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         while(!opcao.equals("S"));
     }
 
-
+    //------------------------
+    // FlowSetDateTime
+    //------------------------
+    private void setDateTimeLocal() {
+        LocalDateTime ldt = getLocalDateTimeFromInput();
+        model.fromDateTimeLocal(ldt);
+    }
 
     //------------------------
     // FlowShiftDateTime
@@ -149,7 +156,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "DIA" : shiftWorkDays(); break;
+                case "M" : shiftWorkDays(); break;
                 case "S": break;
                 default: out.println("Opcão Inválida !"); break;
             }
@@ -289,7 +296,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                         out.println("[!] Numero da semana invalido.");
                 }
                 if (nweeks != -1) {
-                    ldt = nextMondayN(ldt, nweeks-1);
+                    ldt = (LocalDateTime) nextMondayN(ldt, nweeks-1);
                     while (ndays == null) {
                         out.print("Dia: ");
                         str = Input.lerString();
@@ -299,7 +306,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                     }
                     if (ndays != -1) {
                         //Imprime a data do dia em questão
-                        ldt = nextDayN(ldt, ndays-1); // -1 porque o atual conta
+                        ldt = (LocalDateTime) nextDayN(ldt, ndays-1); // -1 porque o atual conta
                         model.fromDateTimeLocal(ldt);
                         out.println(localDateToString(ldt));
                     }
@@ -344,7 +351,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         LocalDateTime start = LocalDateTime.from(ldt);
         while(start.getMonthValue() == ldt.getMonthValue()) {
             out.println(organizeDays(ldt));
-            ldt = nextMondayN(ldt, 1);
+            ldt = (LocalDateTime) nextMondayN(ldt, 1);
         }
         out.println();
     }

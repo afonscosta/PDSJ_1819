@@ -7,9 +7,9 @@ import static Utilities.BusinessUtils.repeatStringN;
 
 public class Menu {
 
-    List<Opcao> linhas;
-    String titulo;
-    List<String> desc;
+    private List<Opcao> linhas;
+    private String titulo;
+    private List<String> desc;
 
     public Menu(List<Opcao> linhas, String titulo) {
         this.linhas = linhas;
@@ -21,6 +21,10 @@ public class Menu {
 
     }
 
+    /*
+     * ESTÁ REPETIDO NO UTILS. DEPOIS DE VER SE PODE FICAR LÁ
+     * TEM QUE SE TIRAR DAQUI
+     */
     private void clearConsole() {
         //Só deve funcionar para linux
         System.out.print("\033[H\033[2J");
@@ -76,12 +80,8 @@ public class Menu {
             lenTxt = op.getTexto().length();
             lenTag = op.getTag().length();
             if (lenTxt + lenTag + 3 > max)
-                max = lenTag + lenTxt + 3 + 6;
+                max = lenTag + lenTxt + 5;
         }
         return max;
-    }
-
-    public void addDateTimeToTitle(String dt) {
-        this.titulo = this.titulo.substring(0, 9) + dt;
     }
 }

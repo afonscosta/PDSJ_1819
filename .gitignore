@@ -1,5 +1,12 @@
 tags
 Project/PSJ/.editorconfig
 Project/.idea/
+Project/.vscode/
+Project/CalcDateTimeApp/.idea/
 Project/CalcDateTimeApp/out/
 Project/CalcDateTimeApp/META-INF/
+Project/CalcDateTimeApp/target/
+Project/CalcDateTimeApp/.editorconfig
+Project/CalcDateTimeApp/.gitattributes
+Project/CalcDateTimeApp/.gitignore
+Project/CalcDateTimeApp/.travis.yml

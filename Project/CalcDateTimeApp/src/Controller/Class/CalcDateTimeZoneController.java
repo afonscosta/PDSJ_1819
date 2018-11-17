@@ -10,7 +10,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static Utilities.BusinessUtils.*;
 import static Utilities.EnumDateTimeShiftMode.ADD;
@@ -84,7 +83,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         String opcao;
         do {
             ld = buildZoneDateTimeTitle();
-            menu.addDateTimeToTitle(ld);
+            menu.addDescToTitle(Arrays.asList("Data inicial: " + ld));
             menu.show();
             opcao = Input.lerString().toUpperCase();
             switch(opcao) {
