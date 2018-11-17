@@ -58,8 +58,9 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "A" : flowShiftDateTime(); break;
-                case "AU" : flowShiftWorkDaysDateTime(); break;
+                case "A" : setDateTimeLocal(); break;
+                case "M" : flowShiftDateTime(); break;
+                case "MU" : flowShiftWorkDaysDateTime(); break;
                 case "D" : flowDiffDateTime(); break;
                 case "DU" : flowDiffWorkDaysDateTime(); break;
                 case "O" : getDateTimeLocal(); break;
@@ -70,7 +71,13 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         while(!opcao.equals("S"));
     }
 
-
+    //------------------------
+    // FlowSetDateTime
+    //------------------------
+    private void setDateTimeLocal() {
+        LocalDateTime ldt = getLocalDateTimeFromInput();
+        model.fromDateTimeLocal(ldt);
+    }
 
     //------------------------
     // FlowShiftDateTime
@@ -149,7 +156,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "DIA" : shiftWorkDays(); break;
+                case "M" : shiftWorkDays(); break;
                 case "S": break;
                 default: out.println("Opcão Inválida !"); break;
             }

@@ -10,7 +10,8 @@
    - [X] Diferença dias úteis em data/tempo.
    - [X] Dado um # mês, # semana e # dia, devolver a data/tempo.
    - [X] Opção ANS: se não for dito nada usa a data calculada anteriormente.
-   - [ ] Quando for para inserir datas, fazer clean da interface.
+   - [X] Alterar data no registo.
+   - [ ] Explicar a funcionalidade 'obter data' ao user.
 ** Calculadora de datas e tempos com fusos:
    - Converter data/tempo entre fusos diferentes.
    - Somar/subtrair/diferença data/tempo com fusos.

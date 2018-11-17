@@ -17,28 +17,29 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
 
     private Menus initView() {
         Menus menusLocalTxt = new Menus();
-        Opcao op1, op2, op3, op4, op5, op6;
+        Opcao op1, op2, op3, op4, op5, op6, op7;
 
         //------------------------
         // CalcDateTimeLocal
         //------------------------
         op1 = new Opcao("Alterar data", "A");
-        op2 = new Opcao("Alterar data (dias uteis)", "AU");
-        op3 = new Opcao("Diferenca entre datas", "D");
-        op4 = new Opcao("Diferenca entre datas (dias uteis)", "DU");
-        op5 = new Opcao("Obter um mes, semana ou dia", "O");
-        op6 = new Opcao("Voltar ao Menu Principal", "S");
-        List<Opcao> linhas = Arrays.asList(op1, op2, op3, op4, op5, op6);
+        op2 = new Opcao("Manipular data", "M");
+        op3 = new Opcao("Manipular data (dias uteis)", "MU");
+        op4 = new Opcao("Diferenca entre datas", "D");
+        op5 = new Opcao("Diferenca entre datas (dias uteis)", "DU");
+        op6 = new Opcao("Obter um mes, semana ou dia", "O");
+        op7 = new Opcao("Voltar ao Menu Principal", "S");
+        List<Opcao> linhas = Arrays.asList(op1, op2, op3, op4, op5, op6, op7);
         Menu menuCalcDateTime = new Menu(linhas, "Menu Calculadora Local");
         menusLocalTxt.addMenu(0, menuCalcDateTime);
 
         //------------------------
         // Menu Shift DateTime
         //------------------------
-        op1 = new Opcao("Deslocar dia", "Dia");
-        op2 = new Opcao("Deslocar semana", "Sem");
-        op3 = new Opcao("Deslocar mes", "Mes");
-        op4 = new Opcao("Deslocar ano", "Ano");
+        op1 = new Opcao("Manipular dia", "DIA");
+        op2 = new Opcao("Manipular semana", "SEM");
+        op3 = new Opcao("Manipular mes", "MES");
+        op4 = new Opcao("Manipular ano", "ANO");
         op5 = new Opcao("Voltar a Calc. Local", "S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5);
         Menu menuShiftDateTime = new Menu(linhas, "Alterar Data");
@@ -47,7 +48,7 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
         //------------------------
         // Menu Shift WorkDays DateTime
         //------------------------
-        op1 = new Opcao("Deslocar dia", "Dia");
+        op1 = new Opcao("Manipular dia", "M");
         op2 = new Opcao("Voltar a Calc. Local", "S");
         linhas = Arrays.asList(op1, op2);
         Menu menuShiftWorkDaysDateTime = new Menu(linhas, "Alterar Data - Dias Uteis");
