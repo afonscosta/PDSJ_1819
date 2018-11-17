@@ -29,7 +29,7 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
         op5 = new Opcao("Obter um mes, semana ou dia .......... ", "O");
         op6 = new Opcao("Voltar ao Menu Principal >>>>>>>>>>>>> ", "S");
         List<Opcao> linhas = Arrays.asList(op1, op2, op3, op4, op5, op6);
-        Menu menuCalcDateTime = new Menu(linhas, "   Data: ");
+        Menu menuCalcDateTime = new Menu(linhas, "Menu Calculadora Local");
         menusLocalTxt.addMenu(0, menuCalcDateTime);
 
         //------------------------
@@ -41,7 +41,7 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
         op4 = new Opcao("Deslocar ano ........... ", "Ano");
         op5 = new Opcao("Voltar a Calc. Local >>> ", "S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5);
-        Menu menuShiftDateTime = new Menu(linhas, "   Data: ");
+        Menu menuShiftDateTime = new Menu(linhas, "Alterar Data");
         menusLocalTxt.addMenu(1, menuShiftDateTime);
 
         //------------------------
@@ -50,7 +50,7 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
         op1 = new Opcao("Deslocar dia ........... ", "Dia");
         op2 = new Opcao("Voltar a Calc. Local >>> ", "S");
         linhas = Arrays.asList(op1, op2);
-        Menu menuShiftWorkDaysDateTime = new Menu(linhas, "   Data: ");
+        Menu menuShiftWorkDaysDateTime = new Menu(linhas, "Alterar Data - Dias Uteis");
         menusLocalTxt.addMenu(2, menuShiftWorkDaysDateTime);
 
         //------------------------
@@ -60,7 +60,7 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
         op2 = new Opcao("Inserir data de fim ...... ", "F");
         op3 = new Opcao("Voltar a Calc. Local >>>>> ", "S");
         linhas = Arrays.asList(op1, op2, op3);
-        Menu menuDiffDateTime = new Menu(linhas, "   Data de inicio: ");
+        Menu menuDiffDateTime = new Menu(linhas, "Diferenca entre Datas");
         menusLocalTxt.addMenu(3, menuDiffDateTime);
 
         return menusLocalTxt;
