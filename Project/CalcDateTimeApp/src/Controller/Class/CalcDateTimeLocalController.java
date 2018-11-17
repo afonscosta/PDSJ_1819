@@ -109,7 +109,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     }
 
     private void shiftWeeks() {
-        out.print("Número de semanas: ");
+        out.print("(+|-) número de semanas: ");
         int n = Input.lerInt();
         if (n >= 0)
             model.shiftDateTimeLocal(abs(n), WEEKS, ADD);
@@ -118,7 +118,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     }
 
     private void shiftMonths() {
-        out.print("Número de meses: ");
+        out.print("(+|-) número de meses: ");
         int n = Input.lerInt();
         if (n >= 0)
             model.shiftDateTimeLocal(abs(n), MONTHS, ADD);
@@ -127,7 +127,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     }
 
     private void shiftYears() {
-        out.print("Número de anos: ");
+        out.print("(+|-) número de anos: ");
         int n = Input.lerInt();
         if (n >= 0)
             model.shiftDateTimeLocal(abs(n), YEARS, ADD);
