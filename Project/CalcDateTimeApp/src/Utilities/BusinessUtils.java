@@ -428,7 +428,7 @@ public class BusinessUtils {
         StringBuilder res = new StringBuilder();
         int dow = ldt.getDayOfWeek().getValue();
         int dom = ldt.getDayOfMonth();
-        res.append(repeateStringN(" ", 3*(dow-1)));
+        res.append(repeatStringN(" ", 3*(dow-1)));
         res = normDay(res, dom);
         res.append(" ");
         dow++; dom++;
@@ -447,7 +447,7 @@ public class BusinessUtils {
      * String, int -> String
      * Repete str n vezes.
      */
-    public static String repeateStringN(String str, int n) {
+    public static String repeatStringN(String str, int n) {
         return String.join("", Collections.nCopies(n, str));
     }
 

@@ -22,10 +22,10 @@ public class CalcDateTimeZoneView implements InterfCalcDateTimeZoneView {
         //------------------------
         // CaldDateTimeZone
         //------------------------
-        op1 = new Opcao("Converter para fuso ....... ", "C");
-        op2 = new Opcao("Sair da aplicacao >>>>>>>>> ", "S");
+        op1 = new Opcao("Converter para fuso", "C");
+        op2 = new Opcao("Sair da aplicacao", "S");
         List<Opcao> linhas = Arrays.asList(op1,op2);
-        Menu menuCalcDateTimeZone = new Menu(linhas,"   Data: ");
+        Menu menuCalcDateTimeZone = new Menu(linhas,"Menu Calculadora Zona");
         menusZoneTxt.addMenu(0,menuCalcDateTimeZone);
 
         return menusZoneTxt;

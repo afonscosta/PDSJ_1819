@@ -9,6 +9,14 @@ public class Opcao {
         this.tag = tag;
     }
 
+    public String getTag() {
+        return tag;
+    }
+
+    public String getTexto() {
+        return texto;
+    }
+
     public String toString () {
         return texto + tag;
     }

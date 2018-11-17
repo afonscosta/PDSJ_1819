@@ -8,6 +8,7 @@ import View.Interface.InterfCalcDateTimeLocalView;
 
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
+import java.util.Arrays;
 
 import static Utilities.BusinessUtils.*;
 import static Utilities.EnumDateTimeShiftMode.ADD;
@@ -52,7 +53,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         do {
             ld = buildDateTimeTitle();
-            menu.addDateTimeToTitle(ld);
+            menu.addDescToTitle(Arrays.asList("Data: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -81,7 +82,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         do {
             ld = buildDateTimeTitle();
-            menu.addDateTimeToTitle(ld);
+            menu.addDescToTitle(Arrays.asList("Data: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -108,7 +109,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     }
 
     private void shiftWeeks() {
-        out.print("Número de semanas: ");
+        out.print("(+|-) número de semanas: ");
         int n = Input.lerInt();
         if (n >= 0)
             model.shiftDateTimeLocal(abs(n), WEEKS, ADD);
@@ -117,7 +118,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     }
 
     private void shiftMonths() {
-        out.print("Número de meses: ");
+        out.print("(+|-) número de meses: ");
         int n = Input.lerInt();
         if (n >= 0)
             model.shiftDateTimeLocal(abs(n), MONTHS, ADD);
@@ -126,7 +127,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     }
 
     private void shiftYears() {
-        out.print("Número de anos: ");
+        out.print("(+|-) número de anos: ");
         int n = Input.lerInt();
         if (n >= 0)
             model.shiftDateTimeLocal(abs(n), YEARS, ADD);
@@ -143,7 +144,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         do {
             ld = buildDateTimeTitle();
-            menu.addDateTimeToTitle(ld);
+            menu.addDescToTitle(Arrays.asList("Data: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -174,7 +175,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         do {
             ld = buildDateTimeTitle();
-            menu.addDateTimeToTitle(ld);
+            menu.addDescToTitle(Arrays.asList("Data inicial: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -218,7 +219,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         do {
             ld = buildDateTimeTitle();
-            menu.addDateTimeToTitle(ld);
+            menu.addDescToTitle(Arrays.asList("Data inicial: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -323,7 +324,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
      */
     private void printHeader(int month) {
         out.println();
-        String prefix = repeateStringN(" ", (20 - getMonth(month).length())/2);
+        String prefix = repeatStringN(" ", (20 - getMonth(month).length())/2);
         out.println(prefix + getMonth(month));
         out.println("se te qu qu se sa do");
     }

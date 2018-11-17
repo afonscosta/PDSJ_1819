@@ -11,6 +11,7 @@ import static Utilities.BusinessUtils.getAvailableTimeZoneIdsByPage;
 import static Utilities.BusinessUtils.clearConsole;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneController {
@@ -46,7 +47,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         String opcao;
         do {
             zld = buildZoneDateTimeTitle();
-            menu.addDateTimeToTitle(zld);
+            menu.addDescToTitle(Arrays.asList("Data: " + zld));
             menu.show();
             opcao = Input.lerString().toUpperCase();
             switch(opcao) {
