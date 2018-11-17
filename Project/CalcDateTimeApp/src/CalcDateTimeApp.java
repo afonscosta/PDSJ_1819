@@ -69,8 +69,8 @@ public final class CalcDateTimeApp {
         control.startFlow();
 
         //--------------------------------
-        System.out.println("Fim da Aplicação >> "
-            + java.time.LocalDateTime.now());
+        //System.out.println("Fim da Aplicação >> "
+        //    + java.time.LocalDateTime.now());
 
         System.exit(0);
     }
