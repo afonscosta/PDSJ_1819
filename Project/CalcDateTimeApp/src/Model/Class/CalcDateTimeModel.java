@@ -54,6 +54,11 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     }
 
     @Override
+    public String diffWorkDaysDateTimeLocal(LocalDateTime toDateTime) {
+        return modelLocal.diffWorkDaysDateTimeLocal(toDateTime);
+    }
+
+    @Override
     public void fromDateTimeLocal(LocalDateTime ldt) {
         modelLocal.fromDateTimeLocal(ldt);
     }
@@ -61,5 +66,9 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     @Override
     public void shiftDateTimeZone(int n, ChronoUnit cu, EnumDateTimeShiftMode mode) {
         modelZone.shiftDateTimeZone(n, cu, mode);
+    }
+
+    public boolean addSlot(Slot newSlot){
+        return modelSchedule.addSlot(newSlot);
     }
 }
