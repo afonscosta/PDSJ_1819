@@ -9,12 +9,7 @@ import View.Interface.InterfCalcDateTimeLocalView;
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 
-import static Utilities.BusinessUtils.localDateTimeToString;
-import static Utilities.BusinessUtils.validatePosNumber;
-import static Utilities.BusinessUtils.validateMonth;
-import static Utilities.BusinessUtils.validateDay;
-import static Utilities.BusinessUtils.validateHour;
-import static Utilities.BusinessUtils.validateMinSec;
+import static Utilities.BusinessUtils.*;
 import static Utilities.EnumDateTimeShiftMode.ADD;
 import static Utilities.EnumDateTimeShiftMode.SUB;
 import static java.lang.Math.abs;
@@ -66,12 +61,14 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                 case "AU" : flowShiftWorkDaysDateTime(); break;
                 case "D" : flowDiffDateTime(); break;
                 case "DU" : flowDiffWorkDaysDateTime(); break;
+                case "O" : getDateTimeLocal(); break;
                 case "S": break;
                 default: out.println("Opcão Inválida !"); break;
             }
         }
         while(!opcao.equals("S"));
     }
+
 
 
     //------------------------
@@ -249,6 +246,123 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
 
 
     //------------------------
+    // FlowGetDateTime
+    //------------------------
+    private void getDateTimeLocal() {
+        Integer year = null;
+        Integer month = null;
+        Integer nweeks = null;
+        Integer ndays = null;
+        String str;
+
+        LocalDateTime ldt = LocalDateTime.now();
+        ldt = ldt.withDayOfMonth(1);
+        ldt = ldt.withHour(0);
+        ldt = ldt.withMinute(0);
+        ldt = ldt.withSecond(0);
+        ldt = ldt.withNano(0);
+
+        while (year == null) {
+            out.print("Ano: ");
+            str = Input.lerString();
+            year = validatePosNumber(str, null);
+            if (year == null)
+                out.println("[!] Ano invalido.");
+        }
+        if (year != null) {
+            ldt = ldt.withYear(year);
+            while (month == null) {
+                out.print("Mes: ");
+                str = Input.lerString();
+                month = validateMonth(str, null);
+                if (month == null)
+                    out.println("[!] Mes invalido.");
+            }
+            if (month != null) {
+                ldt = ldt.withMonth(month);
+                while (nweeks == null) {
+                    out.print("Semana: ");
+                    str = Input.lerString();
+                    nweeks = validateNumWeek(str, -1, year, month);
+                    if (nweeks == null)
+                        out.println("[!] Numero da semana invalido.");
+                }
+                if (nweeks != -1) {
+                    ldt = nextMondayN(ldt, nweeks-1);
+                    while (ndays == null) {
+                        out.print("Dia: ");
+                        str = Input.lerString();
+                        ndays = validateNumDay(str, -1, year, month, nweeks);
+                        if (ndays == null)
+                            out.println("[!] Numero do dia invalido.");
+                    }
+                    if (ndays != -1) {
+                        //Imprime a data do dia em questão
+                        ldt = nextDayN(ldt, ndays-1); // -1 porque o atual conta
+                        model.fromDateTimeLocal(ldt);
+                        out.println(localDateToString(ldt));
+                    }
+                    else {
+                        // Imprime semana inteira
+                        printWeek(ldt);
+                    }
+                } else {
+                    // Imprime o mês inteiro
+                    printMonth(ldt);
+                }
+            }
+        }
+        out.print("Prima Enter para continuar.");
+        String dummy = Input.lerString();
+    }
+
+    /*
+     * Faz print do header de um dado mês
+     *             outubro
+     *      se te qu qu se sá do
+     */
+    private void printHeader(int month) {
+        out.println();
+        String prefix = repeateStringN(" ", (20 - getMonth(month).length())/2);
+        out.println(prefix + getMonth(month));
+        out.println("se te qu qu se sa do");
+    }
+
+    /*
+     * Faz print do mês no formato:
+     *             outubro
+     *      se te qu qu se sá do
+     *       1  2  3  4  5  6  7
+     *       8  9 10 11 12 13 14
+     *      15 16 17 18 19 20 21
+     *      22 23 24 25 26 27 28
+     *      29 30 31
+     */
+    private void printMonth(LocalDateTime ldt) {
+        printHeader(ldt.getMonthValue());
+        LocalDateTime start = LocalDateTime.from(ldt);
+        while(start.getMonthValue() == ldt.getMonthValue()) {
+            out.println(organizeDays(ldt));
+            ldt = nextMondayN(ldt, 1);
+        }
+        out.println();
+    }
+
+    /*
+     * Faz print da semana no formato:
+     *            outubro
+     *     se te qu qu se sá do
+     *      1  2  3  4  5  6  7
+     */
+    private void printWeek(LocalDateTime ldt) {
+        printHeader(ldt.getMonthValue());
+        out.println(organizeDays(ldt));
+        out.println();
+    }
+
+
+
+    //------------------------
     // Métodos adicionais
     //------------------------
 
@@ -275,7 +389,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         Integer minute = null;
         Integer second = null;
         Integer nano = null;
-        String str = null;
+        String str;
 
         while (year == null) {
             out.print("Ano (default: " + ldt.getYear() + "): ");
@@ -286,7 +400,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         }
 
         while (month == null) {
-            out.print("Mês (default: " + ldt.getMonthValue() + "): ");
+            out.print("Mes (default: " + ldt.getMonthValue() + "): ");
             str = Input.lerString();
             month = validateMonth(str, ldt.getMonthValue());
             if (month == null)
