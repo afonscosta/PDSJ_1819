@@ -30,7 +30,7 @@ public final class CalcDateTimeApp {
         //--------------------------------
         InterfCalcDateTimeLocalModel modelLocal = new CalcDateTimeLocalModel();
         InterfCalcDateTimeZoneModel modelZone = new CalcDateTimeZoneModel();
-        InterfCalcDateTimeScheduleModel modelSchedule = new CalcDateTimeScheduleModel();
+        InterfCalcDateTimeScheduleModel modelSchedule = CalcDateTimeScheduleModel.of();
         InterfCalcDateTimeModel model = new CalcDateTimeModel(modelLocal, modelZone, modelSchedule);
 
         //--------------------------------

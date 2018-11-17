@@ -63,4 +63,8 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     public void shiftDateTimeZone(int n, ChronoUnit cu, EnumDateTimeShiftMode mode) {
         modelZone.shiftDateTimeZone(n, cu, mode);
     }
+
+    public boolean addSlot(Slot newSlot){
+        return modelSchedule.addSlot(newSlot);
+    }
 }
