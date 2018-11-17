@@ -35,12 +35,12 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 
     @Override
     public void shiftWorkDaysDateTimeLocal(int n, EnumDateTimeShiftMode mode) {
-        ldt = shiftWorkDaysLocal(ldt, n, mode);
+        ldt = (LocalDateTime) shiftWorkDays(ldt, n, mode);
     }
 
     @Override
     public String diffDateTimeLocal(LocalDateTime toDateTime) {
-        return diffBetweenLocalDateTime(ldt, toDateTime);
+        return diffBetweenDateTime(ldt, toDateTime);
     }
 
     @Override
