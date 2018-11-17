@@ -12,7 +12,7 @@ import static Utilities.BusinessUtils.*;
 
 public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 
-    LocalDateTime ldt;
+    private LocalDateTime ldt;
 
     public CalcDateTimeLocalModel() {
         this.ldt = LocalDateTime.now();

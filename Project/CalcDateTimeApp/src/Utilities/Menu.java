@@ -7,9 +7,9 @@ import static Utilities.BusinessUtils.repeatStringN;
 
 public class Menu {
 
-    List<Opcao> linhas;
-    String titulo;
-    List<String> desc;
+    private List<Opcao> linhas;
+    private String titulo;
+    private List<String> desc;
 
     public Menu(List<Opcao> linhas, String titulo) {
         this.linhas = linhas;

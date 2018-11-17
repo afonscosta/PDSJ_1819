@@ -12,9 +12,9 @@ import java.time.temporal.Temporal;
 
 public class CalcDateTimeModel implements InterfCalcDateTimeModel {
 
-    InterfCalcDateTimeLocalModel modelLocal;
-    InterfCalcDateTimeZoneModel modelZone;
-    InterfCalcDateTimeScheduleModel modelSchedule;
+    private InterfCalcDateTimeLocalModel modelLocal;
+    private InterfCalcDateTimeZoneModel modelZone;
+    private InterfCalcDateTimeScheduleModel modelSchedule;
 
     public CalcDateTimeModel(InterfCalcDateTimeLocalModel modelLocal,
                              InterfCalcDateTimeZoneModel modelZone,
