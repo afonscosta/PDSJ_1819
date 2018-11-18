@@ -25,10 +25,10 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     }
 
 
-    public void saveState(String nomeFicheiro) throws FileNotFoundException, IOException {
+    public void saveState(String nomeFicheiro) throws IOException {
         FileOutputStream fos = new FileOutputStream(nomeFicheiro);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(this); //guarda-se todo o objecto de uma só vez
+        oos.writeObject(this);//guarda-se o objecto de uma só vez
         oos.close();
         fos.close();
     }

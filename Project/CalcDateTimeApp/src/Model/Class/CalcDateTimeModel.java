@@ -71,7 +71,7 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
         return modelSchedule.addSlot(newSlot);
     }
 
-    public void saveState(String nomeFicheiro) throws FileNotFoundException, IOException{
+    public void saveState(String nomeFicheiro) throws IOException{
         modelSchedule.saveState(nomeFicheiro);
     }
 }

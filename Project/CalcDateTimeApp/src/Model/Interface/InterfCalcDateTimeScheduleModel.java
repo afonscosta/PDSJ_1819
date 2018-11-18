@@ -7,11 +7,9 @@ public interface InterfCalcDateTimeScheduleModel {
 
     boolean addSlot(Slot newSlot);
 
-    public void saveState(String nomeFicheiro)throws FileNotFoundException, IOException;
+    void saveState(String nomeFicheiro)throws IOException;
 
-    public static InterfCalcDateTimeScheduleModel pushState(String nomeFicheiro) throws FileNotFoundException,
-        IOException,
-        ClassNotFoundException {
+    static InterfCalcDateTimeScheduleModel pushState(String nomeFicheiro) throws IOException, ClassNotFoundException {
         FileInputStream fis = new FileInputStream(nomeFicheiro);
         ObjectInputStream ois = new ObjectInputStream(fis);
         InterfCalcDateTimeScheduleModel scheduleModel = (InterfCalcDateTimeScheduleModel) ois.readObject();

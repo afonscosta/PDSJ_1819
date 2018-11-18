@@ -33,8 +33,6 @@ public final class CalcDateTimeApp {
         InterfCalcDateTimeLocalModel modelLocal = new CalcDateTimeLocalModel();
         InterfCalcDateTimeZoneModel modelZone = new CalcDateTimeZoneModel();
         try {
-            //InterfCalcDateTimeScheduleModel modelSchedule = CalcDateTimeScheduleModel.of();
-
             InterfCalcDateTimeScheduleModel modelSchedule = InterfCalcDateTimeScheduleModel.pushState("AgendaReunioes");
             InterfCalcDateTimeModel model = new CalcDateTimeModel(modelLocal, modelZone, modelSchedule);
 
@@ -66,9 +64,9 @@ public final class CalcDateTimeApp {
             e.printStackTrace();
             System.out.println("Problemas a trazer os dados para o tree set");
         }
+        //InterfCalcDateTimeScheduleModel modelSchedule = CalcDateTimeScheduleModel.of();
 
-
-            //--------------------------------
+        //--------------------------------
         System.out.println("Fim da Aplicação >> "
             + java.time.LocalDateTime.now());
 
