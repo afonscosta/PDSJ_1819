@@ -8,6 +8,7 @@ import View.Interface.InterfCalcDateTimeLocalView;
 
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
+import java.util.Arrays;
 
 import static Utilities.BusinessUtils.*;
 import static Utilities.EnumDateTimeShiftMode.ADD;
@@ -52,13 +53,14 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         do {
             ld = buildDateTimeTitle();
-            menu.addDateTimeToTitle(ld);
+            menu.addDescToTitle(Arrays.asList("Data: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "A" : flowShiftDateTime(); break;
-                case "AU" : flowShiftWorkDaysDateTime(); break;
+                case "A" : setDateTimeLocal(); break;
+                case "M" : flowShiftDateTime(); break;
+                case "MU" : flowShiftWorkDaysDateTime(); break;
                 case "D" : flowDiffDateTime(); break;
                 case "DU" : flowDiffWorkDaysDateTime(); break;
                 case "O" : getDateTimeLocal(); break;
@@ -69,7 +71,13 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         while(!opcao.equals("S"));
     }
 
-
+    //------------------------
+    // FlowSetDateTime
+    //------------------------
+    private void setDateTimeLocal() {
+        LocalDateTime ldt = getLocalDateTimeFromInput();
+        model.fromDateTimeLocal(ldt);
+    }
 
     //------------------------
     // FlowShiftDateTime
@@ -81,7 +89,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         do {
             ld = buildDateTimeTitle();
-            menu.addDateTimeToTitle(ld);
+            menu.addDescToTitle(Arrays.asList("Data: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -108,7 +116,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     }
 
     private void shiftWeeks() {
-        out.print("Número de semanas: ");
+        out.print("(+|-) número de semanas: ");
         int n = Input.lerInt();
         if (n >= 0)
             model.shiftDateTimeLocal(abs(n), WEEKS, ADD);
@@ -117,7 +125,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     }
 
     private void shiftMonths() {
-        out.print("Número de meses: ");
+        out.print("(+|-) número de meses: ");
         int n = Input.lerInt();
         if (n >= 0)
             model.shiftDateTimeLocal(abs(n), MONTHS, ADD);
@@ -126,7 +134,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     }
 
     private void shiftYears() {
-        out.print("Número de anos: ");
+        out.print("(+|-) número de anos: ");
         int n = Input.lerInt();
         if (n >= 0)
             model.shiftDateTimeLocal(abs(n), YEARS, ADD);
@@ -143,12 +151,12 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         do {
             ld = buildDateTimeTitle();
-            menu.addDateTimeToTitle(ld);
+            menu.addDescToTitle(Arrays.asList("Data: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "DIA" : shiftWorkDays(); break;
+                case "M" : shiftWorkDays(); break;
                 case "S": break;
                 default: out.println("Opcão Inválida !"); break;
             }
@@ -174,7 +182,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         do {
             ld = buildDateTimeTitle();
-            menu.addDateTimeToTitle(ld);
+            menu.addDescToTitle(Arrays.asList("Data inicial: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -218,7 +226,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         do {
             ld = buildDateTimeTitle();
-            menu.addDateTimeToTitle(ld);
+            menu.addDescToTitle(Arrays.asList("Data inicial: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -288,7 +296,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                         out.println("[!] Numero da semana invalido.");
                 }
                 if (nweeks != -1) {
-                    ldt = nextMondayN(ldt, nweeks-1);
+                    ldt = (LocalDateTime) nextMondayN(ldt, nweeks-1);
                     while (ndays == null) {
                         out.print("Dia: ");
                         str = Input.lerString();
@@ -298,7 +306,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                     }
                     if (ndays != -1) {
                         //Imprime a data do dia em questão
-                        ldt = nextDayN(ldt, ndays-1); // -1 porque o atual conta
+                        ldt = (LocalDateTime) nextDayN(ldt, ndays-1); // -1 porque o atual conta
                         model.fromDateTimeLocal(ldt);
                         out.println(localDateToString(ldt));
                     }
@@ -323,7 +331,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
      */
     private void printHeader(int month) {
         out.println();
-        String prefix = repeateStringN(" ", (20 - getMonth(month).length())/2);
+        String prefix = repeatStringN(" ", (20 - getMonth(month).length())/2);
         out.println(prefix + getMonth(month));
         out.println("se te qu qu se sa do");
     }
@@ -343,7 +351,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         LocalDateTime start = LocalDateTime.from(ldt);
         while(start.getMonthValue() == ldt.getMonthValue()) {
             out.println(organizeDays(ldt));
-            ldt = nextMondayN(ldt, 1);
+            ldt = (LocalDateTime) nextMondayN(ldt, 1);
         }
         out.println();
     }

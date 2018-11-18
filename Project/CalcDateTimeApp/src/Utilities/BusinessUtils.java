@@ -5,13 +5,16 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAdjuster;
-import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import static java.lang.Math.abs;
 import static java.time.DayOfWeek.*;
-import static java.time.temporal.ChronoUnit.DAYS;
+import static java.time.temporal.ChronoUnit.*;
 import static java.time.temporal.TemporalAdjusters.next;
+import static java.time.temporal.TemporalAdjusters.previous;
 
 // Metodos estáticos aqui
 public class BusinessUtils {
@@ -61,13 +64,15 @@ public class BusinessUtils {
      * Formato de saída: dd/mm/aaaa  hh:mm:ss [zona]
      */
     public static String zoneDateTimeToString(ZonedDateTime zdt) {
-        String dt = zdt.getDayOfMonth() + "/" +
-                    zdt.getMonth().getValue() + "/" +
-                    zdt.getYear() + " " +
-                    zdt.getHour() + ":" +
-                    zdt.getMinute() + ":" +
-                    zdt.getSecond() + ":" +
-                    zdt.getNano() +
+        LocalDateTime ldt = zdt.toLocalDateTime();
+
+        String dt = ldt.getDayOfMonth() + "/" +
+                    ldt.getMonth().getValue() + "/" +
+                    ldt.getYear() + " " +
+                    ldt.getHour() + ":" +
+                    ldt.getMinute() + ":" +
+                    ldt.getSecond() + ":" +
+                    ldt.getNano() +
                     " [" + zdt.getZone() + "]";
         return dt;
     }
@@ -82,77 +87,76 @@ public class BusinessUtils {
         return temp;
     }
 
+
     /*
-     * LocalDateTime, int, EnumDateTimeShiftMode -> LocalDateTime
+     * Temporal, int, EnumDateTimeShiftMode -> LocalDateTime
      * Soma ou subtrai, dependendo do valor do mode, n dias úteis ao ldt.
+     * Retorna null se o argumento temp for de uma classe diferente de
+     * LocalDateTime e ZonedDateTime.
      */
-    public static LocalDateTime shiftWorkDaysLocal(LocalDateTime ldt, int n, EnumDateTimeShiftMode mode) {
+    public static Temporal shiftWorkDays(Temporal temp, int n, EnumDateTimeShiftMode mode) {
         int conta = 0;  // conta dias úteis
         DayOfWeek dia;
         while (conta < n) {
-            System.out.println(localDateTimeToString(ldt));
-            dia = ldt.getDayOfWeek();
+            if ((dia = getDayOfWeek(temp)) == null) return null;
             if (!(dia.equals(SATURDAY) || dia.equals(SUNDAY))) conta++;
             switch (mode) {
-                case ADD: ldt = ldt.plus(1, DAYS); break;
-                case SUB: ldt = ldt.minus(1, DAYS); break;
+                case ADD: temp = temp.plus(1, DAYS); break;
+                case SUB: temp = temp.minus(1, DAYS); break;
             }
         }
         // Ajustar o dia final para não ficar num fim de semana.
-        dia = ldt.getDayOfWeek();
+        if ((dia = getDayOfWeek(temp)) == null) return null;
         switch (mode) {
             case ADD:
                 if (dia.equals(SATURDAY) || dia.equals(SUNDAY)) {
-                    TemporalAdjuster nextMonday = next(MONDAY);
-                    ldt = ldt.with(nextMonday);
+                    temp = nextMondayN(temp, 1);
                 }
                 break;
             case SUB:
                 if (dia.equals(SATURDAY) || dia.equals(SUNDAY)) {
-                    TemporalAdjuster prevFriday = TemporalAdjusters.previous(FRIDAY);
-                    ldt = ldt.with(prevFriday);
+                    temp = prevFridayN(temp, 1);
                 }
                 break;
         }
-        return ldt;
+        return temp;
     }
 
     /*
      * LocalDateTime, LocalDateTime -> String
-     * Calcula a diferença temporal entre duas LocalDateTime's.
+     * Calcula a diferença temporal entre dois temporais desde que estejam na mesma zona.
      * Formato do output: X anos Y meses Z dias W horas V minutos U segundos D nanosegundos
+     * Nota: o segundo argumento é modificado.
      */
-    public static String diffBetweenLocalDateTime(LocalDateTime start, LocalDateTime stop) {
+    public static String diffBetweenDateTime(Temporal start, Temporal stop) {
         StringBuilder sb = new StringBuilder();
 
-        LocalDateTime tempLDT = LocalDateTime.from(start);
-
-        long years = tempLDT.until( stop, ChronoUnit.YEARS);
-        tempLDT = tempLDT.plusYears( years );
+        long years = start.until( stop, YEARS);
+        start = start.plus(years, YEARS);
         sb.append(abs(years)).append(" anos ");
 
-        long months = tempLDT.until( stop, ChronoUnit.MONTHS);
-        tempLDT = tempLDT.plusMonths( months );
+        long months = start.until( stop, MONTHS);
+        start = start.plus( months, MONTHS );
         sb.append(abs(months)).append(" meses ");
 
-        long days = tempLDT.until( stop, DAYS);
-        tempLDT = tempLDT.plusDays( days );
+        long days = start.until( stop, DAYS);
+        start = start.plus( days, DAYS );
         sb.append(abs(days)).append(" dias ");
 
-        long hours = tempLDT.until( stop, ChronoUnit.HOURS);
-        tempLDT = tempLDT.plusHours( hours );
+        long hours = start.until( stop, HOURS);
+        start = start.plus( hours, HOURS );
         sb.append(abs(hours)).append(" horas ");
 
-        long minutes = tempLDT.until( stop, ChronoUnit.MINUTES);
-        tempLDT = tempLDT.plusMinutes( minutes );
+        long minutes = start.until( stop, MINUTES);
+        start = start.plus( minutes, MINUTES );
         sb.append(abs(minutes)).append(" minutos ");
 
-        long seconds = tempLDT.until( stop, ChronoUnit.SECONDS);
-        tempLDT = tempLDT.plusSeconds( seconds );
+        long seconds = start.until( stop, SECONDS);
+        start = start.plus( seconds, SECONDS );
         sb.append(abs(seconds)).append(" segundos ");
 
-        long nanos = tempLDT.until( stop, ChronoUnit.NANOS);
-        sb.append(abs(nanos)).append(" nanosegundos ");
+        long nanos = start.until( stop, NANOS);
+        sb.append(abs(nanos)).append(" nanosegundos");
 
         return sb.toString();
     }
@@ -339,27 +343,88 @@ public class BusinessUtils {
     }
 
     /*
+     * Temporal -> DayOfWeek
+     * Dado um temporal dá o dia da semana.
+     * Caso não seja um ZonedDateTime ou LocalDateTime devolve null.
+     */
+    public static DayOfWeek getDayOfWeek(Temporal temp) {
+        DayOfWeek dow = null;
+        if (temp.getClass().getSimpleName().equals("ZonedDateTime"))
+            dow = ((ZonedDateTime) temp).getDayOfWeek();
+        else if (temp.getClass().getSimpleName().equals("LocalDateTime"))
+            dow = ((LocalDateTime) temp).getDayOfWeek();
+        return dow;
+    }
+
+    /*
+     * Temporal, int -> Temporal
+     * Transita para a sexta feira anterior n vezes
+     */
+    public static Temporal prevFridayN(Temporal temp, int n) {
+        for (int i = 0; i < n; i++) {
+            temp = temp.with(previous(FRIDAY));
+        }
+        return temp;
+    }
+
+    /*
      * LocalDateTime, int -> LocalDateTime
      * Transita para a próxima segunda feira n vezes.
      */
-    public static LocalDateTime nextMondayN(LocalDateTime ldt, int n) {
+    public static Temporal nextMondayN(Temporal temp, int n) {
         for (int i = 0; i < n; i++) {
-            ldt = ldt.with(next(MONDAY));
+            temp = temp.with(next(MONDAY));
         }
-        return ldt;
+        return temp;
     }
 
     /*
      * LocalDateTime, int -> LocalDateTime
      * Incrementa o dia n vezes.
      */
-    public static LocalDateTime nextDayN(LocalDateTime ldt, int n) {
+    public static Temporal nextDayN(Temporal temp, int n) {
         for (int i = 0; i < n; i++) {
-            ldt = ldt.plusDays(1);
+            temp = ((LocalDateTime) temp).plusDays(1);
         }
-        return ldt;
+        return temp;
     }
 
+    public static <T> List<List<T>> partitionIntoPages(List<T> list, int elementsPerPage) {
+        List<List<T>> ret = new ArrayList<>();
+
+        int totalListIndex = 0;
+        int pageListIndex = 0;
+
+        while (totalListIndex < list.size()) {
+            List<T> currentPage = new ArrayList<>();
+            pageListIndex = 0;
+
+            while ((pageListIndex < elementsPerPage) && (totalListIndex < list.size())) {
+                currentPage.add(list.get(totalListIndex++));
+                pageListIndex++;
+            }
+
+            ret.add(currentPage);
+        }
+
+        return ret;
+    }
+
+    public static List<String> getSortedAvailableZoneIds() {
+        List<String> ret = new ArrayList<>(ZoneId.getAvailableZoneIds());
+        ret.sort(Comparator.naturalOrder());
+
+        return ret;
+    }
+
+    /**
+     * TODO: VERIFICAR SE É CORRETO USAR CLEARCONSOLE COMO UM MÉTODO ESTÁTICO
+     */
+    public static void clearConsole() {
+        //Só deve funcionar para linux
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
 
     /*
      * StringBuilder, int -> StringBuilder
@@ -387,7 +452,7 @@ public class BusinessUtils {
         StringBuilder res = new StringBuilder();
         int dow = ldt.getDayOfWeek().getValue();
         int dom = ldt.getDayOfMonth();
-        res.append(repeateStringN(" ", 3*(dow-1)));
+        res.append(repeatStringN(" ", 3*(dow-1)));
         res = normDay(res, dom);
         res.append(" ");
         dow++; dom++;
@@ -406,7 +471,7 @@ public class BusinessUtils {
      * String, int -> String
      * Repete str n vezes.
      */
-    public static String repeateStringN(String str, int n) {
+    public static String repeatStringN(String str, int n) {
         return String.join("", Collections.nCopies(n, str));
     }
 

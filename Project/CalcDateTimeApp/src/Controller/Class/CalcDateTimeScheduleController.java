@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.util.Arrays;
 
 import static Utilities.BusinessUtils.*;
 import static Utilities.BusinessUtils.validateMinSec;
@@ -61,15 +62,15 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     //Escolha da data a inserir
     private void flowAddSlot(){
         //isto vai transitar para o menu depois
-        Temporal tempLocal = model.getDateTimeLocal();
-        Temporal tempZone = model.getDateTimeZone();
-        String ldt = localDateTimeToString(tempLocal);
-        String zdt = zoneDateTimeToString((ZonedDateTime)tempZone);
-        System.out.println("Data calculadora datas/tempos local:" + ldt);
-        System.out.println("Data calculadora datas/tempos com fusos:" + zdt);
         Menu menu = viewScheduleTxt.getMenu(3);
         String opcao;
         do {
+            Temporal tempLocal = model.getDateTimeLocal();
+            Temporal tempZone = model.getDateTimeZone();
+            String ldt = localDateTimeToString(tempLocal);
+            String zdt = zoneDateTimeToString((ZonedDateTime)tempZone);
+            menu.addDescToTitle(Arrays.asList("Data calc. local: " + ldt,
+                                              "Data calc. zona: " + zdt));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -219,7 +220,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         while(!opcao.equals("S"));
     }
 
-    private void flowResultsBusySlots(String op ){
+    private void flowResultsBusySlots(String op){
         //chamada ao metodo que irá devolver as slots pedidas
         //apresentar as slots pedidas
         Menu menu = viewScheduleTxt.getMenu(2);

@@ -27,6 +27,17 @@ import java.io.IOException;
 
 public final class CalcDateTimeApp {
 
+    /*
+    TODO Global:
+
+    ClearConsole cross-platform
+
+    TODO Zone:
+
+    Validar input incorreto para Sair de paginação
+    Set data
+     */
+
     public static void main(String[] args) {
 
         //--------------------------------
@@ -67,8 +78,8 @@ public final class CalcDateTimeApp {
         //InterfCalcDateTimeScheduleModel modelSchedule = CalcDateTimeScheduleModel.of();
 
         //--------------------------------
-        System.out.println("Fim da Aplicação >> "
-            + java.time.LocalDateTime.now());
+        //System.out.println("Fim da Aplicação >> "
+        //    + java.time.LocalDateTime.now());
 
         System.exit(0);
     }

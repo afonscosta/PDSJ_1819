@@ -15,9 +15,9 @@ import java.util.Set;
 
 public class CalcDateTimeModel implements InterfCalcDateTimeModel {
 
-    InterfCalcDateTimeLocalModel modelLocal;
-    InterfCalcDateTimeZoneModel modelZone;
-    InterfCalcDateTimeScheduleModel modelSchedule;
+    private InterfCalcDateTimeLocalModel modelLocal;
+    private InterfCalcDateTimeZoneModel modelZone;
+    private InterfCalcDateTimeScheduleModel modelSchedule;
 
     public CalcDateTimeModel(InterfCalcDateTimeLocalModel modelLocal,
                              InterfCalcDateTimeZoneModel modelZone,
@@ -35,6 +35,16 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     @Override
     public Temporal getDateTimeZone() {
         return modelZone.getDateTimeZone();
+    }
+
+    public void convertZoneDateTimeToZone(String zoneId) {
+        modelZone.convertZoneDateTimeToZone(zoneId);
+    }
+
+    @Override
+    public void changeZoneDateTimeToCurrentDateInZone(String zoneId) {
+        modelZone.changeZoneDateTimeToCurrentDateInZone(zoneId);
+
     }
 
     @Override
