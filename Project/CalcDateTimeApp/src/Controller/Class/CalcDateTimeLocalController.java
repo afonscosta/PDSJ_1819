@@ -19,7 +19,7 @@ import static java.time.temporal.ChronoUnit.*;
 public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalController {
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeLocalView viewLocalTxt;
-    private final String bufferCode = "bufferLocal";
+    private final String bufferCode = "local";
 
     public CalcDateTimeLocalController() {
     }

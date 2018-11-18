@@ -22,7 +22,7 @@ import static java.time.temporal.ChronoUnit.*;
 public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneController {
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeZoneView viewZoneTxt;
-    private final String bufferCode = "bufferZone";
+    private final String bufferCode = "zona";
 
     public CalcDateTimeZoneController() {
     }
