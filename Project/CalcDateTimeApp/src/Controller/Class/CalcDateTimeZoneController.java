@@ -15,12 +15,14 @@ import static Utilities.BusinessUtils.*;
 import static Utilities.EnumDateTimeShiftMode.ADD;
 import static Utilities.EnumDateTimeShiftMode.SUB;
 import static java.lang.Math.abs;
+import static java.lang.System.getSecurityManager;
 import static java.lang.System.out;
 import static java.time.temporal.ChronoUnit.*;
 
 public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneController {
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeZoneView viewZoneTxt;
+    private final String bufferCode = "bufferZone";
 
     public CalcDateTimeZoneController() {
     }
@@ -28,6 +30,8 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     @Override
     public void setModel(InterfCalcDateTimeModel model) {
         this.model = model;
+        // Utilizar o zoneId do ficheiro de configuração
+        this.model.fromDateTime(bufferCode, ZonedDateTime.now());
     }
 
     @Override
@@ -36,9 +40,8 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     }
 
     private String buildZoneDateTimeTitle() {
-        ZonedDateTime temp = (ZonedDateTime) model.getDateTimeZone();
-        String ld = zoneDateTimeToString(temp);
-        return ld;
+        ZonedDateTime zdt = (ZonedDateTime) model.getDateTime(bufferCode);
+        return zoneDateTimeToString(zdt);
     }
 
     //------------------------
@@ -73,7 +76,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         String answerZone = flowShowAllAvailableTimezonesAndGetZoneId();
 
         if (!answerZone.equals(("S"))) {
-            model.changeZoneDateTimeToCurrentDateInZone(answerZone);
+            model.changeToCurrentDateInZone(bufferCode, answerZone);
         }
     }
 
@@ -102,37 +105,25 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     private void shiftDays() {
         out.print("(+|-) número de dias: ");
         int n = Input.lerInt();
-        if (n >= 0)
-            model.shiftDateTimeZone(abs(n), DAYS, ADD);
-        else
-            model.shiftDateTimeZone(abs(n), DAYS, SUB);
+        model.shiftDateTime(bufferCode, n, DAYS);
     }
 
     private void shiftWeeks() {
         out.print("Número de semanas: ");
         int n = Input.lerInt();
-        if (n >= 0)
-            model.shiftDateTimeZone(abs(n), WEEKS, ADD);
-        else
-            model.shiftDateTimeZone(abs(n), WEEKS, SUB);
+        model.shiftDateTime(bufferCode, n, WEEKS);
     }
 
     private void shiftMonths() {
         out.print("Número de meses: ");
         int n = Input.lerInt();
-        if (n >= 0)
-            model.shiftDateTimeZone(abs(n), MONTHS, ADD);
-        else
-            model.shiftDateTimeZone(abs(n), MONTHS, SUB);
+        model.shiftDateTime(bufferCode, n, MONTHS);
     }
 
     private void shiftYears() {
         out.print("Número de anos: ");
         int n = Input.lerInt();
-        if (n >= 0)
-            model.shiftDateTimeZone(abs(n), YEARS, ADD);
-        else
-            model.shiftDateTimeZone(abs(n), YEARS, SUB);
+        model.shiftDateTime(bufferCode, n, YEARS);
     }
 
 
@@ -144,7 +135,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         String answerZone = flowShowAllAvailableTimezonesAndGetZoneId();
 
         if (!answerZone.equals(("S"))) {
-            model.convertZoneDateTimeToZone(answerZone);
+            model.convertZoneDateTimeToZone(bufferCode, answerZone);
         }
     }
 
@@ -200,7 +191,9 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
                         totalPages = chosenZoneIdsByPage.size();
                     } else if (opcao.matches("=.*")) {
                         opcao = opcao.substring(1); // Remover o "="
-                        flowDone = true;
+                        if (getSortedAvailableZoneIds().contains(opcao)) {
+                            flowDone = true;
+                        }
                     }
                     break;
             }

@@ -12,17 +12,21 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import static Utilities.BusinessUtils.*;
-import static Utilities.BusinessUtils.validateMinSec;
-import static Utilities.BusinessUtils.validatePosNumber;
 import static java.lang.System.out;
 
 public class CalcDateTimeScheduleController implements InterfCalcDateTimeScheduleController {
 
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeScheduleView viewScheduleTxt;
+    private Set<String> bufferCodes;
+
+    public CalcDateTimeScheduleController() {
+    }
 
     @Override
     public void setView(InterfCalcDateTimeScheduleView viewSchedule) {
@@ -32,10 +36,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     @Override
     public void setModel(InterfCalcDateTimeModel model) {
         this.model = model;
-    }
-
-    public CalcDateTimeScheduleController() {
-
+        this.bufferCodes = model.getKeys();
     }
 
     public void flowSchedule(){
@@ -60,30 +61,41 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     //Escolha da data a inserir
     private void flowAddSlot(){
         //isto vai transitar para o menu depois
+        Boolean flowDone = false;
         Menu menu = viewScheduleTxt.getMenu(3);
         String opcao;
         do {
-            Temporal tempLocal = model.getDateTimeLocal();
-            Temporal tempZone = model.getDateTimeZone();
-            String ldt = localDateTimeToString(tempLocal);
-            String zdt = zoneDateTimeToString((ZonedDateTime)tempZone);
-            menu.addDescToTitle(Arrays.asList("Data calc. local: " + ldt,
-                                              "Data calc. zona: " + zdt));
+            Temporal temp;
+            List<String> dts = new ArrayList<>();
+            for (String c : bufferCodes) {
+                temp = model.getDateTime(c);
+                dts.add("Data calc. " + c + ": " + zoneDateTimeToString((ZonedDateTime) temp));
+            }
+            menu.addDescToTitle(dts);
             menu.show();
             opcao = Input.lerString();
-            opcao = opcao.toUpperCase();
-            switch(opcao) {
-                case "L" : addSlot(tempLocal); break;
-                case "Z" : addSlot(tempZone); break;
-                case "M" : addSlot(null); break;
-                case "S": break;
-                default: System.out.println("Opcão Inválida !"); break;
+            if (opcao.toUpperCase().equals("M")) {
+                addSlot(null); flowDone = true;
+            }
+            else if (opcao.toUpperCase().equals("S")) {
+                flowDone = true;
+            }
+            else {
+                if (opcao.matches("=.*")) {
+                    opcao = opcao.substring(1); // Remover o "="
+                    if (bufferCodes.contains(opcao)) {
+                        System.out.println(opcao);
+                        addSlot(model.getDateTime(opcao));
+                        flowDone = true;
+                    }
+                }
             }
         }
         //Come back to init menu of Agenda
-        while(!(opcao.equals("S")| opcao.equals("L") | opcao.equals("Z") | opcao.equals("M")));
+        while(!flowDone);
     }
     private void addSlot(Temporal date){
+        System.out.println(date);
         if(date==null){
             System.out.println("->Introduza a data da nova reuniao:");
             date = getLocalDateTimeFromInput();
@@ -114,7 +126,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     // Se não disser nada fica a que se encontra no modelLocal.
     // Devolve null caso dê uma exceção.
     private LocalDateTime getLocalDateTimeFromInput() {
-        LocalDateTime ldt = (LocalDateTime) model.getDateTimeLocal();
+        LocalDateTime ldt = (LocalDateTime) model.getDateTime((String) bufferCodes.toArray()[0]);
         Integer year = null;
         Integer month = null;
         Integer day = null;

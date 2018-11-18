@@ -78,13 +78,8 @@ public class BusinessUtils {
     }
 
     // Dada uma ZonedDateTime, soma ou subtrai, dependendo do mode, n ChronoUnits.
-    public static Temporal shiftDateTime(Temporal temp, int n, ChronoUnit cu, EnumDateTimeShiftMode mode) {
-        //Não sei se é boa ideia este método depender do EnumDateTimeShiftMode.
-        switch (mode) {
-            case ADD: temp = temp.plus(n, cu); break;
-            case SUB: temp = temp.minus(n, cu); break;
-        }
-        return temp;
+    public static Temporal shiftDateTime(Temporal temp, int n, ChronoUnit cu) {
+        return temp.plus(n, cu);
     }
 
 
@@ -94,30 +89,24 @@ public class BusinessUtils {
      * Retorna null se o argumento temp for de uma classe diferente de
      * LocalDateTime e ZonedDateTime.
      */
-    public static Temporal shiftWorkDays(Temporal temp, int n, EnumDateTimeShiftMode mode) {
+    public static Temporal shiftWorkDays(Temporal temp, int n) {
         int conta = 0;  // conta dias úteis
         DayOfWeek dia;
-        while (conta < n) {
+        while (conta < abs(n)) {
             if ((dia = getDayOfWeek(temp)) == null) return null;
             if (!(dia.equals(SATURDAY) || dia.equals(SUNDAY))) conta++;
-            switch (mode) {
-                case ADD: temp = temp.plus(1, DAYS); break;
-                case SUB: temp = temp.minus(1, DAYS); break;
-            }
+            temp = temp.plus(n/abs(n), DAYS);
         }
         // Ajustar o dia final para não ficar num fim de semana.
         if ((dia = getDayOfWeek(temp)) == null) return null;
-        switch (mode) {
-            case ADD:
-                if (dia.equals(SATURDAY) || dia.equals(SUNDAY)) {
-                    temp = nextMondayN(temp, 1);
-                }
-                break;
-            case SUB:
-                if (dia.equals(SATURDAY) || dia.equals(SUNDAY)) {
-                    temp = prevFridayN(temp, 1);
-                }
-                break;
+        if (n > 0)
+            if (dia.equals(SATURDAY) || dia.equals(SUNDAY)) {
+                temp = nextMondayN(temp, 1);
+            }
+        else if (n < 0){
+            if (dia.equals(SATURDAY) || dia.equals(SUNDAY)) {
+                temp = prevFridayN(temp, 1);
+            }
         }
         return temp;
     }
@@ -128,34 +117,36 @@ public class BusinessUtils {
      * Formato do output: X anos Y meses Z dias W horas V minutos U segundos D nanosegundos
      * Nota: o segundo argumento é modificado.
      */
-    public static String diffBetweenDateTime(Temporal start, Temporal stop) {
+    public static String diffBetweenDateTime(ZonedDateTime start, ZonedDateTime stop) {
         StringBuilder sb = new StringBuilder();
 
-        long years = start.until( stop, YEARS);
+        ZonedDateTime stopWithSameZone = stop.withZoneSameInstant(start.getZone());
+
+        long years = start.until( stopWithSameZone, YEARS);
         start = start.plus(years, YEARS);
         sb.append(abs(years)).append(" anos ");
 
-        long months = start.until( stop, MONTHS);
+        long months = start.until( stopWithSameZone, MONTHS);
         start = start.plus( months, MONTHS );
         sb.append(abs(months)).append(" meses ");
 
-        long days = start.until( stop, DAYS);
+        long days = start.until( stopWithSameZone, DAYS);
         start = start.plus( days, DAYS );
         sb.append(abs(days)).append(" dias ");
 
-        long hours = start.until( stop, HOURS);
+        long hours = start.until( stopWithSameZone, HOURS);
         start = start.plus( hours, HOURS );
         sb.append(abs(hours)).append(" horas ");
 
-        long minutes = start.until( stop, MINUTES);
+        long minutes = start.until( stopWithSameZone, MINUTES);
         start = start.plus( minutes, MINUTES );
         sb.append(abs(minutes)).append(" minutos ");
 
-        long seconds = start.until( stop, SECONDS);
+        long seconds = start.until( stopWithSameZone, SECONDS);
         start = start.plus( seconds, SECONDS );
         sb.append(abs(seconds)).append(" segundos ");
 
-        long nanos = start.until( stop, NANOS);
+        long nanos = start.until( stopWithSameZone, NANOS);
         sb.append(abs(nanos)).append(" nanosegundos");
 
         return sb.toString();
@@ -165,7 +156,7 @@ public class BusinessUtils {
      * LocalDateTime, LocalDateTime -> long
      * Calcula o número de dias úteis entre duas LocalDateTime's.
      */
-    public static long countWorkDays(LocalDateTime start, LocalDateTime stop) {
+    public static long countWorkDays(ZonedDateTime start, ZonedDateTime stop) {
         // Code taken from Answer by Roland.
         // https://stackoverflow.com/a/44942039/642706
         long count = 0;
@@ -384,7 +375,7 @@ public class BusinessUtils {
      */
     public static Temporal nextDayN(Temporal temp, int n) {
         for (int i = 0; i < n; i++) {
-            temp = ((LocalDateTime) temp).plusDays(1);
+            temp = temp.plus(1, DAYS);
         }
         return temp;
     }
@@ -448,20 +439,20 @@ public class BusinessUtils {
      * ldt: 2018/10/1 -> ' 1  2  3  4  5  6  7'
      * ldt: 2018/11/5 -> ' 5  6  7  8  9 10 11'
      */
-    public static String organizeDays(LocalDateTime ldt) {
+    public static String organizeDays(ZonedDateTime zdt) {
         StringBuilder res = new StringBuilder();
-        int dow = ldt.getDayOfWeek().getValue();
-        int dom = ldt.getDayOfMonth();
+        int dow = zdt.getDayOfWeek().getValue();
+        int dom = zdt.getDayOfMonth();
         res.append(repeatStringN(" ", 3*(dow-1)));
         res = normDay(res, dom);
         res.append(" ");
         dow++; dom++;
-        while(ldt.getMonthValue() == ldt.plusDays(dow-1).getMonthValue() && dow < 7) {
+        while(zdt.getMonthValue() == zdt.plusDays(dow-1).getMonthValue() && dow < 7) {
             res = normDay(res, dom);
             res.append(" ");
             dow++; dom++;
         }
-        if(ldt.getMonthValue() == ldt.plusDays(dow-1).getMonthValue()) {
+        if(zdt.getMonthValue() == zdt.plusDays(dow-1).getMonthValue()) {
             res = normDay(res, dom);
         }
         return res.toString();
