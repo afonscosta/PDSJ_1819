@@ -6,12 +6,10 @@ import Controller.Interface.InterfCalcDateTimeController;
 import Controller.Interface.InterfCalcDateTimeLocalController;
 import Controller.Interface.InterfCalcDateTimeScheduleController;
 import Controller.Interface.InterfCalcDateTimeZoneController;
-import Model.Class.CalcDateTimeLocalModel;
-import Model.Class.CalcDateTimeZoneModel;
+import Model.Class.CalcDateTimeLocZonModel;
 import Model.Class.CalcDateTimeModel;
 import Model.Class.CalcDateTimeScheduleModel;
-import Model.Interface.InterfCalcDateTimeLocalModel;
-import Model.Interface.InterfCalcDateTimeZoneModel;
+import Model.Interface.InterfCalcDateTimeLocZonModel;
 import Model.Interface.InterfCalcDateTimeModel;
 import Model.Interface.InterfCalcDateTimeScheduleModel;
 import View.Class.CalcDateTimeLocalView;
@@ -39,10 +37,9 @@ public final class CalcDateTimeApp {
     public static void main(String[] args) {
 
         //--------------------------------
-        InterfCalcDateTimeLocalModel modelLocal = new CalcDateTimeLocalModel();
-        InterfCalcDateTimeZoneModel modelZone = new CalcDateTimeZoneModel();
+        InterfCalcDateTimeLocZonModel modelLocZon = new CalcDateTimeLocZonModel();
         InterfCalcDateTimeScheduleModel modelSchedule = CalcDateTimeScheduleModel.of();
-        InterfCalcDateTimeModel model = new CalcDateTimeModel(modelLocal, modelZone, modelSchedule);
+        InterfCalcDateTimeModel model = new CalcDateTimeModel(modelLocZon, modelSchedule);
 
         //--------------------------------
         InterfCalcDateTimeLocalView viewLocal = new CalcDateTimeLocalView();
