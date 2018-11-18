@@ -6,12 +6,9 @@ import Model.Interface.InterfCalcDateTimeModel;
 import Model.Interface.InterfCalcDateTimeScheduleModel;
 import Model.Interface.InterfCalcDateTimeZoneModel;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
-import java.util.Set;
 
 public class CalcDateTimeModel implements InterfCalcDateTimeModel {
 
@@ -79,9 +76,5 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
 
     public boolean addSlot(Slot newSlot){
         return modelSchedule.addSlot(newSlot);
-    }
-
-    public void saveState(String nomeFicheiro) throws IOException{
-        modelSchedule.saveState(nomeFicheiro);
     }
 }

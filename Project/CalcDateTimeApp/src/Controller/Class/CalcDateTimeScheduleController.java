@@ -7,8 +7,6 @@ import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeScheduleView;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -241,15 +239,5 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         while(!opcao.equals("S"));
     }
     private void slotDetails(){}
-
-    public void saveState(){
-        try{
-            model.saveState("AgendaReunioes");
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Problemas a guardar o estado");
-        }
-
-    }
 
 }

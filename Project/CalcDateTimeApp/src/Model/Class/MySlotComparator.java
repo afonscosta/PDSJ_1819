@@ -1,13 +1,12 @@
 package Model.Class;
 
-import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
 import java.util.Comparator;
 
-public class MySlotComparator implements Comparator<Slot>, Serializable {
+public class MySlotComparator implements Comparator<Slot> {
 
     @Override
     public int compare(Slot s1, Slot s2) {
