@@ -193,6 +193,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         Slot newSlot = new Slot(data, temp.getDuration(),temp.getLocal(),temp.getDescription());
         boolean add = addSlot(newSlot);
         if(add==false){
+            System.out.println("NAO DEU PARA ALTERAR DATA");
             addSlot(temp);
             return temp;
         }

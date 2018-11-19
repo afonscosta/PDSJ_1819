@@ -17,7 +17,7 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
 
     private Menus initView() {
         Menus menusScheduleTxt = new Menus();
-        Opcao op1, op2, op3, op4, op5;
+        Opcao op1, op2, op3, op4, op5,op6,op7;
 
         //------------------------
         // Menu CalcDateTimeSchedule
@@ -33,11 +33,13 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         // Menu Busy slots navigator
         //------------------------
         op1 = new Opcao("Modo", "/<modo>");
-        op2 = new Opcao("Pagina anterior", "-");
-        op3 = new Opcao("Pagina seguinte", "+");
-        op4 = new Opcao("Selecionar", "=<id reuniao>");
-        op5 = new Opcao("Voltar ao Menu Agenda", "S");
-        linhas = Arrays.asList(op1, op2, op3, op4, op5);
+        op2 = new Opcao("Pagina anterior", "<");
+        op3 = new Opcao("Pagina seguinte", ">");
+        op4 = new Opcao("Avancar modo(dia/semana/mes)", ">>");
+        op5 = new Opcao("Recuar modo(dia/semana/mes)", "<<");
+        op6 = new Opcao("Selecionar", "=<id reuniao>");
+        op7 = new Opcao("Voltar ao Menu Agenda", "S");
+        linhas = Arrays.asList(op1, op2, op3, op4, op5,op6,op7);
         Menu menuBusySlotsNavigator = new Menu(linhas, "Reunioes Agendadas");
         menusScheduleTxt.addMenu(1, menuBusySlotsNavigator);
 
@@ -83,8 +85,9 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         op2 = new Opcao("Manipular semana", "Sem");
         op3 = new Opcao("Manipular mes", "M");
         op4 = new Opcao("Manipular ano", "A");
-        op5 = new Opcao("Voltar ao Menu reuniao", "S");
-        linhas = Arrays.asList(op1, op2, op3, op4, op5);
+        op5 = new Opcao("Alterar horas","T");
+        op6 = new Opcao("Voltar ao Menu reuniao", "S");
+        linhas = Arrays.asList(op1, op2, op3, op4, op5,op6);
         Menu menuShiftDateTime = new Menu(linhas, "Alterar Data");
         menusScheduleTxt.addMenu(5, menuShiftDateTime);
 
