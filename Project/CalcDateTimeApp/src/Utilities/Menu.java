@@ -46,7 +46,7 @@ public class Menu {
                                " " + tag + " |");
         }
         System.out.println("+" + repeatStringN("=", max+2) + "+");
-        System.out.print("Insira a sua opçao: ");
+        System.out.print("Insira a sua opcao: ");
     }
 
     private void buildHeader() {

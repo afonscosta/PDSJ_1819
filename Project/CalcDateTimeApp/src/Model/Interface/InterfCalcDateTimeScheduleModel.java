@@ -2,6 +2,7 @@ package Model.Interface;
 
 import Model.Class.Slot;
 import java.io.*;
+import java.util.List;
 
 public interface InterfCalcDateTimeScheduleModel {
 
@@ -17,6 +18,11 @@ public interface InterfCalcDateTimeScheduleModel {
         fis.close();
         return scheduleModel;
     }
+    List<String> getMainInfoSlots();
+
+    boolean removeSlot(String idSlot);
+
+    boolean editSlot(String idSlot);
 
 }
 

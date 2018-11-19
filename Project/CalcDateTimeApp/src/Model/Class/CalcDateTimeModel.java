@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.util.List;
 import java.util.Set;
 
 public class CalcDateTimeModel implements InterfCalcDateTimeModel {
@@ -84,4 +85,16 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     public void saveState(String nomeFicheiro) throws IOException{
         modelSchedule.saveState(nomeFicheiro);
     }
+    public List<String> getMainInfoSlots(){
+        return modelSchedule.getMainInfoSlots();
+    }
+
+    public boolean removeSlot(String infoSlot){
+         return modelSchedule.removeSlot(infoSlot);
+    }
+
+    public boolean editSlot(String infoSlot){
+         return modelSchedule.editSlot(infoSlot);
+    }
+
 }

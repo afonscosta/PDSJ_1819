@@ -14,7 +14,11 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static Utilities.BusinessUtils.*;
 import static Utilities.BusinessUtils.validateMinSec;
@@ -49,11 +53,9 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             opcao = opcao.toUpperCase();
             switch(opcao) {
                 case "I" : flowAddSlot(); break;
-                case "R" : flowRemoveSlot(); break;
-                case "A" : flowEditSlot(); break;
-                case "V" : flowGetBusySlotsFor(); break;
+                case "V" : flowGetBusySlots(); break;
                 case "S": break;
-                default: System.out.println("Opcão Inválida !"); break;
+                default: out.println("Opcao Invalida !"); break;
             }
         }
         while(!opcao.equals("S"));
@@ -79,29 +81,30 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                 case "Z" : addSlot(tempZone); break;
                 case "M" : addSlot(null); break;
                 case "S": break;
-                default: System.out.println("Opcão Inválida !"); break;
+                default: System.out.println("Opcao Invalida !"); break;
             }
         }
         //Come back to init menu of Agenda
         while(!(opcao.equals("S")| opcao.equals("L") | opcao.equals("Z") | opcao.equals("M")));
     }
+
     private void addSlot(Temporal date){
         if(date==null){
-            System.out.println("->Introduza a data da nova reuniao:");
+            out.println("Introduza a data da nova reuniao:");
             date = getLocalDateTimeFromInput();
         }
-        System.out.println("->Duracao da nova reuniao:");
-        System.out.println("Horas irá demorar:");
+        out.println("Duracao da nova reuniao:");
+        out.print("Horas ira demorar: ");
         int horas = Input.lerInt();
-        System.out.println("Minutos irá demorar:");
+        out.print("Minutos ira demorar: ");
         int minutos = Input.lerInt();
         Duration duration = Duration.of(horas, ChronoUnit.HOURS);
         duration = duration.plus(minutos,ChronoUnit.MINUTES);
 
-        System.out.println("->Introduza o local da nova reuniao:");
+        out.print("Introduza o local da nova reuniao: ");
         String local = Input.lerString();
 
-        System.out.println("->Introduza uma descrição da nova reuniao:");
+        out.print("Introduza uma descricao da nova reuniao:");
         String description= Input.lerString();
         Slot newSlot = new Slot(date,duration,local,description);
         boolean res =model.addSlot(newSlot);
@@ -135,7 +138,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         }
 
         while (month == null) {
-            out.print("Mês (default: " + ldt.getMonthValue() + "): ");
+            out.print("Mes (default: " + ldt.getMonthValue() + "): ");
             str = Input.lerString();
             month = validateMonth(str, ldt.getMonthValue());
             if (month == null)
@@ -186,22 +189,128 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         return newLDT;
     }
 
-    // Remover um slot de trabalho
-    private void flowRemoveSlot(){
-        System.out.println("Remove slot");
+    private String flowGetBusySlots() {
+        Boolean flowDone = false;
+        List<List<String>> slotsOfMode = partitionIntoPages(model.getMainInfoSlots(),25); // If someone looks for "europe", place matches it here
+
+        int pageIndex = 0;
+        int totalPages = slotsOfMode.size();
+        Menu menu = viewScheduleTxt.getMenu(1);
+        List<String> description;
+        String opcao;
+        do {
+
+            // Mais complexo do que necessário para o caso em que a lista de procuras está vazia,
+            // e assim não acontece indexOuto
+            try {
+                description = new ArrayList(slotsOfMode.get(pageIndex));
+            } catch (IndexOutOfBoundsException e) {
+                description = new ArrayList<>();
+            }
+
+            description.add(""); // Linha branca na descrição
+            description.add(String.format("Pagina (%s/%s)", pageIndex+1, totalPages));
+
+            menu.addDescToTitle(description);
+
+            menu.show();
+            opcao = Input.lerString();
+            switch (opcao) {
+                case "+": if ((pageIndex + 1) < totalPages) { pageIndex++; } break;
+                case "-": if ((pageIndex - 1) >= 0) { pageIndex--; } break;
+                case "s": flowDone = true; break;
+                default:
+                    if (opcao.matches("\\/.*")) {
+                        List<String> matches = new ArrayList<>();
+                        pageIndex = 0;
+                        String searchedWordNormalized = opcao.substring(1).toLowerCase(); // Remover o "?" e lowercase
+
+
+
+                        slotsOfMode = partitionIntoPages(matches,25);
+                        totalPages = slotsOfMode.size();
+                    } else if (opcao.matches("=.*")) {
+                        opcao = opcao.substring(1); // Remover o "="
+                        for (String infoSlot : model.getMainInfoSlots()) {
+                            String idSlot = getIdSlot(infoSlot);
+                            System.out.println(idSlot);
+                            System.out.println(opcao);
+                            if(idSlot!=null & idSlot.equals(opcao)){
+                                flowSelectBusySlot(idSlot);
+                                break;
+                            }
+
+                        }
+                        flowDone = true;
+                    }
+                    break;
+            }
+        } while(!flowDone);
+
+        return opcao;
     }
 
-    // Editar um slot de trabalho
-    private void flowEditSlot(){
-        System.out.println("Edit slot");
+    public String getIdSlot(String infoSlot){
+        Pattern p = Pattern.compile("^[0-9]+");
+        Matcher m = p.matcher(infoSlot);
+        if(m.find()){
+            return m.group(0);
+        }
+        else return null;
     }
 
+    public void flowSelectBusySlot(String idSlot) {
+        Menu menu = viewScheduleTxt.getMenu(2);
+        String opcao;
+            do {
+                menu.addDescToTitle(Arrays.asList("ID escolhido: ",idSlot));
+                menu.show();
+                opcao = Input.lerString();
+                switch (opcao) {
+                    case "A":
+                        editSlot(idSlot);
+                        break;
+                    case "R":
+                        removeSlot(idSlot);
+                        break;
+                    case "D":
+                        slotDetails(idSlot);
+                        break;
+                    case "S":
+                }
+            }
+            while (!opcao.equals("S"));
+        }
+
+
+
+        // Remover um slot de trabalho
+        private void removeSlot(String idSlot){
+                boolean res =model.removeSlot(idSlot);
+                //para adicioanar ao cabeçalho
+                if(res== true){
+                    out.println("Removido com sucesso!");
+                }
+                else
+                    out.println("Ups,tente outra vez!");
+        }
+
+        // Editar um slot de trabalho
+        private void editSlot(String infoSlot){
+            System.out.println("Edit slot");
+        }
+        private void slotDetails(String infoSlot){
+
+        }
+
+
+    /*
     // Mostrar todos os slots do proximo/dia/semana/mes, dependendo da escolha que vai ser efetuada
     // dia -> resto do dia de hoje + opcoes de next, previous e select
     // semana -> resto da semana atual + opcoes de next, previous e select
     // mês -> resto de mes igual + opcoes de next, previous e select
     // reminder : imprimir identificador antes de cada slot, para ser usado no select
-    private void flowGetBusySlotsFor(){
+    //private void flowGetBusySlotsFor(){
         Menu menu = viewScheduleTxt.getMenu(1);
         String opcao;
         do {
@@ -240,7 +349,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         }
         while(!opcao.equals("S"));
     }
-    private void slotDetails(){}
+    */
 
     public void saveState(){
         try{
