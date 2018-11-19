@@ -1,13 +1,15 @@
 package Model.Class;
 
 import Model.Interface.InterfCalcDateTimeScheduleModel;
+import Utilities.EnumEditSlotInfo;
 
 import java.io.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.time.temporal.Temporal;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.*;
 
 public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleModel,Serializable  {
@@ -61,6 +63,19 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                                                 };
                 this.agenda= new TreeSet<>(compDateSlots);
     }
+
+    public Set<Slot> getAgenda() {
+        return agenda;
+    }
+
+    public void setAgenda(Set<Slot> agenda) {
+        this.agenda = agenda;
+    }
+
+    //------------------------
+    // Devolve todas as reuniões existentes
+    // É apresentada cada reunião de forma aglutinada, pela sua data e local.
+    //------------------------
     public List<String> getMainInfoSlots(){
         List<String> res= new ArrayList();
         int index =0;
@@ -74,32 +89,121 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         return res;
     }
 
-    public Set<Slot> getAgenda() {
-        return agenda;
+    //------------------------
+    // ModeNormalized: diario, semanal, mensal
+    // want -> a igualdade a verficar na agenda
+    // Por exemplo, utilizador escolhe diario -> want diz-me o dia referente
+    //------------------------
+
+    public List<String> getRestrictSlots(String modeNormalized, int want){
+        List<String> res= new ArrayList();
+        int index =0;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm");
+        for(Slot s : agenda) {
+            LocalDateTime date = LocalDateTime.from(s.getData());
+            switch (modeNormalized) {
+                case "diario":
+                    System.out.print(date.getDayOfMonth() +"==" + want);
+                    if(date.getDayOfMonth()==want){
+                        System.out.println("YES");
+                        String formattedDate = date.format(formatter);
+                        res.add(index + ": " + formattedDate + " || " + s.getLocal());
+                        index ++;
+                    }
+                    break;
+                case "semanal":
+                    TemporalField woy = WeekFields.ISO.weekOfMonth();
+                    int weekNumber = date.get(woy);
+                    System.out.println(weekNumber);
+                    if(weekNumber==want){
+                        String formattedDate = date.format(formatter);
+                        res.add(index + ": " + formattedDate + " || " + s.getLocal());
+                        index ++;
+                    }
+                    break;
+                case "mensal":
+                    if(date.getMonthValue()==want){
+                        String formattedDate = date.format(formatter);
+                        res.add(index + ": " + formattedDate + " || " + s.getLocal());
+                        index ++;
+                    }
+                    break;
+            }
+        }
+        System.out.println(res);
+        return res;
     }
 
-    public void setAgenda(Set<Slot> agenda) {
-        this.agenda = agenda;
-    }
-
+    //------------------------
+    // Adicionar uma reunião à agenda
+    //------------------------
     public boolean addSlot(Slot newSlot){
         boolean add = agenda.add(newSlot);
 
         return add;
     }
-    public boolean removeSlot(String idSlot){
-        Slot s = getSlot(idSlot);
-        boolean res= false;
-        if(s!=null){
-            res =agenda.remove(s);
+
+    //------------------------
+    // Remover uma reunião da agenda
+    //------------------------
+    public boolean removeSlot(Slot s){
+        return agenda.remove(s);
+    }
+
+    //------------------------
+    // Adicionar uma reunião à agenda
+    //------------------------
+    public void editSlot(Slot s, EnumEditSlotInfo e, String edit){
+            switch (e){
+                case LOCAL:
+                    s.setLocal(edit);
+                    break;
+                case DESC:
+                    s.setDescription(edit);
+                    break;
+            }
+    }
+
+    //------------------------
+    // Alterar a duração de uma reuniao
+    // É necessário garantir que a nova duração não provoca sobreposições
+    // Remover o slot antigo -> adicionar um novo slot, com a mesma info excepto a duração.
+    //------------------------
+    public Slot editDurationSlot(Slot s, Duration newDuration) {
+        Slot temp = s.clone();
+        boolean res =removeSlot(s);
+        System.out.println("Remover o slot que quero substituir:" + res);
+        Slot newSlot = new Slot(temp.getData(),newDuration,temp.getLocal(),temp.getDescription());
+        boolean add = addSlot(newSlot);
+        if(add==false) {
+            addSlot(temp);
+            return temp;
         }
-        return res;
+        return newSlot;
+    }
+    //------------------------
+    // Alterar a data de uma reuniao
+    // É necessário garantir que a nova data não provoca sobreposições
+    // Remover o slot antigo -> adicionar um novo slot, com a mesma info excepto a data.
+    //------------------------
+    public Slot editDateSLot(Slot s, Temporal data){
+        Slot temp = s.clone();
+        boolean res =removeSlot(s);
+        System.out.println("Remover o slot que quero substituir:" + res);
+        Slot newSlot = new Slot(data, temp.getDuration(),temp.getLocal(),temp.getDescription());
+        boolean add = addSlot(newSlot);
+        if(add==false){
+            addSlot(temp);
+            return temp;
+        }
+        return newSlot;
     }
 
-    public boolean editSlot(String idSlot){
-        return true;
-    }
-
+    //------------------------
+    // Dado o idenficador gerado ao nivel da interface ao percorrer a agenda
+    // Este identificador pode ser visto como temporário
+    // Devolver o objecto que o identifica
+    //------------------------
     public Slot getSlot(String infoSlot){
         int id = Integer.parseInt(infoSlot);
         int index =0;
@@ -109,14 +213,19 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
             }
             if(index>id)
                 return null;
+        index ++;
         }
         return  null;
     }
 
+
+    //------------------------
+    // Guarda o estado do model pois este tem de ser persistente
+    //------------------------
     public void saveState(String nomeFicheiro) throws IOException {
         FileOutputStream fos = new FileOutputStream(nomeFicheiro);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(this);//guarda-se o objecto de uma só vez
+        oos.writeObject(this);
         oos.close();
         fos.close();
     }

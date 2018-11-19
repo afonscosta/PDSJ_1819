@@ -63,7 +63,42 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         Menu menuDateChoice = new Menu(linhas, "Data da reuniao a inserir");
         menusScheduleTxt.addMenu(3, menuDateChoice);
 
+        //------------------------
+        // Menu alter slot
+        //------------------------
+        op1 = new Opcao("Alterar data", "Data");
+        op2 = new Opcao("Alterar duracao", "D");
+        op3 = new Opcao("Alterar local", "L");
+        op4 = new Opcao("Alterar descricao", "Desc");
+        op5 = new Opcao("Voltar ao Menu reuniao", "S");
+        linhas = Arrays.asList(op1, op2,op3,op4,op5);
+        Menu menuAlterSlot = new Menu(linhas, "Alterar reuniao");
+        menusScheduleTxt.addMenu(4, menuAlterSlot);
+
+        //------------------------
+        // Menu alter data
+        //------------------------
+
+        op1 = new Opcao("Manipular dia", "D");
+        op2 = new Opcao("Manipular semana", "Sem");
+        op3 = new Opcao("Manipular mes", "M");
+        op4 = new Opcao("Manipular ano", "A");
+        op5 = new Opcao("Voltar ao Menu reuniao", "S");
+        linhas = Arrays.asList(op1, op2, op3, op4, op5);
+        Menu menuShiftDateTime = new Menu(linhas, "Alterar Data");
+        menusScheduleTxt.addMenu(5, menuShiftDateTime);
+
+        //------------------------
+        // Menu details slot
+        //------------------------
+
+        op1 = new Opcao("Voltar ao Menu reuniao", "S");
+        linhas = Arrays.asList(op1);
+        Menu menuDetailsSlot = new Menu(linhas, "Alterar Data");
+        menusScheduleTxt.addMenu(6, menuDetailsSlot);
+
         return menusScheduleTxt;
+
     }
 
     public Menu getMenu(int id) {

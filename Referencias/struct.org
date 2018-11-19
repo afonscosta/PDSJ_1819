@@ -25,17 +25,17 @@
    - [X]Dado um país, saber a sua hora atual.
    - Opção ANS: se não for dito nada usa a data calculada anteriormente.
 ** Agenda de reuniões:
-   - Duração das slots é arbitrária
-   - Inserir, remover, alterar slots
+   - [X] Duração das slots é arbitrária
+   - [X] Inserir, remover, alterar slots
    - Slot seguinte
    - O que é que tenho no resto do dia?
-   - O que tenho neste dia
+   [X] - O que tenho neste dia
    - Views:
-     + Next + Prev
-     + Diária
-     + Semanal
-     + Mensal
-     + Agenda
+      + Next + Prev
+     [X] + Diária
+     [X] + Semanal
+     [X] + Mensal
+     [X] + Agenda
 * MVC
 ** Model
    - TreeMap<LocalDateTime,Slot>

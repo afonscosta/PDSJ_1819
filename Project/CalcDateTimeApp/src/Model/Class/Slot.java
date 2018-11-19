@@ -50,4 +50,9 @@ public class Slot implements Serializable {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public Slot clone(){
+        Slot res = new Slot(data,duration,local,description);
+        return res;
+    }
 }
