@@ -29,9 +29,7 @@ public final class CalcDateTimeApp {
     ClearConsole cross-platform
 
     TODO Zone:
-
-    Validar input incorreto para Sair de paginação
-    Set data
+    "Esta é a data, quer guardar no buffer?"
      */
 
     public static void main(String[] args) {
