@@ -4,3 +4,4 @@
 - Onde colocar os ENUMS?
 - O utils pode ter funções com IO?
 - Onde usar .of() e onde usar new()?
+- É justo o Controller modificar dinâmicamente a view?

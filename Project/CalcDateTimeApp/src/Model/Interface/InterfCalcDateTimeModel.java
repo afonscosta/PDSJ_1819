@@ -1,6 +1,5 @@
 package Model.Interface;
 
-
 import Model.Class.Slot;
 
 import java.time.ZonedDateTime;

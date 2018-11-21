@@ -1,9 +1,6 @@
 package Model.Class;
 
-import Model.Interface.InterfCalcDateTimeLocalModel;
-import Model.Interface.InterfCalcDateTimeModel;
-import Model.Interface.InterfCalcDateTimeScheduleModel;
-import Model.Interface.InterfCalcDateTimeZoneModel;
+import Model.Interface.*;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;

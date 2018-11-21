@@ -79,7 +79,6 @@ public class BusinessUtils {
 
     // Dada uma ZonedDateTime, soma ou subtrai, dependendo do mode, n ChronoUnits.
     public static Temporal shiftDateTime(Temporal temp, int n, ChronoUnit cu) {
-        //Não sei se é boa ideia este método depender do EnumDateTimeShiftMode.
         return temp.plus(n, cu);
     }
 
@@ -93,7 +92,7 @@ public class BusinessUtils {
     public static Temporal shiftWorkDays(Temporal temp, int n) {
         int conta = 0;  // conta dias úteis
         DayOfWeek dia;
-        while (conta < n) {
+        while (conta < abs(n)) {
             if ((dia = getDayOfWeek(temp)) == null) return null;
             if (!(dia.equals(SATURDAY) || dia.equals(SUNDAY))) conta++;
             temp = temp.plus(n/abs(n), DAYS);
@@ -119,34 +118,36 @@ public class BusinessUtils {
      * Formato do output: X anos Y meses Z dias W horas V minutos U segundos D nanosegundos
      * Nota: o segundo argumento é modificado.
      */
-    public static String diffBetweenDateTime(Temporal start, Temporal stop) {
+    public static String diffBetweenDateTime(ZonedDateTime start, ZonedDateTime stop) {
         StringBuilder sb = new StringBuilder();
 
-        long years = start.until( stop, YEARS);
+        ZonedDateTime stopWithSameZone = stop.withZoneSameInstant(start.getZone());
+
+        long years = start.until( stopWithSameZone, YEARS);
         start = start.plus(years, YEARS);
         sb.append(abs(years)).append(" anos ");
 
-        long months = start.until( stop, MONTHS);
+        long months = start.until( stopWithSameZone, MONTHS);
         start = start.plus( months, MONTHS );
         sb.append(abs(months)).append(" meses ");
 
-        long days = start.until( stop, DAYS);
+        long days = start.until( stopWithSameZone, DAYS);
         start = start.plus( days, DAYS );
         sb.append(abs(days)).append(" dias ");
 
-        long hours = start.until( stop, HOURS);
+        long hours = start.until( stopWithSameZone, HOURS);
         start = start.plus( hours, HOURS );
         sb.append(abs(hours)).append(" horas ");
 
-        long minutes = start.until( stop, MINUTES);
+        long minutes = start.until( stopWithSameZone, MINUTES);
         start = start.plus( minutes, MINUTES );
         sb.append(abs(minutes)).append(" minutos ");
 
-        long seconds = start.until( stop, SECONDS);
+        long seconds = start.until( stopWithSameZone, SECONDS);
         start = start.plus( seconds, SECONDS );
         sb.append(abs(seconds)).append(" segundos ");
 
-        long nanos = start.until( stop, NANOS);
+        long nanos = start.until( stopWithSameZone, NANOS);
         sb.append(abs(nanos)).append(" nanosegundos");
 
         return sb.toString();
@@ -375,7 +376,7 @@ public class BusinessUtils {
      */
     public static Temporal nextDayN(Temporal temp, int n) {
         for (int i = 0; i < n; i++) {
-            temp = ((LocalDateTime) temp).plusDays(1);
+            temp = temp.plus(1, DAYS);
         }
         return temp;
     }
@@ -439,20 +440,20 @@ public class BusinessUtils {
      * ldt: 2018/10/1 -> ' 1  2  3  4  5  6  7'
      * ldt: 2018/11/5 -> ' 5  6  7  8  9 10 11'
      */
-    public static String organizeDays(ZonedDateTime ldt) {
+    public static String organizeDays(ZonedDateTime zdt) {
         StringBuilder res = new StringBuilder();
-        int dow = ldt.getDayOfWeek().getValue();
-        int dom = ldt.getDayOfMonth();
+        int dow = zdt.getDayOfWeek().getValue();
+        int dom = zdt.getDayOfMonth();
         res.append(repeatStringN(" ", 3*(dow-1)));
         res = normDay(res, dom);
         res.append(" ");
         dow++; dom++;
-        while(ldt.getMonthValue() == ldt.plusDays(dow-1).getMonthValue() && dow < 7) {
+        while(zdt.getMonthValue() == zdt.plusDays(dow-1).getMonthValue() && dow < 7) {
             res = normDay(res, dom);
             res.append(" ");
             dow++; dom++;
         }
-        if(ldt.getMonthValue() == ldt.plusDays(dow-1).getMonthValue()) {
+        if(zdt.getMonthValue() == zdt.plusDays(dow-1).getMonthValue()) {
             res = normDay(res, dom);
         }
         return res.toString();
