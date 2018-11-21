@@ -3,6 +3,10 @@
   - Máscara para fazer disable de certas zonas dos slots.
   - Formata de apresentação das datas (DateTimeFormatter).
 * Funcionalidades
+** Geral
+   - [ ] Adicionar ficheiro de configuração
+   - [ ] DateTimeFormatter
+   - [ ] Header: acrescentar status
 ** Calculadora de datas e tempos locais:
    - [X] Somar/subtrair data/tempo.
    - [X] Diferença data/tempo.
@@ -18,7 +22,7 @@
      + Opção: 
        * nº de vezes que executa
        * formato de saída (e.g. dif em horas...)
-   - []Somar/subtrair/diferença dias úteis em data/tempo com fusos.
+   - [X]Somar/subtrair/diferença dias úteis em data/tempo com fusos.
      + Opção: 
        * nº de vezes que executa
        * formato de saída (e.g. dif em horas...)

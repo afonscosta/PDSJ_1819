@@ -1,22 +1,20 @@
 package Model.Interface;
 
-import Utilities.EnumDateTimeShiftMode;
-
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 
 public interface InterfCalcDateTimeLocalModel {
 
-    Temporal getDateTimeLocal();
+    Temporal getDateTime();
 
-    void fromDateTimeLocal(LocalDateTime ldt);
+    void fromDateTime(ZonedDateTime zdt);
 
-    void shiftDateTimeLocal(int n, ChronoUnit cu, EnumDateTimeShiftMode mode);
+    void shiftDateTime(int n, ChronoUnit cu);
 
-    void shiftWorkDaysDateTimeLocal(int n, EnumDateTimeShiftMode mode);
+    void shiftWorkDaysDateTime(int n);
 
-    String diffDateTimeLocal(LocalDateTime toDateTime);
+    String diffDateTime(ZonedDateTime toDateTime);
 
-    String diffWorkDaysDateTimeLocal(LocalDateTime toDateTime);
+    String diffWorkDaysDateTime(ZonedDateTime toDateTime);
 }

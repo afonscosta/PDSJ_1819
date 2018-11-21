@@ -13,8 +13,10 @@ import java.time.temporal.Temporal;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
+import java.util.Set;
+import java.util.TreeSet;
 
-public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleModel,Serializable  {
+public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleModel {
     private Set<Slot> agenda;
     static final long serialVersionUID = 1L;
     //do ficheiro de configuração
@@ -96,7 +98,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     public String DateSlotToString(Slot s,ZoneId referenceZone){
         DateTimeFormatter formatterToShowLocalDateTime = DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm");
-        DateTimeFormatter formatterToShowZonedDateTime = DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm V");
+        DateTimeFormatter formatterToShowZonedDateTime = DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm VV");
         ZonedDateTime date = ZonedDateTime.from(s.getData());
         boolean temp = isSlotfromReferenceZone(s,referenceZone);
         if(temp==true) {

@@ -1,20 +1,14 @@
 package Model.Class;
 
-import Utilities.EnumDateTimeShiftMode;
-import Model.Interface.InterfCalcDateTimeLocalModel;
-import Model.Interface.InterfCalcDateTimeModel;
-import Model.Interface.InterfCalcDateTimeScheduleModel;
-import Model.Interface.InterfCalcDateTimeZoneModel;
+import Model.Interface.*;
 import Utilities.EnumEditSlotInfo;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.List;
-import java.util.Set;
 
 public class CalcDateTimeModel implements InterfCalcDateTimeModel {
 
@@ -30,61 +24,91 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
         this.modelSchedule = modelSchedule;
     }
 
+    //------------------------
+    // Métodos Model Local
+    //------------------------
     @Override
     public Temporal getDateTimeLocal() {
-        return modelLocal.getDateTimeLocal();
+        return modelLocal.getDateTime();
     }
 
+    @Override
+    public void shiftDateTimeLocal(int n, ChronoUnit cu) {
+        modelLocal.shiftDateTime(n, cu);
+    }
+
+    @Override
+    public void shiftWorkDaysDateTimeLocal(int n) {
+        modelLocal.shiftWorkDaysDateTime(n);
+    }
+
+    @Override
+    public String diffDateTimeLocal(ZonedDateTime toDateTime) {
+        return modelLocal.diffDateTime(toDateTime);
+    }
+
+    @Override
+    public String diffWorkDaysDateTimeLocal(ZonedDateTime toDateTime) {
+        return modelLocal.diffWorkDaysDateTime(toDateTime);
+    }
+
+    @Override
+    public void fromDateTimeLocal(ZonedDateTime ldt) {
+        modelLocal.fromDateTime(ldt);
+    }
+
+    //------------------------
+    // Métodos Model Zone
+    //------------------------
     @Override
     public Temporal getDateTimeZone() {
-        return modelZone.getDateTimeZone();
-    }
-
-    public void convertZoneDateTimeToZone(String zoneId) {
-        modelZone.convertZoneDateTimeToZone(zoneId);
+        return modelZone.getDateTime();
     }
 
     @Override
-    public void changeZoneDateTimeToCurrentDateInZone(String zoneId) {
-        modelZone.changeZoneDateTimeToCurrentDateInZone(zoneId);
-
+    public void shiftDateTimeZone(int n, ChronoUnit cu) {
+        modelZone.shiftDateTime(n, cu);
     }
 
     @Override
-    public void shiftDateTimeLocal(int n, ChronoUnit cu, EnumDateTimeShiftMode mode) {
-        modelLocal.shiftDateTimeLocal(n, cu, mode);
+    public void shiftWorkDaysDateTimeZone(int n) {
+        modelZone.shiftWorkDaysDateTime(n);
     }
 
     @Override
-    public void shiftWorkDaysDateTimeLocal(int n, EnumDateTimeShiftMode mode) {
-        modelLocal.shiftWorkDaysDateTimeLocal(n, mode);
+    public String diffDateTimeZone(ZonedDateTime toDateTime) {
+        return modelZone.diffDateTime(toDateTime);
     }
 
     @Override
-    public String diffDateTimeLocal(LocalDateTime toDateTime) {
-        return modelLocal.diffDateTimeLocal(toDateTime);
+    public String diffWorkDaysDateTimeZone(ZonedDateTime toDateTime) {
+        return modelZone.diffWorkDaysDateTime(toDateTime);
     }
 
     @Override
-    public String diffWorkDaysDateTimeLocal(LocalDateTime toDateTime) {
-        return modelLocal.diffWorkDaysDateTimeLocal(toDateTime);
+    public void fromDateTimeZone(ZonedDateTime zdt) {
+        modelZone.fromDateTime(zdt);
     }
 
     @Override
-    public void fromDateTimeLocal(LocalDateTime ldt) {
-        modelLocal.fromDateTimeLocal(ldt);
+    public void withZone(String zoneId) {
+        modelZone.withZone(zoneId);
     }
 
     @Override
-    public void shiftDateTimeZone(int n, ChronoUnit cu, EnumDateTimeShiftMode mode) {
-        modelZone.shiftDateTimeZone(n, cu, mode);
+    public void changeToCurrentDateInZone(String zoneId) {
+        modelZone.changeToCurrentDateInZone(zoneId);
+
     }
 
+    //------------------------
+    // Métodos Model Schedule
+    //------------------------
     public boolean addSlot(Slot newSlot){
         return modelSchedule.addSlot(newSlot);
     }
 
-    public void saveState(String nomeFicheiro) throws IOException{
+    public void saveState(String nomeFicheiro) throws IOException {
         modelSchedule.saveState(nomeFicheiro);
     }
     public List<String> getMainInfoSlots(){
@@ -115,5 +139,4 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     public List<String> getRestrictSlots(String modeNormalized, int want){
         return modelSchedule.getRestrictSlots(modeNormalized,want);
     }
-
 }

@@ -18,19 +18,14 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static Utilities.BusinessUtils.*;
-import static Utilities.BusinessUtils.validateMinSec;
-import static Utilities.BusinessUtils.validatePosNumber;
-import static Utilities.EnumDateTimeShiftMode.ADD;
-import static Utilities.EnumDateTimeShiftMode.SUB;
 import static Utilities.EnumEditSlotInfo.DESC;
 import static Utilities.EnumEditSlotInfo.DURACAO;
 import static Utilities.EnumEditSlotInfo.LOCAL;
-import static java.lang.Math.abs;
 import static java.lang.System.out;
 import static java.time.temporal.ChronoUnit.*;
 import static java.time.temporal.ChronoUnit.YEARS;
@@ -40,6 +35,9 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeScheduleView viewScheduleTxt;
 
+    public CalcDateTimeScheduleController() {
+
+    }
     @Override
     public void setView(InterfCalcDateTimeScheduleView viewSchedule) {
         this.viewScheduleTxt = viewSchedule;
@@ -50,9 +48,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         this.model = model;
     }
 
-    public CalcDateTimeScheduleController() {
-
-    }
+    
     //------------------------
     // Fluxo inicial do menu agenda
     //------------------------
@@ -86,7 +82,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             String ldt = localDateTimeToString(tempLocal);
             String zdt = zoneDateTimeToString((ZonedDateTime)tempZone);
             menu.addDescToTitle(Arrays.asList("Data calc. local: " + ldt,
-                                              "Data calc. zona: " + zdt));
+                    "Data calc. zona: " + zdt));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -106,6 +102,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     // Adicionar uma nova reunião
     //------------------------
     private void addSlot(Temporal date){
+        System.out.println(date);
         if(date==null){
             out.println("Introduza a data da nova reuniao:");
             date = getLocalDateTimeFromInput();
@@ -184,8 +181,8 @@ private void flowGetBusySlots() {
             switch (opcao) {
                 case ">": if ((pageIndex + 1) < totalPages) { pageIndex++; } break;
                 case "<": if ((pageIndex - 1) >= 0) { pageIndex--; } break;
-                case ">>": currentDateMode = changeDataMode(currentDateMode,modeNormalized,ADD); break;
-                case "<<": currentDateMode = changeDataMode(currentDateMode,modeNormalized,SUB); break;
+                case ">>": currentDateMode = changeDataMode(currentDateMode,modeNormalized,1); break;
+                case "<<": currentDateMode = changeDataMode(currentDateMode,modeNormalized,-1); break;
                 case "S": flowDone = true; break;
                 default:
                     if (opcao.matches("\\/.*")) {
@@ -218,16 +215,16 @@ private void flowGetBusySlots() {
     //------------------------
     // Dado modo, a data atual do modo e a operação desejada pelo utilizador, atualiza a data do modo.
     //------------------------
-    public LocalDate changeDataMode(LocalDate currentDateMode, String mode, EnumDateTimeShiftMode e){
+    public LocalDate changeDataMode(LocalDate currentDateMode, String mode, int n){
             switch (mode){
                 case "":
                     return currentDateMode;
                 case "diario":
-                    return (LocalDate)BusinessUtils.shiftDateTime(currentDateMode,1,DAYS,e);
+                    return (LocalDate)BusinessUtils.shiftDateTime(currentDateMode,n,DAYS);
                 case"semanal":
-                    return (LocalDate)BusinessUtils.shiftDateTime(currentDateMode,1,WEEKS,e);
+                    return (LocalDate)BusinessUtils.shiftDateTime(currentDateMode,n,WEEKS);
                 case"mensal":
-                    return (LocalDate)BusinessUtils.shiftDateTime(currentDateMode,1,MONTHS,e);
+                    return (LocalDate)BusinessUtils.shiftDateTime(currentDateMode,n,MONTHS);
 
             }
             return currentDateMode;
@@ -402,11 +399,7 @@ private void flowGetBusySlots() {
     private Temporal shiftDays(Temporal data) {
         out.print("(+|-) número de dias: ");
         int n = Input.lerInt();
-        if (n >= 0)
-            data = BusinessUtils.shiftDateTime(data, abs(n), DAYS, ADD);
-        else
-            data = BusinessUtils.shiftDateTime(data, abs(n), DAYS, SUB);
-        return data;
+        return BusinessUtils.shiftDateTime(data,n, DAYS);
     }
 
     //------------------------
@@ -415,11 +408,8 @@ private void flowGetBusySlots() {
     private Temporal shiftWeeks(Temporal data) {
         out.print("(+|-) número de semanas: ");
         int n = Input.lerInt();
-        if (n >= 0)
-            data = BusinessUtils.shiftDateTime(data,abs(n), WEEKS, ADD);
-        else
-           data = BusinessUtils.shiftDateTime(data,abs(n), WEEKS, SUB);
-        return data;
+        return BusinessUtils.shiftDateTime(data,n, WEEKS);
+
     }
 
     //------------------------
@@ -428,11 +418,7 @@ private void flowGetBusySlots() {
     private Temporal shiftMonths(Temporal data) {
         out.print("(+|-) número de meses: ");
         int n = Input.lerInt();
-        if (n >= 0)
-            data = BusinessUtils.shiftDateTime(data,abs(n), MONTHS, ADD);
-        else
-            data = BusinessUtils.shiftDateTime(data,abs(n), MONTHS, SUB);
-        return data;
+        return BusinessUtils.shiftDateTime(data,n, MONTHS);
     }
 
     //------------------------
@@ -441,11 +427,7 @@ private void flowGetBusySlots() {
     private Temporal shiftYears(Temporal data) {
         out.print("(+|-) número de anos: ");
         int n = Input.lerInt();
-        if (n >= 0)
-            BusinessUtils.shiftDateTime(data,abs(n), YEARS, ADD);
-        else
-            BusinessUtils.shiftDateTime(data,abs(n), YEARS, SUB);
-        return data;
+        return BusinessUtils.shiftDateTime(data,n, YEARS);
     }
     //------------------------
     // Alterar Time do Temporal da reunião
@@ -527,7 +509,7 @@ private void flowGetBusySlots() {
         Integer minute = null;
         Integer second = null;
         Integer nano = null;
-        String str = null;
+        String str;
 
         while (year == null) {
             out.print("Ano (default: " + ldt.getYear() + "): ");
@@ -585,8 +567,7 @@ private void flowGetBusySlots() {
                 out.println("[!] Nanosegundos invalidos.");
         }
 
-        LocalDateTime newLDT = LocalDateTime.of(year, month, day, hour, minute, second, nano);
-        return newLDT;
+        return LocalDateTime.of(year, month, day, hour, minute, second, nano);
     }
 
     //------------------------
@@ -600,4 +581,60 @@ private void flowGetBusySlots() {
             System.out.println("Problemas a guardar o estado");
         }
     }
+    // Remover um slot de trabalho
+    private void flowRemoveSlot(){
+        System.out.println("Remove slot");
+    }
+
+    // Editar um slot de trabalho
+    private void flowEditSlot(){
+        System.out.println("Edit slot");
+    }
+
+    // Mostrar todos os slots do proximo/dia/semana/mes, dependendo da escolha que vai ser efetuada
+    // dia -> resto do dia de hoje + opcoes de next, previous e select
+    // semana -> resto da semana atual + opcoes de next, previous e select
+    // mês -> resto de mes igual + opcoes de next, previous e select
+    // reminder : imprimir identificador antes de cada slot, para ser usado no select
+    private void flowGetBusySlotsFor(){
+        Menu menu = viewScheduleTxt.getMenu(1);
+        String opcao;
+        do {
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "P" : flowResultsBusySlots("P"); break;
+                case "D" : flowResultsBusySlots("D"); break;
+                case "Sem" : flowResultsBusySlots("Sem"); break;
+                case "M" : flowResultsBusySlots("M"); break;
+                case "S": break;
+                default: System.out.println("Opcão Inválida !"); break;
+            }
+        }
+        while(!opcao.equals("S"));
+    }
+
+    private void flowResultsBusySlots(String op){
+        //chamada ao metodo que irá devolver as slots pedidas
+        //apresentar as slots pedidas
+        Menu menu = viewScheduleTxt.getMenu(2);
+        String opcao;
+        do {
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "P" : flowResultsBusySlots("P"); break;
+                case "A" : flowResultsBusySlots("D"); break;
+                case "D" : slotDetails(); break;
+                case "M" : flowResultsBusySlots("M"); break;
+                case "S": break;
+                default: System.out.println("Opcão Inválida !"); break;
+            }
+        }
+        while(!opcao.equals("S"));
+    }
+    private void slotDetails(){}
+
 }

@@ -7,13 +7,13 @@ import Controller.Interface.InterfCalcDateTimeLocalController;
 import Controller.Interface.InterfCalcDateTimeScheduleController;
 import Controller.Interface.InterfCalcDateTimeZoneController;
 import Model.Class.CalcDateTimeLocalModel;
-import Model.Class.CalcDateTimeZoneModel;
 import Model.Class.CalcDateTimeModel;
 import Model.Class.CalcDateTimeScheduleModel;
+import Model.Class.CalcDateTimeZoneModel;
 import Model.Interface.InterfCalcDateTimeLocalModel;
-import Model.Interface.InterfCalcDateTimeZoneModel;
 import Model.Interface.InterfCalcDateTimeModel;
 import Model.Interface.InterfCalcDateTimeScheduleModel;
+import Model.Interface.InterfCalcDateTimeZoneModel;
 import View.Class.CalcDateTimeLocalView;
 import View.Class.CalcDateTimeScheduleView;
 import View.Class.CalcDateTimeView;
@@ -23,8 +23,6 @@ import View.Interface.InterfCalcDateTimeScheduleView;
 import View.Interface.InterfCalcDateTimeView;
 import View.Interface.InterfCalcDateTimeZoneView;
 
-import java.io.IOException;
-
 public final class CalcDateTimeApp {
 
     /*
@@ -33,16 +31,14 @@ public final class CalcDateTimeApp {
     ClearConsole cross-platform
 
     TODO Zone:
-
-    Validar input incorreto para Sair de paginação
-    Set data
+    "Esta é a data, quer guardar no buffer?"
      */
 
     public static void main(String[] args) {
 
         //--------------------------------
-        InterfCalcDateTimeLocalModel modelLocal = new CalcDateTimeLocalModel();
-        InterfCalcDateTimeZoneModel modelZone = new CalcDateTimeZoneModel();
+        InterfCalcDateTimeLocalModel modelLocal = CalcDateTimeLocalModel.of();
+        InterfCalcDateTimeZoneModel modelZone = CalcDateTimeZoneModel.of();
         InterfCalcDateTimeScheduleModel modelSchedule = InterfCalcDateTimeScheduleModel.pushState("AgendaReunioes");
         InterfCalcDateTimeModel model = new CalcDateTimeModel(modelLocal, modelZone, modelSchedule);
 
