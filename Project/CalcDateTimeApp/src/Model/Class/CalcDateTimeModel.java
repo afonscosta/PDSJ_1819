@@ -1,73 +1,105 @@
 package Model.Class;
 
-import Utilities.EnumDateTimeShiftMode;
-import Model.Interface.InterfCalcDateTimeLocZonModel;
-import Model.Interface.InterfCalcDateTimeModel;
-import Model.Interface.InterfCalcDateTimeScheduleModel;
+import Model.Interface.*;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
-import java.util.Set;
 
 public class CalcDateTimeModel implements InterfCalcDateTimeModel {
 
-    private InterfCalcDateTimeLocZonModel modelLocZon;
+    private InterfCalcDateTimeLocalModel modelLocal;
+    private InterfCalcDateTimeZoneModel modelZone;
     private InterfCalcDateTimeScheduleModel modelSchedule;
 
-    public CalcDateTimeModel(InterfCalcDateTimeLocZonModel modelLocZon,
+    public CalcDateTimeModel(InterfCalcDateTimeLocalModel modelLocal,
+                             InterfCalcDateTimeZoneModel modelZone,
                              InterfCalcDateTimeScheduleModel modelSchedule) {
-        this.modelLocZon = modelLocZon;
+        this.modelLocal = modelLocal;
+        this.modelZone = modelZone;
         this.modelSchedule = modelSchedule;
     }
 
+    //------------------------
+    // Métodos Model Local
+    //------------------------
     @Override
-    public Set<String> getKeys() {
-        return modelLocZon.getKeys();
+    public Temporal getDateTimeLocal() {
+        return modelLocal.getDateTime();
     }
 
     @Override
-    public Temporal getDateTime(String k) {
-        return modelLocZon.getDateTime(k);
+    public void shiftDateTimeLocal(int n, ChronoUnit cu) {
+        modelLocal.shiftDateTime(n, cu);
     }
 
     @Override
-    public void convertZoneDateTimeToZone(String k, String zoneId) {
-        modelLocZon.convertZoneDateTimeToZone(k, zoneId);
+    public void shiftWorkDaysDateTimeLocal(int n) {
+        modelLocal.shiftWorkDaysDateTime(n);
     }
 
     @Override
-    public void changeToCurrentDateInZone(String k, String zoneId) {
-        modelLocZon.changeToCurrentDateInZone(k, zoneId);
-
+    public String diffDateTimeLocal(ZonedDateTime toDateTime) {
+        return modelLocal.diffDateTime(toDateTime);
     }
 
     @Override
-    public void shiftDateTime(String k, int n, ChronoUnit cu) {
-        modelLocZon.shiftDateTime(k, n, cu);
+    public String diffWorkDaysDateTimeLocal(ZonedDateTime toDateTime) {
+        return modelLocal.diffWorkDaysDateTime(toDateTime);
     }
 
     @Override
-    public void shiftWorkDaysDateTime(String k, int n) {
-        modelLocZon.shiftWorkDaysDateTime(k, n);
+    public void fromDateTimeLocal(ZonedDateTime ldt) {
+        modelLocal.fromDateTime(ldt);
+    }
+
+    //------------------------
+    // Métodos Model Zone
+    //------------------------
+    @Override
+    public Temporal getDateTimeZone() {
+        return modelZone.getDateTime();
     }
 
     @Override
-    public String diffDateTime(String k, ZonedDateTime toDateTime) {
-        return modelLocZon.diffDateTime(k, toDateTime);
+    public void shiftDateTimeZone(int n, ChronoUnit cu) {
+        modelZone.shiftDateTime(n, cu);
     }
 
     @Override
-    public String diffWorkDaysDateTime(String k, ZonedDateTime toDateTime) {
-        return modelLocZon.diffWorkDaysDateTime(k, toDateTime);
+    public void shiftWorkDaysDateTimeZone(int n) {
+        modelZone.shiftWorkDaysDateTime(n);
     }
 
     @Override
-    public void fromDateTime(String k, ZonedDateTime zdt) {
-        modelLocZon.fromDateTime(k, zdt);
+    public String diffDateTimeZone(ZonedDateTime toDateTime) {
+        return modelZone.diffDateTime(toDateTime);
     }
 
+    @Override
+    public String diffWorkDaysDateTimeZone(ZonedDateTime toDateTime) {
+        return modelZone.diffWorkDaysDateTime(toDateTime);
+    }
+
+    @Override
+    public void fromDateTimeZone(ZonedDateTime zdt) {
+        modelZone.fromDateTime(zdt);
+    }
+
+    @Override
+    public void withZone(String zoneId) {
+        modelZone.withZone(zoneId);
+    }
+
+    @Override
+    public void changeToCurrentDateInZone(String zoneId) {
+        modelZone.changeToCurrentDateInZone(zoneId);
+
+    }
+
+    //------------------------
+    // Métodos Model Schedule
+    //------------------------
     @Override
     public boolean addSlot(Slot newSlot){
         return modelSchedule.addSlot(newSlot);

@@ -21,7 +21,6 @@ import static java.time.temporal.ChronoUnit.*;
 public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneController {
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeZoneView viewZoneTxt;
-    private final String bufferCode = "zona";
 
     public CalcDateTimeZoneController() {
     }
@@ -30,7 +29,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     public void setModel(InterfCalcDateTimeModel model) {
         this.model = model;
         // Utilizar o zoneId do ficheiro de configuração
-        this.model.fromDateTime(bufferCode, ZonedDateTime.now());
+        this.model.fromDateTimeZone(ZonedDateTime.now());
     }
 
     @Override
@@ -39,7 +38,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     }
 
     private String buildZoneDateTimeTitle() {
-        ZonedDateTime zdt = (ZonedDateTime) model.getDateTime(bufferCode);
+        ZonedDateTime zdt = (ZonedDateTime) model.getDateTimeZone();
         return zoneDateTimeToString(zdt);
     }
 
@@ -112,7 +111,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         while(toDateTime == null) {
             toDateTime = getLocalDateTimeZoneFromInput();
         }
-        String resDiff = model.diffWorkDaysDateTime(bufferCode, toDateTime);
+        String resDiff = model.diffWorkDaysDateTimeZone(toDateTime);
 
         out.println("\nResultado: " + resDiff);
         out.print("Prima Enter para continuar.");
@@ -146,7 +145,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         while(newLDT == null) {
             newLDT = getLocalDateTimeZoneFromInput();
         }
-        model.fromDateTime(bufferCode, newLDT);
+        model.fromDateTimeZone(newLDT);
     }
 
     private void diffDateTimeLocal() {
@@ -154,11 +153,11 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         while(toDateTime == null) {
             toDateTime = getLocalDateTimeZoneFromInput();
         }
-        String resDiff = model.diffDateTime(bufferCode, toDateTime);
+        String resDiff = model.diffDateTimeZone(toDateTime);
 
         out.println("\nResultado: " + resDiff);
         out.print("Prima Enter para continuar.");
-        String str = Input.lerString();
+        Input.lerString();
     }
 
     private void flowShiftWorkDaysDateTimeZone() {
@@ -184,17 +183,17 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     private void shiftWorkDays() {
         out.print("(+|-) número de dias: ");
         int n = Input.lerInt();
-        model.shiftWorkDaysDateTime(bufferCode, n);
+        model.shiftWorkDaysDateTimeZone(n);
     }
 
     private void setDateTimeZone() {
         ZonedDateTime zdt = getLocalDateTimeZoneFromInput();
-        model.fromDateTime(bufferCode, zdt);
+        model.fromDateTimeZone(zdt);
     }
 
     private ZonedDateTime getLocalDateTimeZoneFromInput() {
 
-        ZonedDateTime ldt = (ZonedDateTime) model.getDateTime(bufferCode);
+        ZonedDateTime ldt = (ZonedDateTime) model.getDateTimeZone();
         Integer year = null;
         Integer month = null;
         Integer day = null;
@@ -263,8 +262,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         String zoneIdString = flowShowAllAvailableTimezonesAndGetNZoneIds(1).get(0);
         ZoneId zoneId = ZoneId.of(zoneIdString);
 
-        ZonedDateTime newLDT = ZonedDateTime.of(year, month, day, hour, minute, second, nano, zoneId);
-        return newLDT;
+        return ZonedDateTime.of(year, month, day, hour, minute, second, nano, zoneId);
     }
 
     //------------------------
@@ -275,7 +273,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         String answerZone = flowShowAllAvailableTimezonesAndGetNZoneIds(1).get(0);
 
         if (!answerZone.equals(("S"))) {
-            model.changeToCurrentDateInZone(bufferCode, answerZone);
+            model.changeToCurrentDateInZone(answerZone);
         }
     }
 
@@ -304,25 +302,25 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     private void shiftDays() {
         out.print("(+|-) número de dias: ");
         int n = Input.lerInt();
-        model.shiftDateTime(bufferCode, n, DAYS);
+        model.shiftDateTimeZone(n, DAYS);
     }
 
     private void shiftWeeks() {
         out.print("Número de semanas: ");
         int n = Input.lerInt();
-        model.shiftDateTime(bufferCode, n, WEEKS);
+        model.shiftDateTimeZone(n, WEEKS);
     }
 
     private void shiftMonths() {
         out.print("Número de meses: ");
         int n = Input.lerInt();
-        model.shiftDateTime(bufferCode, n, MONTHS);
+        model.shiftDateTimeZone(n, MONTHS);
     }
 
     private void shiftYears() {
         out.print("Número de anos: ");
         int n = Input.lerInt();
-        model.shiftDateTime(bufferCode, n, YEARS);
+        model.shiftDateTimeZone(n, YEARS);
     }
 
 
@@ -334,7 +332,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         String answerZone = flowShowAllAvailableTimezonesAndGetNZoneIds(1).get(0);
 
         if (!answerZone.equals(("S"))) {
-            model.convertZoneDateTimeToZone(bufferCode, answerZone);
+            model.withZone(answerZone);
         }
     }
 

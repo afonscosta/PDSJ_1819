@@ -13,6 +13,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +24,6 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
 
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeScheduleView viewScheduleTxt;
-    private Set<String> bufferCodes;
 
     public CalcDateTimeScheduleController() {
     }
@@ -36,7 +36,6 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     @Override
     public void setModel(InterfCalcDateTimeModel model) {
         this.model = model;
-        this.bufferCodes = model.getKeys();
     }
 
     public void flowSchedule(){
@@ -60,40 +59,30 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
 
     //Escolha da data a inserir
     private void flowAddSlot(){
-        //isto vai transitar para o menu depois
-        Boolean flowDone = false;
         Menu menu = viewScheduleTxt.getMenu(3);
         String opcao;
         do {
-            Temporal temp;
-            List<String> dts = new ArrayList<>();
-            for (String c : bufferCodes) {
-                temp = model.getDateTime(c);
-                dts.add("Data calc. " + c + ": " + zoneDateTimeToString((ZonedDateTime) temp));
-            }
-            menu.addDescToTitle(dts);
+            Temporal tempLocal = model.getDateTimeLocal();
+            Temporal tempZone = model.getDateTimeZone();
+            String ldt = localDateTimeToString(tempLocal);
+            String zdt = zoneDateTimeToString((ZonedDateTime)tempZone);
+            menu.addDescToTitle(Arrays.asList("Data calc. local: " + ldt,
+                    "Data calc. zona: " + zdt));
             menu.show();
             opcao = Input.lerString();
-            if (opcao.toUpperCase().equals("M")) {
-                addSlot(null); flowDone = true;
-            }
-            else if (opcao.toUpperCase().equals("S")) {
-                flowDone = true;
-            }
-            else {
-                if (opcao.matches("=.*")) {
-                    opcao = opcao.substring(1); // Remover o "="
-                    if (bufferCodes.contains(opcao)) {
-                        System.out.println(opcao);
-                        addSlot(model.getDateTime(opcao));
-                        flowDone = true;
-                    }
-                }
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "L" : addSlot(tempLocal); break;
+                case "Z" : addSlot(tempZone); break;
+                case "M" : addSlot(null); break;
+                case "S": break;
+                default: System.out.println("Opcao Invalida !"); break;
             }
         }
         //Come back to init menu of Agenda
-        while(!flowDone);
+        while(!(opcao.equals("S")| opcao.equals("L") | opcao.equals("Z") | opcao.equals("M")));
     }
+
     private void addSlot(Temporal date){
         System.out.println(date);
         if(date==null){
@@ -115,7 +104,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         String description= Input.lerString();
         Slot newSlot = new Slot(date,duration,local,description);
         boolean res =model.addSlot(newSlot);
-        if(res == true){
+        if(res){
             System.out.println("Reuniao adicionada com sucesso!");
         }
         else
@@ -126,7 +115,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     // Se não disser nada fica a que se encontra no modelLocal.
     // Devolve null caso dê uma exceção.
     private LocalDateTime getLocalDateTimeFromInput() {
-        LocalDateTime ldt = (LocalDateTime) model.getDateTime((String) bufferCodes.toArray()[0]);
+        LocalDateTime ldt = (LocalDateTime) model.getDateTimeLocal();
         Integer year = null;
         Integer month = null;
         Integer day = null;
@@ -134,7 +123,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         Integer minute = null;
         Integer second = null;
         Integer nano = null;
-        String str = null;
+        String str;
 
         while (year == null) {
             out.print("Ano (default: " + ldt.getYear() + "): ");
@@ -192,8 +181,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                 out.println("[!] Nanosegundos invalidos.");
         }
 
-        LocalDateTime newLDT = LocalDateTime.of(year, month, day, hour, minute, second, nano);
-        return newLDT;
+        return LocalDateTime.of(year, month, day, hour, minute, second, nano);
     }
 
     // Remover um slot de trabalho

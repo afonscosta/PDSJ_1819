@@ -19,7 +19,6 @@ import static java.time.temporal.ChronoUnit.*;
 public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalController {
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeLocalView viewLocalTxt;
-    private final String bufferCode = "local";
 
     public CalcDateTimeLocalController() {
     }
@@ -28,7 +27,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     public void setModel(InterfCalcDateTimeModel model) {
         this.model = model;
         // Utilizar o zoneId do ficheiro de configuração
-        this.model.fromDateTime(bufferCode, ZonedDateTime.now());
+        this.model.fromDateTimeLocal(ZonedDateTime.now());
 
     }
 
@@ -39,9 +38,8 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     }
 
     private String buildDateTimeTitle() {
-        Temporal temp = model.getDateTime(bufferCode);
-        String ld = localDateTimeToString(temp);
-        return ld;
+        Temporal temp = model.getDateTimeLocal();
+        return localDateTimeToString(temp);
     }
 
     //------------------------
@@ -77,8 +75,8 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     // FlowSetDateTime
     //------------------------
     private void setDateTimeLocal() {
-        ZonedDateTime zdt = getLocalDateTimeFromInput();
-        model.fromDateTime(bufferCode, zdt);
+        ZonedDateTime ldt = getLocalDateTimeFromInput();
+        model.fromDateTimeLocal(ldt);
     }
 
     //------------------------
@@ -111,25 +109,25 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     private void shiftDays() {
         out.print("(+|-) número de dias: ");
         int n = Input.lerInt();
-        model.shiftDateTime(bufferCode, n, DAYS);
+        model.shiftDateTimeLocal(n, DAYS);
     }
 
     private void shiftWeeks() {
         out.print("(+|-) número de semanas: ");
         int n = Input.lerInt();
-        model.shiftDateTime(bufferCode, n, WEEKS);
+        model.shiftDateTimeLocal(n, WEEKS);
     }
 
     private void shiftMonths() {
         out.print("(+|-) número de meses: ");
         int n = Input.lerInt();
-        model.shiftDateTime(bufferCode, n, MONTHS);
+        model.shiftDateTimeLocal(n, MONTHS);
     }
 
     private void shiftYears() {
         out.print("(+|-) número de anos: ");
         int n = Input.lerInt();
-        model.shiftDateTime(bufferCode, n, YEARS);
+        model.shiftDateTimeLocal(n, YEARS);
     }
 
     //------------------------
@@ -157,7 +155,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     private void shiftWorkDays() {
         out.print("(+|-) número de dias: ");
         int n = Input.lerInt();
-        model.shiftWorkDaysDateTime(bufferCode, n);
+        model.shiftWorkDaysDateTimeLocal(n);
     }
 
     //------------------------
@@ -188,7 +186,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         while(newLDT == null) {
             newLDT = getLocalDateTimeFromInput();
         }
-        model.fromDateTime(bufferCode, newLDT);
+        model.fromDateTimeLocal(newLDT);
     }
 
 
@@ -197,11 +195,11 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         while(toDateTime == null) {
             toDateTime = getLocalDateTimeFromInput();
         }
-        String resDiff = model.diffDateTime(bufferCode, toDateTime);
+        String resDiff = model.diffDateTimeLocal(toDateTime);
 
         out.println("\nResultado: " + resDiff);
         out.print("Prima Enter para continuar.");
-        String str = Input.lerString();
+        Input.lerString();
     }
 
     //------------------------
@@ -232,11 +230,11 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         while(toDateTime == null) {
              toDateTime = getLocalDateTimeFromInput();
         }
-        String resDiff = model.diffWorkDaysDateTime(bufferCode, toDateTime);
+        String resDiff = model.diffWorkDaysDateTimeLocal(toDateTime);
 
         out.println("\nResultado: " + resDiff);
         out.print("Prima Enter para continuar.");
-        String str = Input.lerString();
+        Input.lerString();
     }
 
 
@@ -294,7 +292,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                     if (ndays != -1) {
                         //Imprime a data do dia em questão
                         zdt = (ZonedDateTime) nextDayN(zdt, ndays-1); // -1 porque o atual conta
-                        model.fromDateTime(bufferCode, zdt);
+                        model.fromDateTimeLocal(zdt);
                         out.println(localDateToString(zdt));
                     }
                     else {
@@ -376,7 +374,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     // Se não disser nada fica a que se encontra no modelLocal.
     // Devolve null caso dê uma exceção.
     private ZonedDateTime getLocalDateTimeFromInput() {
-        ZonedDateTime ldt = (ZonedDateTime) model.getDateTime(bufferCode);
+        ZonedDateTime zdt = (ZonedDateTime) model.getDateTimeLocal();
         Integer year = null;
         Integer month = null;
         Integer day = null;
@@ -387,63 +385,63 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String str;
 
         while (year == null) {
-            out.print("Ano (default: " + ldt.getYear() + "): ");
+            out.print("Ano (default: " + zdt.getYear() + "): ");
             str = Input.lerString();
-            year = validatePosNumber(str, ldt.getYear());
+            year = validatePosNumber(str, zdt.getYear());
             if (year == null)
                 out.println("[!] Ano invalido.");
         }
 
         while (month == null) {
-            out.print("Mes (default: " + ldt.getMonthValue() + "): ");
+            out.print("Mes (default: " + zdt.getMonthValue() + "): ");
             str = Input.lerString();
-            month = validateMonth(str, ldt.getMonthValue());
+            month = validateMonth(str, zdt.getMonthValue());
             if (month == null)
                 out.println("[!] Mes invalido.");
         }
 
         while (day == null) {
-            out.print("Dia (default: " + ldt.getDayOfMonth() + "): ");
+            out.print("Dia (default: " + zdt.getDayOfMonth() + "): ");
             str = Input.lerString();
-            day = validateDay(str, ldt.getDayOfMonth(), year, month);
+            day = validateDay(str, zdt.getDayOfMonth(), year, month);
             if (day == null)
                 out.println("[!] Dia invalido.");
         }
 
         while (hour == null) {
-            out.print("Hora (default: " + ldt.getHour() + "): ");
+            out.print("Hora (default: " + zdt.getHour() + "): ");
             str = Input.lerString();
-            hour = validateHour(str, ldt.getHour());
+            hour = validateHour(str, zdt.getHour());
             if (hour == null)
                 out.println("[!] Hora invalida.");
         }
 
         while (minute == null) {
-            out.print("Minutos (default: " + ldt.getMinute() + "): ");
+            out.print("Minutos (default: " + zdt.getMinute() + "): ");
             str = Input.lerString();
-            minute = validateMinSec(str, ldt.getMinute());
+            minute = validateMinSec(str, zdt.getMinute());
             if (minute == null)
                 out.println("[!] Minutos invalidos.");
         }
 
         while (second == null) {
-            out.print("Segundos (default: " + ldt.getSecond() + "): ");
+            out.print("Segundos (default: " + zdt.getSecond() + "): ");
             str = Input.lerString();
-            second = validateMinSec(str, ldt.getSecond());
+            second = validateMinSec(str, zdt.getSecond());
             if (second == null)
                 out.println("[!] Segundos invalidos.");
         }
 
         while (nano == null) {
-            out.print("Nanosegundos (default: " + ldt.getNano() + "): ");
+            out.print("Nanosegundos (default: " + zdt.getNano() + "): ");
             str = Input.lerString();
-            nano = validatePosNumber(str, ldt.getNano());
+            nano = validatePosNumber(str, zdt.getNano());
             if (nano == null)
                 out.println("[!] Nanosegundos invalidos.");
         }
 
-        ZonedDateTime newLDT = ZonedDateTime.of(year, month, day, hour, minute, second, nano, ZoneId.systemDefault());
-        return newLDT;
+        // Colocar o zone do ficheiro de configuração
+        return ZonedDateTime.of(year, month, day, hour, minute, second, nano, ZoneId.systemDefault());
     }
 
 

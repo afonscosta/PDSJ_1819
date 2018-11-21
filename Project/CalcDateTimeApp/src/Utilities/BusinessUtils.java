@@ -99,11 +99,12 @@ public class BusinessUtils {
         }
         // Ajustar o dia final para não ficar num fim de semana.
         if ((dia = getDayOfWeek(temp)) == null) return null;
-        if (n > 0)
+        if (n > 0) {
             if (dia.equals(SATURDAY) || dia.equals(SUNDAY)) {
                 temp = nextMondayN(temp, 1);
             }
-        else if (n < 0){
+        }
+        else if (n < 0) {
             if (dia.equals(SATURDAY) || dia.equals(SUNDAY)) {
                 temp = prevFridayN(temp, 1);
             }
