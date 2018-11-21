@@ -503,7 +503,7 @@ private void flowGetBusySlots() {
             String opcao;
             Menu menu = viewScheduleTxt.getMenu(6);
             do{
-                menu.addDescToTitle(Arrays.asList(localDateTimeToString(s.getData()),
+                menu.addDescToTitle(Arrays.asList(zoneDateTimeToString((ZonedDateTime)s.getData()),
                                                     s.getDuration().toString(),
                                                     s.getDescription(),
                                                     s.getLocal()));

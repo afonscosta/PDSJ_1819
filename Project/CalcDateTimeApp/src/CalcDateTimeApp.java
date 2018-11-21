@@ -43,9 +43,8 @@ public final class CalcDateTimeApp {
         //--------------------------------
         InterfCalcDateTimeLocalModel modelLocal = new CalcDateTimeLocalModel();
         InterfCalcDateTimeZoneModel modelZone = new CalcDateTimeZoneModel();
-        try {
-            InterfCalcDateTimeScheduleModel modelSchedule = InterfCalcDateTimeScheduleModel.pushState("AgendaReunioes");
-            InterfCalcDateTimeModel model = new CalcDateTimeModel(modelLocal, modelZone, modelSchedule);
+        InterfCalcDateTimeScheduleModel modelSchedule = InterfCalcDateTimeScheduleModel.pushState("AgendaReunioes");
+        InterfCalcDateTimeModel model = new CalcDateTimeModel(modelLocal, modelZone, modelSchedule);
 
         //--------------------------------
         InterfCalcDateTimeLocalView viewLocal = new CalcDateTimeLocalView();
@@ -70,37 +69,6 @@ public final class CalcDateTimeApp {
         // Aqui não fiz 'control.setModel(model)' porque o Controller principal não acede ao model.
         control.setView(view);
         control.startFlow();
-
-        } catch (IOException|ClassNotFoundException e) {
-            System.out.println("Problemas a trazer os dados para o tree set");
-            InterfCalcDateTimeScheduleModel modelSchedule = CalcDateTimeScheduleModel.of();
-            InterfCalcDateTimeModel model = new CalcDateTimeModel(modelLocal, modelZone, modelSchedule);
-
-            //--------------------------------
-            InterfCalcDateTimeLocalView viewLocal = new CalcDateTimeLocalView();
-            InterfCalcDateTimeZoneView viewZone = new CalcDateTimeZoneView();
-            InterfCalcDateTimeScheduleView viewSchedule = new CalcDateTimeScheduleView();
-            InterfCalcDateTimeView view = new CalcDateTimeView();
-
-            //--------------------------------
-            InterfCalcDateTimeLocalController controlLocal = new CalcDateTimeLocalController();
-            controlLocal.setModel(model);
-            controlLocal.setView(viewLocal);
-
-            InterfCalcDateTimeZoneController controlZone = new CalcDateTimeZoneController();
-            controlZone.setModel(model);
-            controlZone.setView(viewZone);
-
-            InterfCalcDateTimeScheduleController controlSchedule = new CalcDateTimeScheduleController();
-            controlSchedule.setModel(model);
-            controlSchedule.setView(viewSchedule);
-
-            InterfCalcDateTimeController control = new CalcDateTimeController(controlLocal, controlZone, controlSchedule);
-            // Aqui não fiz 'control.setModel(model)' porque o Controller principal não acede ao model.
-            control.setView(view);
-            control.startFlow();
-
-        }
 
         //--------------------------------
         //System.out.println("Fim da Aplicação >> "

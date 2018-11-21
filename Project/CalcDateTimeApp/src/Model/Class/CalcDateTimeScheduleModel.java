@@ -6,6 +6,8 @@ import Utilities.EnumEditSlotInfo;
 import java.io.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalField;
@@ -15,6 +17,8 @@ import java.util.*;
 public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleModel,Serializable  {
     private Set<Slot> agenda;
     static final long serialVersionUID = 1L;
+    //do ficheiro de configuração
+    private final ZoneId referenceZone= ZoneId.of("Europe/Lisbon");
 
     public static CalcDateTimeScheduleModel of() {
         return new CalcDateTimeScheduleModel();
@@ -23,45 +27,52 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     private CalcDateTimeScheduleModel() {
         Comparator<Slot> compDateSlots =
                 (Comparator<Slot> & Serializable)(Slot s1, Slot s2) -> {
-                                                    Temporal data1 = s1.getData();
-                                                    Temporal data2 = s2.getData();
+                                Temporal data1 = s1.getData();
+                                Temporal data2 = s2.getData();
+                                LocalDateTime ldt1 = LocalDateTime.from(data1);
+                                LocalDateTime ldt2 = LocalDateTime.from(data2);
 
-                                                    if (data1.equals(data2)) return 0;
-                                                    else if (data1.getClass().getSimpleName().equals("LocalDateTime")) {
-                                                        if (data2.getClass().getSimpleName().equals("LocalDateTime")) {
-                                                            System.out.println("AS DUAS DATAS SÃO LOCALDATETIME");
-                                                            LocalDateTime ldt1 = LocalDateTime.from(data1);
-                                                            LocalDateTime ldt2 = LocalDateTime.from(data2);
-                                                            System.out.println("ldt1->" + ldt1.toString());
-                                                            System.out.println("ldt2->" + ldt2.toString());
+                                if (data1.equals(data2)) return 0;
+                                else {
+                                    if (data1.getClass().getSimpleName().equals("ZonedDateTime")) {
+                                        ldt1 = convertZoneDateTimeToSpecificZone(data1, this.referenceZone).toLocalDateTime();
+                                    }
+                                    if (data2.getClass().getSimpleName().equals("ZonedDateTime")) {
+                                        ldt2 = convertZoneDateTimeToSpecificZone(data2,this.referenceZone).toLocalDateTime();
+                                    }
+                                    System.out.println("ldt1->" + ldt1.toString());
+                                    System.out.println("ldt2->" + ldt2.toString());
 
-                                                            if (ldt1.isBefore(ldt2)) {
-                                                                Duration d1 = s1.getDuration();
-                                                                LocalDateTime data1Final = ldt1.plus(d1);
-                                                                System.out.println("data1Final->" + data1Final);
-                                                                if (data1Final.isBefore(ldt2))
-                                                                    return -1;
-                                                                else {
-                                                                    System.out.println("Retornei 0 no mesmo dia!!");
-                                                                    return 0;
-                                                                }
-                                                            } else {
-                                                                Duration d2 = s2.getDuration();
-                                                                LocalDateTime data2Final = ldt2.plus(d2);
-                                                                System.out.println("data2Final->" + data2Final);
-                                                                if (data2Final.isBefore(ldt1))
-                                                                    return 1;
-                                                                else {
-                                                                    System.out.println("Retornei 0 no mesmo dia!!");
-                                                                    return 0;
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                    System.out.println("Se estou aqui é porque não são LocalDate Time");
-                                                    return 0;
-                                                };
+                                    if (ldt1.isBefore(ldt2)) {
+                                        Duration d1 = s1.getDuration();
+                                        LocalDateTime data1Final = ldt1.plus(d1);
+                                        System.out.println("data1Final->" + data1Final);
+                                        if (data1Final.isBefore(ldt2))
+                                            return -1;
+                                        else {
+                                            return 0;
+                                        }
+                                    } else {
+                                        Duration d2 = s2.getDuration();
+                                        LocalDateTime data2Final = ldt2.plus(d2);
+                                        System.out.println("data2Final->" + data2Final);
+                                        if (data2Final.isBefore(ldt1))
+                                            return 1;
+                                        else {
+                                            return 0;
+                                        }
+                                    }
+                                }
+                };
                 this.agenda= new TreeSet<>(compDateSlots);
+    }
+    //pode ir para o utils
+    public ZonedDateTime convertZoneDateTimeToSpecificZone (Temporal data,ZoneId referenceZone) {
+        System.out.println(data);
+        ZonedDateTime zoneData= ZonedDateTime.from(data);
+        zoneData = zoneData.withZoneSameInstant(referenceZone);
+        System.out.println(zoneData);
+        return zoneData;
     }
 
     public Set<Slot> getAgenda() {
@@ -72,18 +83,40 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         this.agenda = agenda;
     }
 
+    public boolean isSlotfromReferenceZone(Slot s, ZoneId referenceZone){
+        ZonedDateTime date = ZonedDateTime.from(s.getData());
+        if(date.getZone().equals(referenceZone))
+            return true;
+        else
+            return false;
+    }
+
+    //------------------------
+    // Se a reunião estiver na zoned default, não é apresentada a informação referente a Zoned
+    //------------------------
+    public String DateSlotToString(Slot s,ZoneId referenceZone){
+        DateTimeFormatter formatterToShowLocalDateTime = DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm");
+        DateTimeFormatter formatterToShowZonedDateTime = DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm V");
+        ZonedDateTime date = ZonedDateTime.from(s.getData());
+        boolean temp = isSlotfromReferenceZone(s,referenceZone);
+        if(temp==true) {
+             return date.format(formatterToShowLocalDateTime);
+        }
+        else{
+            return date.format(formatterToShowZonedDateTime);
+        }
+    }
+
     //------------------------
     // Devolve todas as reuniões existentes
     // É apresentada cada reunião de forma aglutinada, pela sua data e local.
+    // Se a reunião estiver na zoned default, não é apresentada a zoned
     //------------------------
     public List<String> getMainInfoSlots(){
         List<String> res= new ArrayList();
         int index =0;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm");
         for(Slot s : agenda) {
-            LocalDateTime date = LocalDateTime.from(s.getData());
-            String formattedDate = date.format(formatter);
-            res.add(index + ": " + formattedDate + " || " + s.getLocal());
+            res.add(index + ": " + DateSlotToString(s,this.referenceZone) + " || " + s.getLocal());
             index ++;
         }
         return res;
@@ -98,16 +131,14 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     public List<String> getRestrictSlots(String modeNormalized, int want){
         List<String> res= new ArrayList();
         int index =0;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm");
         for(Slot s : agenda) {
-            LocalDateTime date = LocalDateTime.from(s.getData());
+            ZonedDateTime date = ZonedDateTime.from(s.getData());
             switch (modeNormalized) {
                 case "diario":
                     System.out.print(date.getDayOfMonth() +"==" + want);
                     if(date.getDayOfMonth()==want){
                         System.out.println("YES");
-                        String formattedDate = date.format(formatter);
-                        res.add(index + ": " + formattedDate + " || " + s.getLocal());
+                        res.add(index + ": " + DateSlotToString(s,this.referenceZone) + " || " + s.getLocal());
                         index ++;
                     }
                     break;
@@ -116,15 +147,13 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                     int weekNumber = date.get(woy);
                     System.out.println(weekNumber);
                     if(weekNumber==want){
-                        String formattedDate = date.format(formatter);
-                        res.add(index + ": " + formattedDate + " || " + s.getLocal());
+                        res.add(index + ": " + DateSlotToString(s,this.referenceZone) + " || " + s.getLocal());
                         index ++;
                     }
                     break;
                 case "mensal":
                     if(date.getMonthValue()==want){
-                        String formattedDate = date.format(formatter);
-                        res.add(index + ": " + formattedDate + " || " + s.getLocal());
+                        res.add(index + ": " + DateSlotToString(s,this.referenceZone) + " || " + s.getLocal());
                         index ++;
                     }
                     break;

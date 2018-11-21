@@ -1,5 +1,6 @@
 package Model.Interface;
 
+import Model.Class.CalcDateTimeScheduleModel;
 import Model.Class.Slot;
 import Utilities.EnumEditSlotInfo;
 
@@ -14,13 +15,20 @@ public interface InterfCalcDateTimeScheduleModel {
 
     void saveState(String nomeFicheiro)throws IOException;
 
-    static InterfCalcDateTimeScheduleModel pushState(String nomeFicheiro) throws IOException, ClassNotFoundException {
-        FileInputStream fis = new FileInputStream(nomeFicheiro);
-        ObjectInputStream ois = new ObjectInputStream(fis);
-        InterfCalcDateTimeScheduleModel scheduleModel = (InterfCalcDateTimeScheduleModel) ois.readObject();
-        ois.close();
-        fis.close();
-        return scheduleModel;
+    static InterfCalcDateTimeScheduleModel pushState(String nomeFicheiro) {
+        try {
+            FileInputStream fis = new FileInputStream(nomeFicheiro);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            InterfCalcDateTimeScheduleModel scheduleModel = (InterfCalcDateTimeScheduleModel) ois.readObject();
+            ois.close();
+            fis.close();
+            return scheduleModel;
+        }
+        catch(IOException | ClassNotFoundException e){
+            System.out.println("Problemas a trazer o tree set");
+            return CalcDateTimeScheduleModel.of();
+
+        }
     }
     List<String> getMainInfoSlots();
 
