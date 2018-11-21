@@ -1,54 +1,43 @@
 package Model.Class;
 
 import Model.Interface.InterfCalcDateTimeZoneModel;
-import Utilities.EnumDateTimeShiftMode;
-import Utilities.BusinessUtils;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.zone.ZoneRulesException;
-import java.util.Set;
 
-public class CalcDateTimeZoneModel implements InterfCalcDateTimeZoneModel {
+public class CalcDateTimeZoneModel extends CalcDateTimeLocalModel implements InterfCalcDateTimeZoneModel {
 
-    ZonedDateTime zdt;
+    private CalcDateTimeZoneModel() {
+        super();
+    }
 
-    public CalcDateTimeZoneModel() {
-        this.zdt = ZonedDateTime.now();
+    public static CalcDateTimeZoneModel of () {
+        return new CalcDateTimeZoneModel();
     }
 
     @Override
-    public Temporal getDateTimeZone() {
-        return zdt;
+    public Temporal getDateTime() {
+        return super.getDateTime();
     }
 
     @Override
-    public void shiftDateTimeZone(int n, ChronoUnit cu, EnumDateTimeShiftMode mode) {
-        zdt = (ZonedDateTime) BusinessUtils.shiftDateTime(zdt, n, cu, mode);
-    }
-
-    @Override
-    public void convertZoneDateTimeToZone(String zoneIdTxt) {
+    public void withZone(String zoneIdTxt) {
         try {
             ZoneId chosenZoneId = ZoneId.of(zoneIdTxt);
-
-            zdt = zdt.withZoneSameInstant(chosenZoneId);
+            super.fromDateTime(((ZonedDateTime) super.getDateTime()).withZoneSameInstant(chosenZoneId));
         } catch (ZoneRulesException e) {
             // Zona inexistente? Ignorar..
         }
     }
 
     @Override
-    public void changeZoneDateTimeToCurrentDateInZone(String zoneIdTxt) {
+    public void changeToCurrentDateInZone(String zoneIdTxt) {
         try {
             ZoneId chosenZoneId = ZoneId.of(zoneIdTxt);
 
-            ZonedDateTime nowInChosenZone = ZonedDateTime.now().withZoneSameInstant(chosenZoneId);
-
-            zdt = nowInChosenZone;
+            super.fromDateTime(ZonedDateTime.now().withZoneSameInstant(chosenZoneId));
         } catch (ZoneRulesException e) {
             // Zona inexistente? Ignorar..
         }

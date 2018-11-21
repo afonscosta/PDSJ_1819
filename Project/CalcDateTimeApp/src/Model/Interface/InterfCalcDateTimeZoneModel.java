@@ -1,18 +1,8 @@
 package Model.Interface;
 
-import Utilities.EnumDateTimeShiftMode;
+public interface InterfCalcDateTimeZoneModel extends InterfCalcDateTimeLocalModel{
 
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
+    void withZone(String zoneIdTxt);
 
-public interface InterfCalcDateTimeZoneModel {
-
-
-    Temporal getDateTimeZone();
-
-    void shiftDateTimeZone(int n, ChronoUnit cu, EnumDateTimeShiftMode mode);
-
-    void convertZoneDateTimeToZone(String zoneId);
-
-    void changeZoneDateTimeToCurrentDateInZone(String zoneId);
+    void changeToCurrentDateInZone(String zoneIdTxt);
 }

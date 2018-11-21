@@ -2,9 +2,8 @@ package Model.Class;
 
 import Model.Interface.InterfCalcDateTimeLocalModel;
 import Utilities.BusinessUtils;
-import Utilities.EnumDateTimeShiftMode;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 
@@ -12,39 +11,47 @@ import static Utilities.BusinessUtils.*;
 
 public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 
-    private LocalDateTime ldt;
+    private ZonedDateTime ldt;
 
+    public static CalcDateTimeLocalModel of () {
+        return new CalcDateTimeLocalModel();
+    }
+
+    // Está public para poder usar na subclasse
     public CalcDateTimeLocalModel() {
-        this.ldt = LocalDateTime.now();
+        this.ldt = ZonedDateTime.now();
     }
 
     @Override
-    public Temporal getDateTimeLocal() {
+    public Temporal getDateTime() {
+        System.out.println("Get: " + ldt);
         return ldt;
     }
 
     @Override
-    public void fromDateTimeLocal(LocalDateTime newLDT) {
-        this.ldt = LocalDateTime.from(newLDT);
+    public void fromDateTime(ZonedDateTime newLDT) {
+        this.ldt = ZonedDateTime.from(newLDT);
     }
 
     @Override
-    public void shiftDateTimeLocal(int n, ChronoUnit cu, EnumDateTimeShiftMode mode) {
-        ldt = (LocalDateTime) BusinessUtils.shiftDateTime(ldt, n, cu, mode);
+    public void shiftDateTime(int n, ChronoUnit cu) {
+        System.out.println("Antes do shift: " + ldt);
+        ldt = (ZonedDateTime) BusinessUtils.shiftDateTime(ldt, n, cu);
+        System.out.println("Depois do shift: " + ldt);
     }
 
     @Override
-    public void shiftWorkDaysDateTimeLocal(int n, EnumDateTimeShiftMode mode) {
-        ldt = (LocalDateTime) shiftWorkDays(ldt, n, mode);
+    public void shiftWorkDaysDateTime(int n) {
+        ldt = (ZonedDateTime) shiftWorkDays(ldt, n);
     }
 
     @Override
-    public String diffDateTimeLocal(LocalDateTime toDateTime) {
+    public String diffDateTime(ZonedDateTime toDateTime) {
         return diffBetweenDateTime(ldt, toDateTime);
     }
 
     @Override
-    public String diffWorkDaysDateTimeLocal(LocalDateTime toDateTime) {
+    public String diffWorkDaysDateTime(ZonedDateTime toDateTime) {
         return countWorkDays(ldt, toDateTime) + " dias úteis";
     }
 }

@@ -73,7 +73,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         String answerZone = flowShowAllAvailableTimezonesAndGetZoneId();
 
         if (!answerZone.equals(("S"))) {
-            model.changeZoneDateTimeToCurrentDateInZone(answerZone);
+            model.changeToCurrentDateInZone(answerZone);
         }
     }
 
@@ -102,37 +102,25 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     private void shiftDays() {
         out.print("(+|-) número de dias: ");
         int n = Input.lerInt();
-        if (n >= 0)
-            model.shiftDateTimeZone(abs(n), DAYS, ADD);
-        else
-            model.shiftDateTimeZone(abs(n), DAYS, SUB);
+        model.shiftDateTimeZone(n, DAYS);
     }
 
     private void shiftWeeks() {
         out.print("Número de semanas: ");
         int n = Input.lerInt();
-        if (n >= 0)
-            model.shiftDateTimeZone(abs(n), WEEKS, ADD);
-        else
-            model.shiftDateTimeZone(abs(n), WEEKS, SUB);
+        model.shiftDateTimeZone(n, WEEKS);
     }
 
     private void shiftMonths() {
         out.print("Número de meses: ");
         int n = Input.lerInt();
-        if (n >= 0)
-            model.shiftDateTimeZone(abs(n), MONTHS, ADD);
-        else
-            model.shiftDateTimeZone(abs(n), MONTHS, SUB);
+        model.shiftDateTimeZone(n, MONTHS);
     }
 
     private void shiftYears() {
         out.print("Número de anos: ");
         int n = Input.lerInt();
-        if (n >= 0)
-            model.shiftDateTimeZone(abs(n), YEARS, ADD);
-        else
-            model.shiftDateTimeZone(abs(n), YEARS, SUB);
+        model.shiftDateTimeZone(n, YEARS);
     }
 
 
@@ -144,7 +132,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         String answerZone = flowShowAllAvailableTimezonesAndGetZoneId();
 
         if (!answerZone.equals(("S"))) {
-            model.convertZoneDateTimeToZone(answerZone);
+            model.withZone(answerZone);
         }
     }
 
