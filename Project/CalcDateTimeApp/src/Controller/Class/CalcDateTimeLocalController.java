@@ -7,12 +7,12 @@ import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeLocalView;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
 import java.util.Arrays;
 
 import static Utilities.BusinessUtils.*;
+import static Utilities.ControllerUtils.getDateTimeFromInput;
 import static java.lang.System.out;
 import static java.time.temporal.ChronoUnit.*;
 
@@ -75,7 +75,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     // FlowSetDateTime
     //------------------------
     private void setDateTimeLocal() {
-        ZonedDateTime ldt = getLocalDateTimeFromInput();
+        ZonedDateTime ldt = getDateTimeFromInput((ZonedDateTime) model.getDateTimeLocal(), null);
         model.fromDateTimeLocal(ldt);
     }
 
@@ -184,7 +184,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     private void fromDateTimeLocal() {
         ZonedDateTime newLDT = null;
         while(newLDT == null) {
-            newLDT = getLocalDateTimeFromInput();
+            newLDT = getDateTimeFromInput((ZonedDateTime) model.getDateTimeLocal(), null);
         }
         model.fromDateTimeLocal(newLDT);
     }
@@ -193,7 +193,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     private void diffDateTimeLocal() {
         ZonedDateTime toDateTime = null;
         while(toDateTime == null) {
-            toDateTime = getLocalDateTimeFromInput();
+            toDateTime = getDateTimeFromInput((ZonedDateTime) model.getDateTimeLocal(), null);
         }
         String resDiff = model.diffDateTimeLocal(toDateTime);
 
@@ -228,7 +228,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     private void diffWorkDaysDateTime() {
         ZonedDateTime toDateTime = null;
         while(toDateTime == null) {
-             toDateTime = getLocalDateTimeFromInput();
+             toDateTime = getDateTimeFromInput((ZonedDateTime) model.getDateTimeLocal(), null);
         }
         String resDiff = model.diffWorkDaysDateTimeLocal(toDateTime);
 
@@ -370,79 +370,6 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     }
 
 
-    // Pede ao utilizador uma data.
-    // Se não disser nada fica a que se encontra no modelLocal.
-    // Devolve null caso dê uma exceção.
-    private ZonedDateTime getLocalDateTimeFromInput() {
-        ZonedDateTime zdt = (ZonedDateTime) model.getDateTimeLocal();
-        Integer year = null;
-        Integer month = null;
-        Integer day = null;
-        Integer hour = null;
-        Integer minute = null;
-        Integer second = null;
-        Integer nano = null;
-        String str;
-
-        while (year == null) {
-            out.print("Ano (default: " + zdt.getYear() + "): ");
-            str = Input.lerString();
-            year = validatePosNumber(str, zdt.getYear());
-            if (year == null)
-                out.println("[!] Ano invalido.");
-        }
-
-        while (month == null) {
-            out.print("Mes (default: " + zdt.getMonthValue() + "): ");
-            str = Input.lerString();
-            month = validateMonth(str, zdt.getMonthValue());
-            if (month == null)
-                out.println("[!] Mes invalido.");
-        }
-
-        while (day == null) {
-            out.print("Dia (default: " + zdt.getDayOfMonth() + "): ");
-            str = Input.lerString();
-            day = validateDay(str, zdt.getDayOfMonth(), year, month);
-            if (day == null)
-                out.println("[!] Dia invalido.");
-        }
-
-        while (hour == null) {
-            out.print("Hora (default: " + zdt.getHour() + "): ");
-            str = Input.lerString();
-            hour = validateHour(str, zdt.getHour());
-            if (hour == null)
-                out.println("[!] Hora invalida.");
-        }
-
-        while (minute == null) {
-            out.print("Minutos (default: " + zdt.getMinute() + "): ");
-            str = Input.lerString();
-            minute = validateMinSec(str, zdt.getMinute());
-            if (minute == null)
-                out.println("[!] Minutos invalidos.");
-        }
-
-        while (second == null) {
-            out.print("Segundos (default: " + zdt.getSecond() + "): ");
-            str = Input.lerString();
-            second = validateMinSec(str, zdt.getSecond());
-            if (second == null)
-                out.println("[!] Segundos invalidos.");
-        }
-
-        while (nano == null) {
-            out.print("Nanosegundos (default: " + zdt.getNano() + "): ");
-            str = Input.lerString();
-            nano = validatePosNumber(str, zdt.getNano());
-            if (nano == null)
-                out.println("[!] Nanosegundos invalidos.");
-        }
-
-        // Colocar o zone do ficheiro de configuração
-        return ZonedDateTime.of(year, month, day, hour, minute, second, nano, ZoneId.systemDefault());
-    }
 
 
 

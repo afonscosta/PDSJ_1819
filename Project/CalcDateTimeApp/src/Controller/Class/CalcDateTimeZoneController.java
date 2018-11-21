@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static Utilities.BusinessUtils.*;
+import static Utilities.ControllerUtils.getDateTimeFromInput;
 import static java.lang.System.out;
 import static java.time.temporal.ChronoUnit.*;
 
@@ -109,7 +110,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     private void diffWorkDaysDateTimeZone() {
         ZonedDateTime toDateTime = null;
         while(toDateTime == null) {
-            toDateTime = getLocalDateTimeZoneFromInput();
+            toDateTime = getZoneDateTimeFromInput();
         }
         String resDiff = model.diffWorkDaysDateTimeZone(toDateTime);
 
@@ -143,7 +144,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     private void fromDateTimeLocal() {
         ZonedDateTime newLDT = null;
         while(newLDT == null) {
-            newLDT = getLocalDateTimeZoneFromInput();
+            newLDT = getZoneDateTimeFromInput();
         }
         model.fromDateTimeZone(newLDT);
     }
@@ -151,7 +152,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     private void diffDateTimeLocal() {
         ZonedDateTime toDateTime = null;
         while(toDateTime == null) {
-            toDateTime = getLocalDateTimeZoneFromInput();
+            toDateTime = getZoneDateTimeFromInput();
         }
         String resDiff = model.diffDateTimeZone(toDateTime);
 
@@ -187,82 +188,15 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     }
 
     private void setDateTimeZone() {
-        ZonedDateTime zdt = getLocalDateTimeZoneFromInput();
+        ZonedDateTime zdt = getZoneDateTimeFromInput();
         model.fromDateTimeZone(zdt);
     }
 
-    private ZonedDateTime getLocalDateTimeZoneFromInput() {
-
-        ZonedDateTime ldt = (ZonedDateTime) model.getDateTimeZone();
-        Integer year = null;
-        Integer month = null;
-        Integer day = null;
-        Integer hour = null;
-        Integer minute = null;
-        Integer second = null;
-        Integer nano = null;
-        String str;
-
-        while (year == null) {
-            out.print("Ano (default: " + ldt.getYear() + "): ");
-            str = Input.lerString();
-            year = validatePosNumber(str, ldt.getYear());
-            if (year == null)
-                out.println("[!] Ano invalido.");
-        }
-
-        while (month == null) {
-            out.print("Mes (default: " + ldt.getMonthValue() + "): ");
-            str = Input.lerString();
-            month = validateMonth(str, ldt.getMonthValue());
-            if (month == null)
-                out.println("[!] Mes invalido.");
-        }
-
-        while (day == null) {
-            out.print("Dia (default: " + ldt.getDayOfMonth() + "): ");
-            str = Input.lerString();
-            day = validateDay(str, ldt.getDayOfMonth(), year, month);
-            if (day == null)
-                out.println("[!] Dia invalido.");
-        }
-
-        while (hour == null) {
-            out.print("Hora (default: " + ldt.getHour() + "): ");
-            str = Input.lerString();
-            hour = validateHour(str, ldt.getHour());
-            if (hour == null)
-                out.println("[!] Hora invalida.");
-        }
-
-        while (minute == null) {
-            out.print("Minutos (default: " + ldt.getMinute() + "): ");
-            str = Input.lerString();
-            minute = validateMinSec(str, ldt.getMinute());
-            if (minute == null)
-                out.println("[!] Minutos invalidos.");
-        }
-
-        while (second == null) {
-            out.print("Segundos (default: " + ldt.getSecond() + "): ");
-            str = Input.lerString();
-            second = validateMinSec(str, ldt.getSecond());
-            if (second == null)
-                out.println("[!] Segundos invalidos.");
-        }
-
-        while (nano == null) {
-            out.print("Nanosegundos (default: " + ldt.getNano() + "): ");
-            str = Input.lerString();
-            nano = validatePosNumber(str, ldt.getNano());
-            if (nano == null)
-                out.println("[!] Nanosegundos invalidos.");
-        }
-
+    private ZonedDateTime getZoneDateTimeFromInput() {
         String zoneIdString = flowShowAllAvailableTimezonesAndGetNZoneIds(1).get(0);
         ZoneId zoneId = ZoneId.of(zoneIdString);
 
-        return ZonedDateTime.of(year, month, day, hour, minute, second, nano, zoneId);
+        return getDateTimeFromInput((ZonedDateTime) model.getDateTimeZone(), zoneId);
     }
 
     //------------------------

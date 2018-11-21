@@ -118,7 +118,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         out.print("Introduza o local da nova reuniao: ");
         String local = Input.lerString();
 
-        out.print("Introduza uma descricao da nova reuniao:");
+        out.print("Introduza uma descricao da nova reuniao: ");
         String description= Input.lerString();
         Slot newSlot = new Slot(date,duration,local,description);
         boolean res =model.addSlot(newSlot);

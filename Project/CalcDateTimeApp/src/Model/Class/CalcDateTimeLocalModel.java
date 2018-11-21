@@ -24,7 +24,6 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 
     @Override
     public Temporal getDateTime() {
-        System.out.println("Get: " + ldt);
         return ldt;
     }
 
@@ -35,9 +34,7 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 
     @Override
     public void shiftDateTime(int n, ChronoUnit cu) {
-        System.out.println("Antes do shift: " + ldt);
         ldt = (ZonedDateTime) BusinessUtils.shiftDateTime(ldt, n, cu);
-        System.out.println("Depois do shift: " + ldt);
     }
 
     @Override
