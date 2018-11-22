@@ -17,6 +17,7 @@ import java.util.List;
 
 import static Utilities.BusinessUtils.*;
 import static Utilities.ControllerUtils.getDateTimeFromInput;
+import static Utilities.ControllerUtils.shift;
 import static java.lang.System.out;
 import static java.time.temporal.ChronoUnit.*;
 
@@ -183,7 +184,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "M" : model.shiftWorkDaysDateTimeZone(ControllerUtils.shift("dias")); break;
+                case "M" : model.shiftWorkDaysDateTimeZone(shift("dias")); break;
                 case "S": break;
                 default: out.println("Opcão Inválida !"); break;
             }
@@ -225,10 +226,14 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
             menu.show();
             opcao = Input.lerString().toUpperCase();
             switch(opcao) {
-                case "DIA" : model.shiftDateTimeZone(ControllerUtils.shift("dias"),DAYS); break;
-                case "SEM" : model.shiftDateTimeZone(ControllerUtils.shift("semanas"), WEEKS);; break;
-                case "MES" : model.shiftDateTimeZone(ControllerUtils.shift("dias"),MONTHS); break;
-                case "ANO" : model.shiftDateTimeZone(ControllerUtils.shift("anos"),YEARS); break;
+                case "ANO" : model.shiftDateTimeZone(shift("anos"),         YEARS);   break;
+                case "MES" : model.shiftDateTimeZone(shift("meses"),        MONTHS);  break;
+                case "SEM" : model.shiftDateTimeZone(shift("semanas"),      WEEKS);   break;
+                case "DIA" : model.shiftDateTimeZone(shift("dias"),         DAYS);    break;
+                case "HOR" : model.shiftDateTimeZone(shift("horas"),        HOURS);   break;
+                case "MIN" : model.shiftDateTimeZone(shift("minutos"),      MINUTES); break;
+                case "SEG" : model.shiftDateTimeZone(shift("segundos"),     SECONDS); break;
+                case "NAN" : model.shiftDateTimeZone(shift("nanosegundos"), NANOS);   break;
                 case "S": break;
                 default: out.println("Opcão Inválida !"); break;
             }
