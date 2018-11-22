@@ -1,5 +1,6 @@
 package Model.Interface;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
@@ -17,4 +18,6 @@ public interface InterfCalcDateTimeLocalModel {
     String diffDateTime(ZonedDateTime toDateTime);
 
     String diffWorkDaysDateTime(ZonedDateTime toDateTime);
+
+    void withZone(String zid);
 }

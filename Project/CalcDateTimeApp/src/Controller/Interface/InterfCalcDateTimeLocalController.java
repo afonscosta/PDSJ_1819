@@ -3,26 +3,19 @@ package Controller.Interface;
 import Model.Interface.InterfCalcDateTimeModel;
 import View.Interface.InterfCalcDateTimeLocalView;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 public interface InterfCalcDateTimeLocalController {
 
-    // Apresentar opções que podem ser feitas na calculadora local (somar, subtrair, diferença)
-    public void flowLocal();
+
+    void flowLocal();
 
     void setModel(InterfCalcDateTimeModel model);
 
     void setView(InterfCalcDateTimeLocalView viewLocal);
 
-    /*
-    // Pedir data de fim e efetuar diferença
-    private void flowDiffBetweenDateTimes();
+    void withZone(String zid);
 
-    // Retirar datas a partir de descrição ordinal
-    private void flowAdjustDateTime();
-
-    // Adicionar ou subtrair dias úteis a uma data
-    private void flowShiftWorkdays(EnumDateTimeShiftMode mode);
-
-    // Mostrar datetime em horas, minutos, segundos... totais
-    private void flowReduceTo();
-    */
+    void setDateTimeFormatter(DateTimeFormatter dtf);
 }
