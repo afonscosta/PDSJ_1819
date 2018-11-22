@@ -44,7 +44,7 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         op3 = new Opcao("Definir o fuso local", "L");
         op4 = new Opcao("Definir horario da agenda","H");
         op5 = new Opcao("Ajuda", "?");
-        op6 = new Opcao("Sair da Aplicacao", "S");
+        op6 = new Opcao("Voltar ao Menu Principal", "S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5, op6);
         Menu menuConfig = new Menu(linhas, "Menu de Configuracoes");
         menuMainTxt.addMenu(1, menuConfig);
@@ -70,6 +70,16 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         menuMainTxt.addMenu(3, menuHelp);
 
         //------------------------
+        // Menu Configurações
+        //------------------------
+        op1 = new Opcao("Escolher pre-definidos", "P");
+        op2 = new Opcao("Manualmente", "M");
+        op3 = new Opcao("Voltar ao menu Configuracoes","S");
+        linhas = Arrays.asList(op1, op2,op3);
+        Menu menuAlterFormatter = new Menu(linhas, "Alterar formato");
+        menuMainTxt.addMenu(4, menuAlterFormatter);
+
+        //------------------------
         // Menu para a escolha do formato a apresentar das datas LocalDateTime
         //------------------------
         op1 = new Opcao("dd-MM-yyy HH:mm", "1");
@@ -78,7 +88,7 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         op4 = new Opcao("Voltar ao menu configuracoes","S");
         linhas = Arrays.asList(op1, op2, op3, op4);
         Menu menuLocalFormatter = new Menu(linhas, "Escolha do formato da data local");
-        menuMainTxt.addMenu(2, menuLocalFormatter);
+        menuMainTxt.addMenu(5, menuLocalFormatter);
 
         //------------------------
         // Menu para a escolha do formato a apresentar das datas ZonedDateTime
@@ -90,7 +100,7 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         op5 = new Opcao("Voltar ao menu configuracoes","S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5);
         Menu menuZonedFormatter = new Menu(linhas, "Escolha do formato da data com fusos");
-        menuMainTxt.addMenu(2, menuZonedFormatter);
+        menuMainTxt.addMenu(6, menuZonedFormatter);
 
         return menuMainTxt;
     }
