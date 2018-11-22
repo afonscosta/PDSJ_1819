@@ -94,9 +94,9 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     }
 
     //------------------------
-    // ModeNormalized: diario, semanal, mensal
+    // ModeNormalized: diaria, semanal, mensal
     // want -> a igualdade a verficar na agenda
-    // Por exemplo, utilizador escolhe diario -> want diz-me o dia referente
+    // Por exemplo, utilizador escolhe diaria -> want diz-me o dia referente
     //------------------------
 
     public List<String> getRestrictSlots(String modeNormalized, int want){
@@ -105,7 +105,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         for(Slot s : agenda) {
             ZonedDateTime date = ZonedDateTime.from(s.getData());
             switch (modeNormalized) {
-                case "diario":
+                case "diaria":
                     System.out.print(date.getDayOfMonth() +"==" + want);
                     if(date.getDayOfMonth()==want){
                         System.out.println("YES");

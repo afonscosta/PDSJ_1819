@@ -37,7 +37,9 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         this.viewMainTxt = view;
     }
 
-    @Override
+    //------------------------
+    // Fluxo inicial do programa
+    //------------------------
     public void startFlow() {
         // Início do fluxo de execução
         Menu menu = viewMainTxt.getMenu(0);
@@ -58,7 +60,9 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         while(!opcao.equals("S"));
 
     }
-
+    //------------------------
+    // Menu de ajuda do menu principal
+    //------------------------
     private void help() {
         List<String> l = asList(
             BLACK_BOLD + "Opcao L:" + RESET + " permite ao utilizador aceder ao menu ",
