@@ -38,10 +38,19 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
         //------------------------
         // Menu Help
         //------------------------
-        op1 = new Opcao("Sair", "S");
-        linhas = Arrays.asList(op1);
+        op1 = new Opcao("Explicacao detalhada da opcao O", "O");
+        op2 = new Opcao("Sair", "S");
+        linhas = Arrays.asList(op1, op2);
         Menu menuHelp = new Menu(linhas, "Menu Ajuda");
         menusLocalTxt.addMenu(1, menuHelp);
+
+        //------------------------
+        // Menu Help Opcao O
+        //------------------------
+        op1 = new Opcao("Sair", "S");
+        linhas = Arrays.asList(op1);
+        Menu menuHelpOpcaoO = new Menu(linhas, "Menu Ajuda Opcao O");
+        menusLocalTxt.addMenu(2, menuHelpOpcaoO);
 
         //------------------------
         // Menu Shift DateTime
@@ -57,7 +66,7 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
         op9 = new Opcao("Voltar a Calc. Local", "S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5, op6, op7, op8, op9);
         Menu menuShiftDateTime = new Menu(linhas, "Aritmetica de Datas");
-        menusLocalTxt.addMenu(2, menuShiftDateTime);
+        menusLocalTxt.addMenu(3, menuShiftDateTime);
 
         //------------------------
         // Menu Shift WorkDays DateTime
@@ -66,7 +75,7 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
         op2 = new Opcao("Voltar a Calc. Local", "S");
         linhas = Arrays.asList(op1, op2);
         Menu menuShiftWorkDaysDateTime = new Menu(linhas, "Aritmetica de Dias Uteis");
-        menusLocalTxt.addMenu(3, menuShiftWorkDaysDateTime);
+        menusLocalTxt.addMenu(4, menuShiftWorkDaysDateTime);
 
         //------------------------
         // Menu Diff DateTime
@@ -76,7 +85,7 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
         op3 = new Opcao("Voltar a Calc. Local", "S");
         linhas = Arrays.asList(op1, op2, op3);
         Menu menuDiffDateTime = new Menu(linhas, "Diferenca entre Datas");
-        menusLocalTxt.addMenu(4, menuDiffDateTime);
+        menusLocalTxt.addMenu(5, menuDiffDateTime);
 
         return menusLocalTxt;
     }
