@@ -2,14 +2,12 @@ package Controller.Class;
 
 import Controller.Interface.InterfCalcDateTimeLocalController;
 import Model.Interface.InterfCalcDateTimeModel;
-import Utilities.ControllerUtils;
 import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeLocalView;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.time.temporal.Temporal;
 import java.util.List;
 
 import static Utilities.BusinessUtils.*;
@@ -73,6 +71,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     private void help() {
         ZonedDateTime ld = (ZonedDateTime) model.getDateTimeLocal();
         String sld = localDateTimeToString(ld);
+        Menu menu = viewLocalTxt.getMenu(1);
         List<String> l = asList(
             RED_BOLD + "Data: " + sld + RESET,
             BLACK_BOLD + "^^^^" + RESET + " - A data presente no registo e usada por omissao ",
@@ -107,7 +106,60 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             BLACK_BOLD + "Opcao ?:" + RESET + " permite ao utilizador visualizar este menu.",
             " ",
             BLACK_BOLD + "Opcao S:" + RESET + " permite ao utilizador voltar ao Menu Principal.");
-        flowHelp(viewLocalTxt.getMenu(1), l);
+
+        String opcao;
+        do {
+            menu.addDescToTitle(l);
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "O": helpOpcaoO();
+                case "S": break;
+                default: out.println("Opcao Invalida!"); break;
+            }
+        }
+        while(!opcao.equals("S"));
+    }
+
+    private void helpOpcaoO() {
+        List<String> l = asList(
+            "A opcao 'O' permite ao utilizador saber a data dando um",
+            "ano, mes, numero da semana nesse mes e numero do dia nessa",
+            "semana.",
+            " ",
+            "Assim sendo, caso o utilizador insira as seguintes opcoes:",
+            "   Ano: 2018",
+            "   Mes: 11",
+            "   Semana: 5",
+            "   Dia: 3",
+            "Obtem-se como resultado: o dia 28 de novembro de 2018.",
+            " ",
+            "Isto porque o mes 11 de 2018 esta dividido nas seguintes",
+            "semanas:",
+            BLACK_BOLD + "                novembro 2018   ",
+            "            se te qu qu se sá do",
+            "                      1  2  3  4 (Semana 1)",
+            "             5  6  7  8  9 10 11 (Semana 2)",
+            "            12 13 14 15 16 17 18 (Semana 3)",
+            "            19 20 21 22 23 24 25 (Semana 4)",
+            "            26 27 28 29 30       (Semana 5)" + RESET,
+            " ",
+            "Desta forma, a quinta semana contem os seguintes dias:",
+            " ",
+            BLACK_BOLD + "                novembro 2018   ",
+            "            se te qu qu se sá do",
+            "            26 27 28 29 30      " + RESET,
+            " ",
+            "O primeiro dia da semana é o 26. O segundo dia é o 27. O",
+            "terceiro é o 28 e assim sucessivamente.",
+            " ",
+            "Por fim, importa referir que casa seja introduzida uma",
+            "semana em branco é apresentado o mes completo no forma",
+            "apresentado a cima. O mesmo acontece para a semana, caso",
+            "o dia seja inserido em branco é apresentada a semana no",
+            "formato apresentado em cima.");
+        flowHelp(viewLocalTxt.getMenu(2), l);
     }
 
     //------------------------
@@ -123,7 +175,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     //------------------------
     private void flowShiftDateTime() {
         String ld;
-        Menu menu = viewLocalTxt.getMenu(2);
+        Menu menu = viewLocalTxt.getMenu(3);
         String opcao;
         do {
             ld = localDateTimeToString(model.getDateTimeLocal());
@@ -152,7 +204,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     //------------------------
     private void flowShiftWorkDaysDateTime() {
         String ld;
-        Menu menu = viewLocalTxt.getMenu(3);
+        Menu menu = viewLocalTxt.getMenu(4);
         String opcao;
         do {
             ld = localDateTimeToString(model.getDateTimeLocal());
@@ -174,7 +226,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     //------------------------
     private void flowDiffDateTime() {
         String ld;
-        Menu menu = viewLocalTxt.getMenu(4);
+        Menu menu = viewLocalTxt.getMenu(5);
         String opcao;
         do {
             ld = localDateTimeToString(model.getDateTimeLocal());
@@ -221,7 +273,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     //------------------------
     private void flowDiffWorkDaysDateTime() {
         String ld;
-        Menu menu = viewLocalTxt.getMenu(4);
+        Menu menu = viewLocalTxt.getMenu(5);
         String opcao;
         do {
             ld = localDateTimeToString(model.getDateTimeLocal());
