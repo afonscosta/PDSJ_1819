@@ -1,6 +1,9 @@
 package Model.Class;
 
-import Model.Interface.*;
+import Model.Interface.InterfCalcDateTimeLocalModel;
+import Model.Interface.InterfCalcDateTimeModel;
+import Model.Interface.InterfCalcDateTimeScheduleModel;
+import Model.Interface.InterfCalcDateTimeZoneModel;
 import Utilities.EnumEditSlotInfo;
 
 import java.io.IOException;
@@ -57,6 +60,11 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
         modelLocal.fromDateTime(ldt);
     }
 
+    @Override
+    public void withZoneLocal(String zoneId) {
+        modelLocal.withZone(zoneId);
+    }
+
     //------------------------
     // Métodos Model Zone
     //------------------------
@@ -91,7 +99,7 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     }
 
     @Override
-    public void withZone(String zoneId) {
+    public void withZoneZone(String zoneId) {
         modelZone.withZone(zoneId);
     }
 

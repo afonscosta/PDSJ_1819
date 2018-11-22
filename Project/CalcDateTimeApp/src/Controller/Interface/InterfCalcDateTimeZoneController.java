@@ -3,7 +3,11 @@ package Controller.Interface;
 import Model.Interface.InterfCalcDateTimeModel;
 import View.Interface.InterfCalcDateTimeZoneView;
 
+import java.time.format.DateTimeFormatter;
+
 public interface InterfCalcDateTimeZoneController {
+
+    void setDateTimeFormatter(DateTimeFormatter dtf);
 
     // Apresentar opções que podem ser feitas na calculadora local (conversão entre timeZones, somar e subtrair, diferença entre tempos)
     public void flowZone();

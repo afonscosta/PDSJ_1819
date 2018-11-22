@@ -7,21 +7,67 @@ import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeLocalView;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static Utilities.BusinessUtils.*;
 import static Utilities.ConsoleColors.*;
 import static Utilities.ControllerUtils.*;
 import static java.lang.System.out;
+import static java.time.ZoneId.systemDefault;
 import static java.time.temporal.ChronoUnit.*;
 import static java.util.Arrays.asList;
 
 public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalController {
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeLocalView viewLocalTxt;
+    private DateTimeFormatter dateTimeFormatter;
+    private ZoneId localZone;
 
-    public CalcDateTimeLocalController() {
+    public static CalcDateTimeLocalController of(DateTimeFormatter dtf, ZoneId zid) {
+        if (dtf != null && zid != null)
+            return new CalcDateTimeLocalController(dtf, zid);
+        else if (dtf != null)
+            return new CalcDateTimeLocalController(dtf);
+        return new CalcDateTimeLocalController(zid);
+    }
+
+    public static CalcDateTimeLocalController of(DateTimeFormatter dtf) {
+        if (dtf != null)
+            return new CalcDateTimeLocalController(dtf);
+        return new CalcDateTimeLocalController();
+    }
+
+    public static CalcDateTimeLocalController of(ZoneId zid) {
+        if (zid != null)
+            return new CalcDateTimeLocalController(zid);
+        return new CalcDateTimeLocalController();
+    }
+
+    public static CalcDateTimeLocalController of() {
+        return new CalcDateTimeLocalController();
+    }
+
+    private CalcDateTimeLocalController(DateTimeFormatter dtf, ZoneId zid) {
+        this.dateTimeFormatter = dtf;
+        this.localZone = zid;
+    }
+
+    private CalcDateTimeLocalController(DateTimeFormatter dtf) {
+        this.dateTimeFormatter = dtf;
+        this.localZone = systemDefault();
+    }
+
+    private CalcDateTimeLocalController(ZoneId zid) {
+        this.dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n");
+        this.localZone = zid;
+    }
+
+    private CalcDateTimeLocalController() {
+        this.dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n");
+        this.localZone = systemDefault();
     }
 
     @Override
@@ -38,6 +84,16 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
 
     }
 
+    @Override
+    public void setDateTimeFormatter(DateTimeFormatter dtf) {
+        this.dateTimeFormatter = dtf;
+    }
+
+    @Override
+    public void withZone(String zid) {
+        model.withZoneLocal(zid);
+    }
+
     //------------------------
     // FlowLocal
     //------------------------
@@ -48,7 +104,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String ld;
         String opcao;
         do {
-            ld = localDateTimeToString(model.getDateTimeLocal());
+            ld = localDateTimeToString(model.getDateTimeLocal(), dateTimeFormatter);
             menu.addDescToTitle(asList("Data: " + ld));
             menu.show();
             opcao = Input.lerString();
@@ -70,7 +126,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
 
     private void help() {
         ZonedDateTime ld = (ZonedDateTime) model.getDateTimeLocal();
-        String sld = localDateTimeToString(ld);
+        String sld = localDateTimeToString(ld, dateTimeFormatter);
         Menu menu = viewLocalTxt.getMenu(1);
         List<String> l = asList(
             RED_BOLD + "Data: " + sld + RESET,
@@ -178,7 +234,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         Menu menu = viewLocalTxt.getMenu(3);
         String opcao;
         do {
-            ld = localDateTimeToString(model.getDateTimeLocal());
+            ld = localDateTimeToString(model.getDateTimeLocal(), dateTimeFormatter);
             menu.addDescToTitle(asList("Data: " + ld));
             menu.show();
             opcao = Input.lerString();
@@ -207,7 +263,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         Menu menu = viewLocalTxt.getMenu(4);
         String opcao;
         do {
-            ld = localDateTimeToString(model.getDateTimeLocal());
+            ld = localDateTimeToString(model.getDateTimeLocal(), dateTimeFormatter);
             menu.addDescToTitle(asList("Data: " + ld));
             menu.show();
             opcao = Input.lerString();
@@ -229,7 +285,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         Menu menu = viewLocalTxt.getMenu(5);
         String opcao;
         do {
-            ld = localDateTimeToString(model.getDateTimeLocal());
+            ld = localDateTimeToString(model.getDateTimeLocal(), dateTimeFormatter);
             menu.addDescToTitle(asList("Data inicial: " + ld));
             menu.show();
             opcao = Input.lerString();
@@ -276,7 +332,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         Menu menu = viewLocalTxt.getMenu(5);
         String opcao;
         do {
-            ld = localDateTimeToString(model.getDateTimeLocal());
+            ld = localDateTimeToString(model.getDateTimeLocal(), dateTimeFormatter);
             menu.addDescToTitle(asList("Data inicial: " + ld));
             menu.show();
             opcao = Input.lerString();

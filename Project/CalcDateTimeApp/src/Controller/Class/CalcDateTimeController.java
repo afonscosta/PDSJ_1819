@@ -5,17 +5,17 @@ import Controller.Interface.InterfCalcDateTimeLocalController;
 import Controller.Interface.InterfCalcDateTimeScheduleController;
 import Controller.Interface.InterfCalcDateTimeZoneController;
 import Utilities.Input;
-import View.Interface.InterfCalcDateTimeView;
 import Utilities.Menu;
+import View.Interface.InterfCalcDateTimeView;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static Utilities.ConsoleColors.BLACK_BOLD;
-import static Utilities.ConsoleColors.RED_BOLD;
 import static Utilities.ConsoleColors.RESET;
-import static Utilities.ControllerUtils.flowHelp;
-import static java.util.Arrays.asList;
+import static Utilities.ControllerUtils.*;
 import static java.lang.System.out;
+import static java.util.Arrays.asList;
 
 public class CalcDateTimeController implements InterfCalcDateTimeController {
 
@@ -24,7 +24,13 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     private InterfCalcDateTimeZoneController controlZone;
     private InterfCalcDateTimeScheduleController controlSchedule;
 
-    public CalcDateTimeController(InterfCalcDateTimeLocalController controlLocal,
+    public static CalcDateTimeController of(InterfCalcDateTimeLocalController controlLocal,
+                                            InterfCalcDateTimeZoneController controlZone,
+                                            InterfCalcDateTimeScheduleController controlSchedule) {
+        return new CalcDateTimeController(controlLocal, controlZone, controlSchedule);
+    }
+
+    private CalcDateTimeController(InterfCalcDateTimeLocalController controlLocal,
                                   InterfCalcDateTimeZoneController controlZone,
                                   InterfCalcDateTimeScheduleController controlSchedule) {
         this.controlLocal = controlLocal;
@@ -37,6 +43,9 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         this.viewMainTxt = view;
     }
 
+    //------------------------
+    // FlowPrincipal
+    //------------------------
     @Override
     public void startFlow() {
         // Início do fluxo de execução
@@ -50,30 +59,85 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 case "L" : controlLocal.flowLocal(); break;
                 case "Z" : controlZone.flowZone(); break;
                 case "A" : controlSchedule.flowSchedule(); break;
-                case "?" : help(); break;
-                case "S": controlSchedule.saveState(); break;
+                case "C" : flowConfig(); break;
+                case "?" : helpMain(); break;
+                case "S": controlSchedule.saveState(); break; //É aqui que se guarda os DateTimeFormatter's e o localZone
                 default: System.out.println("Opcao Invalida!"); break;
             }
         }
         while(!opcao.equals("S"));
-
     }
 
-    private void help() {
+    //------------------------
+    // FlowConfig
+    //------------------------
+    private void flowConfig() {
+        Menu menu = viewMainTxt.getMenu(1);
+        String opcao;
+        do {
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "FL": setDateFormatLocal(); break;
+                case "FF": setDateFormatZoned(); break;
+                case "L": setLocal(); break;
+                case "H": setSchedule(); break;
+                case "?": helpConfig(); break;
+                case "S": break;
+                default: System.out.println("Opcao Invalida!"); break;
+            }
+        }
+        while(!opcao.equals("S"));
+    }
+
+    private void setDateFormatLocal() {
+        out.println("Insira o formato pretendido para datas locais: ");
+        DateTimeFormatter dtf = getDateTimeFormatterFromInput();
+        controlLocal.setDateTimeFormatter(dtf);
+        controlSchedule.setDateTimeFormatterLocal(dtf);
+    }
+
+    private void setDateFormatZoned() {
+        out.println("Insira o formato pretendido para datas com fuso: ");
+        DateTimeFormatter dtf = getDateTimeFormatterFromInput();
+        controlZone.setDateTimeFormatter(dtf);
+        controlSchedule.setDateTimeFormatterZoned(dtf);
+    }
+
+    private void setLocal() {
+        String zone = flowShowAllAvailableTimezonesAndGetNZoneIds(1,viewMainTxt.getMenu(2)).get(0);
+        controlLocal.withZone(zone);
+    }
+
+    private void setSchedule() {
+        out.println("Menu de definicao do horario da agenda");
+        Input.lerString();
+    }
+
+    private void helpConfig() {
+        out.println("Menu de ajuda da configuracao.");
+        Input.lerString();
+    }
+
+    //------------------------
+    // FlowHelpMain
+    //------------------------
+    private void helpMain() {
         List<String> l = asList(
-            BLACK_BOLD + "Opcao L:" + RESET + " permite ao utilizador aceder ao menu ",
-            "         responsavel por interagir com datas e tempos locais.",
-            " ",
-            BLACK_BOLD + "Opcao Z:" + RESET + " permite ao utilizador aceder ao menu ",
-            "         responsavel por interagir com datas e ",
-            "         e tempos, associados a fusos.",
-            " ",
-            BLACK_BOLD + "Opcao A:" + RESET + " permite ao utilizador aceder ao menu ",
-            "         onde se encontram as funcionalidades da agenda.",
-            " ",
-            BLACK_BOLD + "Opcao ?:" + RESET + " permite ao utilizador visualizar este menu.",
-            " ",
-            BLACK_BOLD + "Opcao S:" + RESET + " permite ao utilizador sair da aplicacao.");
-        flowHelp(viewMainTxt.getMenu(1), l);
+                BLACK_BOLD + "Opcao L:" + RESET + " permite ao utilizador aceder ao menu ",
+                "         responsavel por interagir com datas e tempos locais.",
+                " ",
+                BLACK_BOLD + "Opcao Z:" + RESET + " permite ao utilizador aceder ao menu ",
+                "         responsavel por interagir com datas e ",
+                "         e tempos, associados a fusos.",
+                " ",
+                BLACK_BOLD + "Opcao A:" + RESET + " permite ao utilizador aceder ao menu ",
+                "         onde se encontram as funcionalidades da agenda.",
+                " ",
+                BLACK_BOLD + "Opcao ?:" + RESET + " permite ao utilizador visualizar este menu.",
+                " ",
+                BLACK_BOLD + "Opcao S:" + RESET + " permite ao utilizador sair da aplicacao.");
+        flowHelp(viewMainTxt.getMenu(3), l);
     }
 }

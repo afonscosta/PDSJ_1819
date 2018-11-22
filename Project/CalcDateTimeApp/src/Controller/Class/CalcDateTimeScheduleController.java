@@ -11,12 +11,14 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,11 +36,46 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeScheduleView viewScheduleTxt;
     //do ficheiro de configuração
+    private DateTimeFormatter dateTimeFormatterLocal;
+    private DateTimeFormatter dateTimeFormatterZoned;
     private final ZoneId referenceZone= ZoneId.of("Europe/Lisbon");
 
-    public CalcDateTimeScheduleController() {
-
+    public static CalcDateTimeScheduleController of() {
+        return new CalcDateTimeScheduleController();
     }
+
+    public static CalcDateTimeScheduleController of(DateTimeFormatter dtfl, DateTimeFormatter dtfz) {
+        if (dtfl != null && dtfz != null)
+            return new CalcDateTimeScheduleController(dtfl, dtfz);
+        else if (dtfl != null)
+            return new CalcDateTimeScheduleController(dtfl, "local");
+        else if (dtfz != null)
+            return new CalcDateTimeScheduleController(dtfz, "zoned");
+        else
+            return new CalcDateTimeScheduleController();
+    }
+
+    private CalcDateTimeScheduleController(DateTimeFormatter dtf, String mode) {
+        if (mode.equals("local")) {
+            this.dateTimeFormatterLocal = dtf;
+            this.dateTimeFormatterZoned = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n [VV]");
+        }
+        else if (mode.equals("zoned")) {
+            this.dateTimeFormatterLocal = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n");
+            this.dateTimeFormatterZoned = dtf;
+        }
+    }
+
+    private CalcDateTimeScheduleController() {
+        this.dateTimeFormatterLocal = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n");
+        this.dateTimeFormatterZoned = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n [VV]");
+    }
+
+    private CalcDateTimeScheduleController(DateTimeFormatter dtfl, DateTimeFormatter dtfz) {
+        this.dateTimeFormatterLocal = dtfl;
+        this.dateTimeFormatterZoned = dtfz;
+    }
+
     @Override
     public void setView(InterfCalcDateTimeScheduleView viewSchedule) {
         this.viewScheduleTxt = viewSchedule;
@@ -49,7 +86,16 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         this.model = model;
     }
 
-    
+    @Override
+    public void setDateTimeFormatterLocal(DateTimeFormatter dtf) {
+        this.dateTimeFormatterLocal = dtf;
+    }
+
+    @Override
+    public void setDateTimeFormatterZoned(DateTimeFormatter dtf) {
+        this.dateTimeFormatterZoned = dtf;
+    }
+
     //------------------------
     // Fluxo inicial do menu agenda
     //------------------------
@@ -80,8 +126,8 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         do {
             Temporal tempLocal = model.getDateTimeLocal();
             Temporal tempZone = model.getDateTimeZone();
-            String ldt = localDateTimeToString(tempLocal);
-            String zdt = zoneDateTimeToString((ZonedDateTime)tempZone);
+            String ldt = localDateTimeToString(tempLocal, dateTimeFormatterLocal);
+            String zdt = zoneDateTimeToString((ZonedDateTime)tempZone, dateTimeFormatterZoned);
             menu.addDescToTitle(Arrays.asList("Data calc. local: " + ldt,
                     "Data calc. zona: " + zdt));
             menu.show();

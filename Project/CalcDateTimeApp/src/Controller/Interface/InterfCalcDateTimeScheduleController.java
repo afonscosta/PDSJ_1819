@@ -3,7 +3,13 @@ package Controller.Interface;
 import Model.Interface.InterfCalcDateTimeModel;
 import View.Interface.InterfCalcDateTimeScheduleView;
 
+import java.time.format.DateTimeFormatter;
+
 public interface InterfCalcDateTimeScheduleController {
+
+    void setDateTimeFormatterLocal(DateTimeFormatter dtf);
+
+    void setDateTimeFormatterZoned(DateTimeFormatter dtf);
 
     // Mostrar opções que podem ser feitas na agenda
     public void flowSchedule();

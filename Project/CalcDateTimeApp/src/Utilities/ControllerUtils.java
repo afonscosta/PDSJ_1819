@@ -4,7 +4,9 @@ import Model.Interface.InterfCalcDateTimeModel;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
+import java.util.ArrayList;
 import java.util.List;
 
 import static Utilities.BusinessUtils.*;
@@ -165,5 +167,79 @@ public class ControllerUtils {
         while(!opcao.equals("S"));
     }
 
+    /*
+     * Pede ao utilizador um DateTimeFormatter
+     */
+    public static DateTimeFormatter getDateTimeFormatterFromInput() {
+        String format = Input.lerString();
+        DateTimeFormatter dtf = parseFormat(format);
+        while (dtf == null) {
+            out.println("[!] Formato invalido.");
+            out.print("Formato: ");
+            format = Input.lerString();
+            dtf = parseFormat(format);
+        }
+        return dtf;
+    }
 
+    public static List<String> flowShowAllAvailableTimezonesAndGetNZoneIds(int zoneIdsWanted, Menu menu) {
+        List<String> zoneIdList = new ArrayList<>();
+        Boolean flowDone = false;
+        List<List<String>> chosenZoneIdsByPage = partitionIntoPages(getSortedAvailableZoneIds(),25); // If someone looks for "europe", place matches it here
+
+        int pageIndex = 0;
+        int totalPages = chosenZoneIdsByPage.size();
+        List<String> description;
+        String opcao;
+        do {
+
+            // Mais complexo do que necessário para o caso em que a lista de procuras está vazia,
+            // e assim não acontece indexOuto
+            try {
+                description = new ArrayList(chosenZoneIdsByPage.get(pageIndex));
+            } catch (IndexOutOfBoundsException e) {
+                description = new ArrayList<>();
+            }
+
+            description.add(""); // Linha branca na descrição
+            description.add(String.format("Pagina (%s/%s)", pageIndex+1, totalPages));
+
+            menu.addDescToTitle(description);
+
+            menu.show();
+            opcao = Input.lerString();
+            switch (opcao) {
+                case ">": if ((pageIndex + 1) < totalPages) { pageIndex++; } break;
+                case "<": if ((pageIndex - 1) >= 0) { pageIndex--; } break;
+                case "S": flowDone = true; break;
+                case "s": flowDone = true; break;
+                default:
+                    if (opcao.matches("\\/.*")) {
+                        List<String> matches = new ArrayList<>();
+                        pageIndex = 0;
+                        String searchedWordNormalized = opcao.substring(1).toLowerCase(); // Remover o "?" e lowercase
+
+                        for (String zoneId : getSortedAvailableZoneIds()) {
+                            if (zoneId.toLowerCase().contains(searchedWordNormalized)) {
+                                matches.add(zoneId);
+                            }
+                        }
+
+                        chosenZoneIdsByPage = partitionIntoPages(matches,25);
+                        totalPages = chosenZoneIdsByPage.size();
+                    } else if (opcao.matches("=.*")) {
+                        opcao = opcao.substring(1); // Remover o "="
+                        if (getSortedAvailableZoneIds().contains(opcao)) {
+                            zoneIdList.add(opcao);
+                            if (zoneIdList.size() == zoneIdsWanted) {
+                                flowDone = true;
+                            }
+                        }
+                    }
+                    break;
+            }
+        } while(!flowDone);
+
+        return zoneIdList;
+    }
 }

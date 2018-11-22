@@ -23,16 +23,6 @@ public class CalcDateTimeZoneModel extends CalcDateTimeLocalModel implements Int
     }
 
     @Override
-    public void withZone(String zoneIdTxt) {
-        try {
-            ZoneId chosenZoneId = ZoneId.of(zoneIdTxt);
-            super.fromDateTime(((ZonedDateTime) super.getDateTime()).withZoneSameInstant(chosenZoneId));
-        } catch (ZoneRulesException e) {
-            // Zona inexistente? Ignorar..
-        }
-    }
-
-    @Override
     public void changeToCurrentDateInZone(String zoneIdTxt) {
         try {
             ZoneId chosenZoneId = ZoneId.of(zoneIdTxt);
