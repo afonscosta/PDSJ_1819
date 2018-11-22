@@ -17,42 +17,42 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
 
     private Menus initView() {
         Menus menusScheduleTxt = new Menus();
-        Opcao op1, op2, op3, op4, op5;
+        Opcao op1, op2, op3, op4, op5,op6,op7;
 
         //------------------------
         // Menu CalcDateTimeSchedule
         //------------------------
         op1 = new Opcao("Inserir reuniao", "I");
-        op2 = new Opcao("Remover reuniao", "R");
-        op3 = new Opcao("Alterar reuniao", "A");
-        op4 = new Opcao("Visualizar reunioes agendadas", "V");
-        op5 = new Opcao("Voltar ao Menu Principal", "S");
-        List<Opcao> linhas = Arrays.asList(op1, op2, op3, op4, op5);
+        op2 = new Opcao("Visualizar reunioes agendadas", "V");
+        op3 = new Opcao("Voltar ao Menu Principal", "S");
+        List<Opcao> linhas = Arrays.asList(op1, op2, op3);
         Menu menuDateTimeSchedule = new Menu(linhas, "Agenda Reunioes");
         menusScheduleTxt.addMenu(0, menuDateTimeSchedule);
 
         //------------------------
-        // Menu Busy slots
+        // Menu Busy slots navigator
         //------------------------
-        op1 = new Opcao("Proxima reuniao", "P");
-        op2 = new Opcao("Reunioes diaria", "D");
-        op3 = new Opcao("Reunioes semanais", "Sem");
-        op4 = new Opcao("Reunioes mensais", "M");
-        op5 = new Opcao("Voltar ao Menu Agenda", "S");
-        linhas = Arrays.asList(op1, op2, op3, op4, op5);
-        Menu menuBusySlots = new Menu(linhas, "Visualizar");
-        menusScheduleTxt.addMenu(1, menuBusySlots);
+        op1 = new Opcao("Modo", "/<modo>");
+        op2 = new Opcao("Pagina anterior", "<");
+        op3 = new Opcao("Pagina seguinte", ">");
+        op4 = new Opcao("Avancar modo(dia/semana/mes)", ">>");
+        op5 = new Opcao("Recuar modo(dia/semana/mes)", "<<");
+        op6 = new Opcao("Selecionar", "=<id reuniao>");
+        op7 = new Opcao("Voltar ao Menu Agenda", "S");
+        linhas = Arrays.asList(op1, op2, op3, op4, op5,op6,op7);
+        Menu menuBusySlotsNavigator = new Menu(linhas, "Reunioes Agendadas");
+        menusScheduleTxt.addMenu(1, menuBusySlotsNavigator);
 
         //------------------------
-        // Menu Shift busy slots
+        // Menu select busy slots
         //------------------------
-        op1 = new Opcao("Proxima", "P");
-        op2 = new Opcao("Anterior", "A");
-        op3 = new Opcao("Ver detalhes da reuniao", "D");
+        op1 = new Opcao("Alterar", "A");
+        op2 = new Opcao("Remover", "R");
+        op3 = new Opcao("Detalhes", "D");
         op4 = new Opcao("Voltar ao Menu reunioes agendadas", "S");
         linhas = Arrays.asList(op1, op2,op3,op4);
-        Menu menuShiftBusySlots = new Menu(linhas, "Reunioes");
-        menusScheduleTxt.addMenu(2, menuShiftBusySlots);
+        Menu menuSelectBusySlot = new Menu(linhas, "Reuniao");
+        menusScheduleTxt.addMenu(2, menuSelectBusySlot);
 
         //------------------------
         // Menu date choice
@@ -65,7 +65,43 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         Menu menuDateChoice = new Menu(linhas, "Data da reuniao a inserir");
         menusScheduleTxt.addMenu(3, menuDateChoice);
 
+        //------------------------
+        // Menu alter slot
+        //------------------------
+        op1 = new Opcao("Alterar data", "Data");
+        op2 = new Opcao("Alterar duracao", "D");
+        op3 = new Opcao("Alterar local", "L");
+        op4 = new Opcao("Alterar descricao", "Desc");
+        op5 = new Opcao("Voltar ao Menu reuniao", "S");
+        linhas = Arrays.asList(op1, op2,op3,op4,op5);
+        Menu menuAlterSlot = new Menu(linhas, "Alterar reuniao");
+        menusScheduleTxt.addMenu(4, menuAlterSlot);
+
+        //------------------------
+        // Menu alter data
+        //------------------------
+
+        op1 = new Opcao("Manipular dia", "D");
+        op2 = new Opcao("Manipular semana", "Sem");
+        op3 = new Opcao("Manipular mes", "M");
+        op4 = new Opcao("Manipular ano", "A");
+        op5 = new Opcao("Alterar horas","T");
+        op6 = new Opcao("Voltar ao Menu reuniao", "S");
+        linhas = Arrays.asList(op1, op2, op3, op4, op5,op6);
+        Menu menuShiftDateTime = new Menu(linhas, "Alterar Data");
+        menusScheduleTxt.addMenu(5, menuShiftDateTime);
+
+        //------------------------
+        // Menu details slot
+        //------------------------
+
+        op1 = new Opcao("Voltar ao Menu reuniao", "S");
+        linhas = Arrays.asList(op1);
+        Menu menuDetailsSlot = new Menu(linhas, "Alterar Data");
+        menusScheduleTxt.addMenu(6, menuDetailsSlot);
+
         return menusScheduleTxt;
+
     }
 
     public Menu getMenu(int id) {

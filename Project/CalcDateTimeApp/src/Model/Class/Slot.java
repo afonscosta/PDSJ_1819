@@ -1,13 +1,15 @@
 package Model.Class;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.temporal.Temporal;
 
-public class Slot {
+public class Slot implements Serializable {
     private Temporal data;
     private Duration duration;
     private String local;
     private String description;
+    static final long serialVersionUID = 2L;
 
     public Slot(Temporal data, Duration duration, String local, String description) {
         this.data = data;
@@ -46,5 +48,10 @@ public class Slot {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Slot clone(){
+        Slot res = new Slot(data,duration,local,description);
+        return res;
     }
 }

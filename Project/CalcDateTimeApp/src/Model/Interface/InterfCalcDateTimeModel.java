@@ -1,10 +1,14 @@
 package Model.Interface;
 
 import Model.Class.Slot;
+import Utilities.EnumEditSlotInfo;
 
+import java.io.IOException;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.util.List;
 
 public interface InterfCalcDateTimeModel {
         //extends InterfCalcDateTimeLocalModel, InterfCalcDateTimeZoneModel, InterfCalcDateTimeScheduleModel {
@@ -37,4 +41,21 @@ public interface InterfCalcDateTimeModel {
     void changeToCurrentDateInZone(String zoneId);
 
     boolean addSlot(Slot newSlot);
+
+    void saveState(String nomeFicheiro) throws IOException;
+    List<String> getMainInfoSlots();
+
+    boolean removeSlot(Slot slot);
+
+    void editSlot(Slot s, EnumEditSlotInfo e, String edit);
+
+    Slot editDurationSlot(Slot s, Duration d);
+
+
+    Slot editDateSLot(Slot s, Temporal data);
+
+    Slot getSlot(String infoSlot);
+
+    List<String> getRestrictSlots(String modeNormalized, int want);
+
 }

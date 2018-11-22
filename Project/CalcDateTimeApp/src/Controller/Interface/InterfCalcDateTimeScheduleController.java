@@ -11,6 +11,7 @@ public interface InterfCalcDateTimeScheduleController {
     void setView(InterfCalcDateTimeScheduleView viewSchedule);
 
     void setModel(InterfCalcDateTimeModel model);
+    void saveState();
 
     /*
 

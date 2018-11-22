@@ -1,10 +1,14 @@
 package Model.Class;
 
 import Model.Interface.*;
+import Utilities.EnumEditSlotInfo;
 
+import java.io.IOException;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.util.List;
 
 public class CalcDateTimeModel implements InterfCalcDateTimeModel {
 
@@ -100,8 +104,39 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     //------------------------
     // Métodos Model Schedule
     //------------------------
-    @Override
     public boolean addSlot(Slot newSlot){
         return modelSchedule.addSlot(newSlot);
+    }
+
+    public void saveState(String nomeFicheiro) throws IOException {
+        modelSchedule.saveState(nomeFicheiro);
+    }
+    public List<String> getMainInfoSlots(){
+        return modelSchedule.getMainInfoSlots();
+    }
+
+    public boolean removeSlot(Slot slot){
+        return modelSchedule.removeSlot(slot);
+    }
+
+    @Override
+    public void editSlot(Slot s, EnumEditSlotInfo e, String edit) {
+        modelSchedule.editSlot(s,e,edit);
+    }
+
+    @Override
+    public Slot editDurationSlot(Slot s, Duration d) {
+        return modelSchedule.editDurationSlot(s,d);
+    }
+
+    @Override
+    public Slot editDateSLot(Slot s, Temporal data) {
+        return modelSchedule.editDateSLot(s,data);
+    }
+
+    public Slot getSlot(String infoSlot){ return modelSchedule.getSlot(infoSlot);}
+
+    public List<String> getRestrictSlots(String modeNormalized, int want){
+        return modelSchedule.getRestrictSlots(modeNormalized,want);
     }
 }
