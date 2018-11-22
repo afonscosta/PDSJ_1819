@@ -2,6 +2,7 @@ package Controller.Class;
 
 import Controller.Interface.InterfCalcDateTimeLocalController;
 import Model.Interface.InterfCalcDateTimeModel;
+import Utilities.ControllerUtils;
 import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeLocalView;
@@ -9,10 +10,11 @@ import View.Interface.InterfCalcDateTimeLocalView;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
+import java.util.List;
 
 import static Utilities.BusinessUtils.*;
-import static Utilities.ControllerUtils.getDateTimeFromInput;
-import static Utilities.ControllerUtils.shift;
+import static Utilities.ConsoleColors.*;
+import static Utilities.ControllerUtils.*;
 import static java.lang.System.out;
 import static java.time.temporal.ChronoUnit.*;
 import static java.util.Arrays.asList;
@@ -38,11 +40,6 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
 
     }
 
-    private String buildDateTimeTitle() {
-        Temporal temp = model.getDateTimeLocal();
-        return localDateTimeToString(temp);
-    }
-
     //------------------------
     // FlowLocal
     //------------------------
@@ -53,23 +50,64 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String ld;
         String opcao;
         do {
-            ld = buildDateTimeTitle();
+            ld = localDateTimeToString(model.getDateTimeLocal());
             menu.addDescToTitle(asList("Data: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "A" : setDateTimeLocal(); break;
-                case "M" : flowShiftDateTime(); break;
-                case "MU" : flowShiftWorkDaysDateTime(); break;
+                case "C" : setDateTimeLocal(); break;
+                case "A" : flowShiftDateTime(); break;
+                case "AU" : flowShiftWorkDaysDateTime(); break;
                 case "D" : flowDiffDateTime(); break;
                 case "DU" : flowDiffWorkDaysDateTime(); break;
                 case "O" : getDateTimeLocal(); break;
+                case "?" : help(); break;
                 case "S": break;
-                default: out.println("Opcao Invalida !"); break;
+                default: out.println("Opcao Invalida!"); break;
             }
         }
         while(!opcao.equals("S"));
+    }
+
+    private void help() {
+        ZonedDateTime ld = (ZonedDateTime) model.getDateTimeLocal();
+        String sld = localDateTimeToString(ld);
+        List<String> l = asList(
+            RED_BOLD + "Data: " + sld + RESET,
+            BLACK_BOLD + "^^^^" + RESET + " - A data presente no registo e usada por omissao ",
+            "       nos diferentes calculos possiveis neste menu. No ",
+            "       final de cada calculo o registo e atualizado de ",
+            "       forma a conter o resultado da operacao efetuada.",
+            " ",
+            BLACK_BOLD + "Opcao C:" + RESET + " permite ao utilizador alterar a data ",
+            "         que se encontra no registo 'Data' a cima.",
+            " ",
+            BLACK_BOLD + "Opcao A:" + RESET + " permite ao utilizador somar ou subtrair ",
+            "         anos, meses, semanas, dias, horas, minutos, ",
+            "         segundos ou nanosegundos, a data que se ",
+            "         encontra no registo.",
+            " ",
+            BLACK_BOLD + "Opcao AU:" + RESET + " permite ao utilizador somar ou subtrair ",
+            "          dias uteis a data que se encontra no registo.",
+            " ",
+            BLACK_BOLD + "Opcao D:" + RESET + " permite ao utilizador realizar a diferenca ",
+            "         entre datas, sendo que o resultado e ",
+            "         apresentado em anos, meses, dias, horas, ",
+            "         minutos, segundos e nanosegundos.",
+            " ",
+            BLACK_BOLD + "Opcao DU:" + RESET + " permite ao utilizador realizar a diferenca ",
+            "          entre datas, sendo que o resultado e apresentado ",
+            "          em dias uteis.",
+            " ",
+            BLACK_BOLD + "Opcao O:" + RESET + " permite ao utilizador saber a data dando um ano, ",
+            "         mes, numero da semana nesse mes e numero do dia ",
+            "         nessa semana.",
+            " ",
+            BLACK_BOLD + "Opcao ?:" + RESET + " permite ao utilizador visualizar este menu.",
+            " ",
+            BLACK_BOLD + "Opcao S:" + RESET + " permite ao utilizador voltar ao Menu Principal.");
+        flowHelp(viewLocalTxt.getMenu(1), l);
     }
 
     //------------------------
@@ -83,22 +121,25 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     //------------------------
     // FlowShiftDateTime
     //------------------------
-    // Apresentar opções relativas a somar ou subtrair espaço de tempo a uma data
     private void flowShiftDateTime() {
         String ld;
-        Menu menu = viewLocalTxt.getMenu(1);
+        Menu menu = viewLocalTxt.getMenu(2);
         String opcao;
         do {
-            ld = buildDateTimeTitle();
+            ld = localDateTimeToString(model.getDateTimeLocal());
             menu.addDescToTitle(asList("Data: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "DIA" : model.shiftDateTimeLocal(shift("dias"),DAYS); break;
-                case "SEM" : model.shiftDateTimeLocal(shift("semanas"), WEEKS); break;
-                case "MES" : model.shiftDateTimeLocal(shift("dias"),MONTHS); break;
-                case "ANO" : model.shiftDateTimeLocal(shift("anos"),YEARS); break;
+                case "ANO" : model.shiftDateTimeLocal(shift("anos"),         YEARS);   break;
+                case "MES" : model.shiftDateTimeLocal(shift("meses"),        MONTHS);  break;
+                case "SEM" : model.shiftDateTimeLocal(shift("semanas"),      WEEKS);   break;
+                case "DIA" : model.shiftDateTimeLocal(shift("dias"),         DAYS);    break;
+                case "HOR" : model.shiftDateTimeLocal(shift("horas"),        HOURS);   break;
+                case "MIN" : model.shiftDateTimeLocal(shift("minutos"),      MINUTES); break;
+                case "SEG" : model.shiftDateTimeLocal(shift("segundos"),     SECONDS); break;
+                case "NAN" : model.shiftDateTimeLocal(shift("nanosegundos"), NANOS);   break;
                 case "S": break;
                 default: out.println("Opcao Invalida!"); break;
             }
@@ -111,16 +152,16 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     //------------------------
     private void flowShiftWorkDaysDateTime() {
         String ld;
-        Menu menu = viewLocalTxt.getMenu(2);
+        Menu menu = viewLocalTxt.getMenu(3);
         String opcao;
         do {
-            ld = buildDateTimeTitle();
+            ld = localDateTimeToString(model.getDateTimeLocal());
             menu.addDescToTitle(asList("Data: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "M" :  model.shiftWorkDaysDateTimeLocal(shift("dias")); break;
+                case "A" : model.shiftWorkDaysDateTimeLocal(shift("dias uteis")); break;
                 case "S": break;
                 default: out.println("Opcao Invalida!"); break;
             }
@@ -133,10 +174,10 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     //------------------------
     private void flowDiffDateTime() {
         String ld;
-        Menu menu = viewLocalTxt.getMenu(3);
+        Menu menu = viewLocalTxt.getMenu(4);
         String opcao;
         do {
-            ld = buildDateTimeTitle();
+            ld = localDateTimeToString(model.getDateTimeLocal());
             menu.addDescToTitle(asList("Data inicial: " + ld));
             menu.show();
             opcao = Input.lerString();
@@ -151,6 +192,9 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         while(!opcao.equals("S"));
     }
 
+    //------------------------
+    // FlowFromDateTime
+    //------------------------
     private void fromDateTimeLocal() {
         ZonedDateTime newLDT = null;
         while(newLDT == null) {
@@ -177,10 +221,10 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     //------------------------
     private void flowDiffWorkDaysDateTime() {
         String ld;
-        Menu menu = viewLocalTxt.getMenu(3);
+        Menu menu = viewLocalTxt.getMenu(4);
         String opcao;
         do {
-            ld = buildDateTimeTitle();
+            ld = localDateTimeToString(model.getDateTimeLocal());
             menu.addDescToTitle(asList("Data inicial: " + ld));
             menu.show();
             opcao = Input.lerString();
@@ -322,25 +366,4 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         out.println(organizeDays(zdt));
         out.println();
     }
-
-
-
-    //------------------------
-    // Métodos adicionais
-    //------------------------
-
-    // Pede ao utilizador uma string.
-    // Se a string for vazia então devolve o valor passado como argumento.
-    private int getIntFromInput(int def) {
-        String str = Input.lerString();
-        int num = def;
-        if (!str.isEmpty())
-            num = Integer.parseInt(str);
-        return num;
-    }
-
-
-
-
-
 }

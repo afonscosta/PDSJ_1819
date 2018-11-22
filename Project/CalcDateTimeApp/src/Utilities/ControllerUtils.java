@@ -1,15 +1,15 @@
 package Utilities;
 
-import static java.time.ZoneId.systemDefault;
+import Model.Interface.InterfCalcDateTimeModel;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
+import java.util.List;
 
 import static Utilities.BusinessUtils.*;
 import static java.lang.System.out;
-import static java.time.temporal.ChronoUnit.DAYS;
+import static java.time.ZoneId.systemDefault;
 
 public class ControllerUtils {
 
@@ -145,6 +145,24 @@ public class ControllerUtils {
     public static int shift(String type) {
         out.print("(+|-) número de " + type + ": ");
         return Input.lerInt();
+    }
+
+    /*
+     * Flow responsável pelo menu de ajuda.
+     */
+    public static void flowHelp(Menu menu, List<String> l)  {
+        String opcao;
+        do {
+            menu.addDescToTitle(l);
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "S": break;
+                default: out.println("Opcao Invalida!"); break;
+            }
+        }
+        while(!opcao.equals("S"));
     }
 
 
