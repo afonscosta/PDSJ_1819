@@ -21,9 +21,13 @@ import static java.lang.System.out;
 import static java.time.temporal.ChronoUnit.*;
 
 /*TODO:
-    Edgar, resolver todos os pontos em que entro no navegador de zoned e quero sair logo sem ter que escolher nada
+Edgar
+    1.resolver todos os pontos em que entro no navegador de zoned e quero sair logo sem ter que escolher nada
     flowConvertZone() -> está com try catch (falaste em usar Optional)
     há mais métodos para além deste que estão com o mesmo problema e não pus try catch
+    ao testar para ser em todos os fluxos que envolvam o navegador
+    2. Diferenca entre dois fusos -> adicionar uma mensagem qd o utilziador introduzir o primeiro. Se não parece que foi inválido
+    3. Diferenca entre datas -> inserir data fim -> tb escolho o zoned e dps não acontece nada
     */
 
 public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneController {
