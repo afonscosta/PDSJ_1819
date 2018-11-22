@@ -5,6 +5,7 @@ import Utilities.EnumEditSlotInfo;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
@@ -36,13 +37,16 @@ public interface InterfCalcDateTimeModel {
 
     void fromDateTimeZone(ZonedDateTime zdt);
 
-    void withZone(String zoneId);
+    void withZoneLocal(String zid);
+
+    void withZoneZone(String zid);
 
     void changeToCurrentDateInZone(String zoneId);
 
     boolean addSlot(Slot newSlot);
 
     void saveState(String nomeFicheiro) throws IOException;
+
     List<String> getMainInfoSlots();
 
     boolean removeSlot(Slot slot);
@@ -57,5 +61,4 @@ public interface InterfCalcDateTimeModel {
     Slot getSlot(String infoSlot);
 
     List<String> getRestrictSlots(String modeNormalized, int want);
-
 }

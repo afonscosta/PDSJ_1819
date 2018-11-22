@@ -10,12 +10,14 @@ import View.Interface.InterfCalcDateTimeZoneView;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static Utilities.BusinessUtils.*;
+import static Utilities.ControllerUtils.flowShowAllAvailableTimezonesAndGetNZoneIds;
 import static Utilities.ControllerUtils.getDateTimeFromInput;
 import static Utilities.ControllerUtils.shift;
 import static java.lang.System.out;
@@ -34,8 +36,25 @@ Edgar
 public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneController {
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeZoneView viewZoneTxt;
+    private DateTimeFormatter dateTimeFormatter;
 
-    public CalcDateTimeZoneController() {
+    public static CalcDateTimeZoneController of() {
+        return new CalcDateTimeZoneController();
+    }
+
+    public static CalcDateTimeZoneController of(DateTimeFormatter dtf) {
+        if (dtf != null)
+            return new CalcDateTimeZoneController(dtf);
+        else
+            return new CalcDateTimeZoneController();
+    }
+
+    private CalcDateTimeZoneController() {
+        this.dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n [VV]");
+    }
+
+    private CalcDateTimeZoneController(DateTimeFormatter dtf) {
+        this.dateTimeFormatter = dtf;
     }
 
     @Override
@@ -50,9 +69,14 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         this.viewZoneTxt = viewZone;
     }
 
+    @Override
+    public void setDateTimeFormatter(DateTimeFormatter dtf) {
+        this.dateTimeFormatter = dtf;
+    }
+
     private String buildZoneDateTimeTitle() {
         ZonedDateTime zdt = (ZonedDateTime) model.getDateTimeZone();
-        return zoneDateTimeToString(zdt);
+        return zoneDateTimeToString(zdt, dateTimeFormatter);
     }
 
     //------------------------
@@ -85,7 +109,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     }
 
     private void flowDiffInTimeZones() {
-        List<String> zoneIdsTxt = flowShowAllAvailableTimezonesAndGetNZoneIds(2);
+        List<String> zoneIdsTxt = flowShowAllAvailableTimezonesAndGetNZoneIds(2, viewZoneTxt.getMenu(4));
 
         ZoneId zoneId1 = ZoneId.of(zoneIdsTxt.get(0));
         ZoneId zoneId2 = ZoneId.of(zoneIdsTxt.get(1));
@@ -198,7 +222,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     }
 
     private ZonedDateTime getZoneDateTimeFromInput() {
-        String zoneIdString = flowShowAllAvailableTimezonesAndGetNZoneIds(1).get(0);
+        String zoneIdString = flowShowAllAvailableTimezonesAndGetNZoneIds(1, viewZoneTxt.getMenu(4)).get(0);
         ZoneId zoneId = ZoneId.of(zoneIdString);
 
         return getDateTimeFromInput((ZonedDateTime) model.getDateTimeZone(), zoneId);
@@ -209,7 +233,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     //------------------------
     // Saber que data atual é numa certa região
     private void flowShowCurrentTimeInZone() {
-        String answerZone = flowShowAllAvailableTimezonesAndGetNZoneIds(1).get(0);
+        String answerZone = flowShowAllAvailableTimezonesAndGetNZoneIds(1, viewZoneTxt.getMenu(4)).get(0);
 
         if (!answerZone.equals(("S"))) {
             model.changeToCurrentDateInZone(answerZone);
@@ -247,10 +271,10 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     // Pedir para que zona queremos mudar a data
     private void flowConvertZone() {
         try {
-            String answerZone = flowShowAllAvailableTimezonesAndGetNZoneIds(1).get(0);
+            String answerZone = flowShowAllAvailableTimezonesAndGetNZoneIds(1, viewZoneTxt.getMenu(4)).get(0);
 
             if (!answerZone.equals(("S"))) {
-                model.withZone(answerZone);
+                model.withZoneZone(answerZone);
             }
         }
         catch (IndexOutOfBoundsException e){}
@@ -261,66 +285,5 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     // FlowShowAllAvailableTimeZones
     //------------------------
     // Buscar todos os ZoneIds alfabeticamente e fazer display por páginas
-    private List<String> flowShowAllAvailableTimezonesAndGetNZoneIds(int zoneIdsWanted) {
-        List<String> zoneIdList = new ArrayList<>();
-        Boolean flowDone = false;
-        List<List<String>> chosenZoneIdsByPage = partitionIntoPages(getSortedAvailableZoneIds(),25); // If someone looks for "europe", place matches it here
-
-        int pageIndex = 0;
-        int totalPages = chosenZoneIdsByPage.size();
-        Menu menu = viewZoneTxt.getMenu(4);
-        List<String> description;
-        String opcao;
-        do {
-
-            // Mais complexo do que necessário para o caso em que a lista de procuras está vazia,
-            // e assim não acontece indexOuto
-            try {
-                description = new ArrayList(chosenZoneIdsByPage.get(pageIndex));
-            } catch (IndexOutOfBoundsException e) {
-                description = new ArrayList<>();
-            }
-
-            description.add(""); // Linha branca na descrição
-            description.add(String.format("Pagina (%s/%s)", pageIndex+1, totalPages));
-
-            menu.addDescToTitle(description);
-
-            menu.show();
-            opcao = Input.lerString();
-            switch (opcao) {
-                case ">": if ((pageIndex + 1) < totalPages) { pageIndex++; } break;
-                case "<": if ((pageIndex - 1) >= 0) { pageIndex--; } break;
-                case "S": flowDone = true; break;
-                case "s": flowDone = true; break;
-                default:
-                    if (opcao.matches("\\/.*")) {
-                        List<String> matches = new ArrayList<>();
-                        pageIndex = 0;
-                        String searchedWordNormalized = opcao.substring(1).toLowerCase(); // Remover o "?" e lowercase
-
-                        for (String zoneId : getSortedAvailableZoneIds()) {
-                            if (zoneId.toLowerCase().contains(searchedWordNormalized)) {
-                                matches.add(zoneId);
-                            }
-                        }
-
-                        chosenZoneIdsByPage = partitionIntoPages(matches,25);
-                        totalPages = chosenZoneIdsByPage.size();
-                    } else if (opcao.matches("=.*")) {
-                        opcao = opcao.substring(1); // Remover o "="
-                        if (getSortedAvailableZoneIds().contains(opcao)) {
-                            zoneIdList.add(opcao);
-                            if (zoneIdList.size() == zoneIdsWanted) {
-                                flowDone = true;
-                            }
-                        }
-                    }
-                    break;
-            }
-        } while(!flowDone);
-
-        return zoneIdList;
-    }
 
 }

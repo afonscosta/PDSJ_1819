@@ -15,6 +15,7 @@ import java.util.List;
 
 import static java.lang.Math.abs;
 import static java.time.DayOfWeek.*;
+import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.time.temporal.ChronoUnit.*;
 import static java.time.temporal.TemporalAdjusters.next;
 import static java.time.temporal.TemporalAdjusters.previous;
@@ -45,29 +46,22 @@ public class BusinessUtils {
      * Temporal -> String
      * Formato de saída: dd/mm/aaaa  hh:mm:ss
      */
-    public static String localDateTimeToString(Temporal temp) {
+    public static String localDateTimeToString(Temporal temp, DateTimeFormatter localDateTimeFormatter) {
         LocalDateTime ldt;
         if (temp.getClass().getSimpleName().equals("ZonedDateTime")) {
             ldt = ((ZonedDateTime) temp).toLocalDateTime();
         }
         else
             ldt = (LocalDateTime) temp;
-        String dt = ldt.getDayOfMonth() + "/" +
-                    ldt.getMonth().getValue() + "/" +
-                    ldt.getYear() + " " +
-                    ldt.getHour() + ":" +
-                    ldt.getMinute() + ":" +
-                    ldt.getSecond() + ":" +
-                    ldt.getNano();
-        return dt;
+        return ldt.format(localDateTimeFormatter);
     }
 
     /*
      * ZonedDateTime -> String
      * Formato de saída: dd/mm/aaaa  hh:mm:ss [zona]
      */
-    public static String zoneDateTimeToString(ZonedDateTime zdt) {
-        LocalDateTime ldt = zdt.toLocalDateTime();
+    public static String zoneDateTimeToString(ZonedDateTime zdt, DateTimeFormatter zonedDateTimeFormatter) {
+/*        LocalDateTime ldt = zdt.toLocalDateTime();
 
         String dt = ldt.getDayOfMonth() + "/" +
                     ldt.getMonth().getValue() + "/" +
@@ -76,8 +70,8 @@ public class BusinessUtils {
                     ldt.getMinute() + ":" +
                     ldt.getSecond() + ":" +
                     ldt.getNano() +
-                    " [" + zdt.getZone() + "]";
-        return dt;
+                    " [" + zdt.getZone() + "]";*/
+        return zdt.format(zonedDateTimeFormatter);
     }
 
     // Dada uma ZonedDateTime, soma ou subtrai, dependendo do mode, n ChronoUnits.
@@ -488,8 +482,8 @@ public class BusinessUtils {
     // A zoned de referencia é a dada no ficheiro de configuração
     //------------------------
     public static String DateSlotToString(Slot s,ZoneId referenceZone){
-        DateTimeFormatter formatterToShowLocalDateTime = DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm");
-        DateTimeFormatter formatterToShowZonedDateTime = DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm VV");
+        DateTimeFormatter formatterToShowLocalDateTime = ofPattern("dd-MM-yyy HH:mm");
+        DateTimeFormatter formatterToShowZonedDateTime = ofPattern("dd-MM-yyy HH:mm VV");
         ZonedDateTime date = ZonedDateTime.from(s.getData());
         boolean temp = isSlotfromReferenceZone(s,referenceZone);
         if(temp==true) {
@@ -515,5 +509,16 @@ public class BusinessUtils {
         return zoneData;
     }
 
-
+    /*
+     * Realiza o parse de uma string para um DateTimeFormatter.
+     * Em caso de exceção devolve null.
+     */
+    public static DateTimeFormatter parseFormat(String format) {
+        try {
+            return DateTimeFormatter.ofPattern(format);
+        }
+        catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 }
