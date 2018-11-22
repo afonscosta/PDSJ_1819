@@ -2,7 +2,6 @@ package Controller.Class;
 
 import Controller.Interface.InterfCalcDateTimeLocalController;
 import Model.Interface.InterfCalcDateTimeModel;
-import Utilities.ControllerUtils;
 import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeLocalView;
@@ -10,12 +9,13 @@ import View.Interface.InterfCalcDateTimeLocalView;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
-import java.util.Arrays;
 
 import static Utilities.BusinessUtils.*;
 import static Utilities.ControllerUtils.getDateTimeFromInput;
+import static Utilities.ControllerUtils.shift;
 import static java.lang.System.out;
 import static java.time.temporal.ChronoUnit.*;
+import static java.util.Arrays.asList;
 
 public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalController {
     private InterfCalcDateTimeModel model;
@@ -54,7 +54,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         do {
             ld = buildDateTimeTitle();
-            menu.addDescToTitle(Arrays.asList("Data: " + ld));
+            menu.addDescToTitle(asList("Data: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -66,7 +66,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                 case "DU" : flowDiffWorkDaysDateTime(); break;
                 case "O" : getDateTimeLocal(); break;
                 case "S": break;
-                default: out.println("Opcão Inválida !"); break;
+                default: out.println("Opcao Invalida !"); break;
             }
         }
         while(!opcao.equals("S"));
@@ -90,17 +90,17 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         do {
             ld = buildDateTimeTitle();
-            menu.addDescToTitle(Arrays.asList("Data: " + ld));
+            menu.addDescToTitle(asList("Data: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "DIA" : model.shiftDateTimeLocal(ControllerUtils.shift("dias"),DAYS); break;
-                case "SEM" : model.shiftDateTimeLocal(ControllerUtils.shift("semanas"), WEEKS);; break;
-                case "MES" : model.shiftDateTimeLocal(ControllerUtils.shift("dias"),MONTHS); break;
-                case "ANO" : model.shiftDateTimeLocal(ControllerUtils.shift("anos"),YEARS); break;
+                case "DIA" : model.shiftDateTimeLocal(shift("dias"),DAYS); break;
+                case "SEM" : model.shiftDateTimeLocal(shift("semanas"), WEEKS); break;
+                case "MES" : model.shiftDateTimeLocal(shift("dias"),MONTHS); break;
+                case "ANO" : model.shiftDateTimeLocal(shift("anos"),YEARS); break;
                 case "S": break;
-                default: out.println("Opcão Inválida !"); break;
+                default: out.println("Opcao Invalida!"); break;
             }
         }
         while(!opcao.equals("S"));
@@ -115,14 +115,14 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         do {
             ld = buildDateTimeTitle();
-            menu.addDescToTitle(Arrays.asList("Data: " + ld));
+            menu.addDescToTitle(asList("Data: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "M" :  model.shiftWorkDaysDateTimeLocal(ControllerUtils.shift("dias")); break;
+                case "M" :  model.shiftWorkDaysDateTimeLocal(shift("dias")); break;
                 case "S": break;
-                default: out.println("Opcão Inválida !"); break;
+                default: out.println("Opcao Invalida!"); break;
             }
         }
         while(!opcao.equals("S"));
@@ -137,7 +137,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         do {
             ld = buildDateTimeTitle();
-            menu.addDescToTitle(Arrays.asList("Data inicial: " + ld));
+            menu.addDescToTitle(asList("Data inicial: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -145,7 +145,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                 case "I" : fromDateTimeLocal(); break;
                 case "F" : diffDateTimeLocal(); break;
                 case "S": break;
-                default: out.println("Opcão Inválida !"); break;
+                default: out.println("Opcao Invalida!"); break;
             }
         }
         while(!opcao.equals("S"));
@@ -181,7 +181,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         do {
             ld = buildDateTimeTitle();
-            menu.addDescToTitle(Arrays.asList("Data inicial: " + ld));
+            menu.addDescToTitle(asList("Data inicial: " + ld));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -189,7 +189,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                 case "I" : fromDateTimeLocal(); break;
                 case "F" : diffWorkDaysDateTime(); break;
                 case "S": break;
-                default: out.println("Opcão Inválida !"); break;
+                default: out.println("Opcao Invalida!"); break;
             }
         }
         while(!opcao.equals("S"));

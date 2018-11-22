@@ -37,7 +37,7 @@ public class Input {
              ok = true;
          }
          catch(InputMismatchException e)
-             { out.println("Texto Invalido");
+             { out.println("[!] Texto Invalido");
                out.print("Novo valor: ");
                input.nextLine();
              }
@@ -57,7 +57,7 @@ public class Input {
              ok = true;
          }
          catch(InputMismatchException e)
-             { out.println("Inteiro Invalido");
+             { out.println("[!] Inteiro Invalido");
                out.print("Novo valor: ");
                input.nextLine();
              }
@@ -76,7 +76,7 @@ public class Input {
              ok = true;
          }
          catch(InputMismatchException e)
-             { out.println("Valor real Invalido");
+             { out.println("[!] Valor real Invalido");
                out.print("Novo valor: ");
                input.nextLine();
              }
@@ -95,7 +95,7 @@ public class Input {
              ok = true;
          }
          catch(InputMismatchException e)
-             { out.println("Valor real Invalido");
+             { out.println("[!] Valor real Invalido");
                out.print("Novo valor: ");
                input.nextLine();
              }
@@ -114,7 +114,7 @@ public class Input {
              ok = true;
          }
          catch(InputMismatchException e)
-             { out.println("Booleano Invalido");
+             { out.println("[!] Booleano Invalido");
                out.print("Novo valor: ");
                input.nextLine();
              }
@@ -133,7 +133,7 @@ public class Input {
              ok = true;
          }
          catch(InputMismatchException e)
-             { out.println("Short Invalido");
+             { out.println("[!] Short Invalido");
                out.print("Novo valor: ");
                input.nextLine();
              }

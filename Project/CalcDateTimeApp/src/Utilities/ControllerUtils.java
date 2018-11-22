@@ -130,14 +130,20 @@ public class ControllerUtils {
                 out.println("[!] Nanosegundos invalidos.");
 
         }
-        ZonedDateTime newZDT = ZonedDateTime.of(zdt.getYear(), zdt.getMonthValue(), zdt.getDayOfMonth(), hour, minute, second, nano,zdt.getZone());
-        return newZDT;
+        return ZonedDateTime.of(zdt.getYear(),
+                                zdt.getMonthValue(),
+                                zdt.getDayOfMonth(),
+                                hour,
+                                minute,
+                                second,
+                                nano,
+                                zdt.getZone());
     }
 
 
     //substitui o shitfDays shiftWeeks shiftMonth shitfYears e shiftWorkDays
     public static int shift(String type) {
-        out.print("(+|-) número de " + type+": ");
+        out.print("(+|-) número de " + type + ": ");
         return Input.lerInt();
     }
 
