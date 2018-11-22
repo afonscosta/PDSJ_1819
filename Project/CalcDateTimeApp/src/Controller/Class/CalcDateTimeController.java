@@ -44,7 +44,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
     //------------------------
-    // FlowPrincipal
+    // Fluxo inicial do programa
     //------------------------
     @Override
     public void startFlow() {
@@ -69,7 +69,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
     //------------------------
-    // FlowConfig
+    // Menu de configuração
     //------------------------
     private void flowConfig() {
         Menu menu = viewMainTxt.getMenu(1);
@@ -121,7 +121,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
     //------------------------
-    // FlowHelpMain
+    // Menu de ajuda do menu principal
     //------------------------
     private void helpMain() {
         List<String> l = asList(

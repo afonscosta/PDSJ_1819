@@ -145,7 +145,7 @@ public class ControllerUtils {
 
     //substitui o shitfDays shiftWeeks shiftMonth shitfYears e shiftWorkDays
     public static int shift(String type) {
-        out.print("(+|-) número de " + type + ": ");
+        out.print("(+|-) numero de " + type + ": ");
         return Input.lerInt();
     }
 
