@@ -2,6 +2,7 @@ package Controller.Class;
 
 import Controller.Interface.InterfCalcDateTimeLocalController;
 import Model.Interface.InterfCalcDateTimeModel;
+import Utilities.ControllerUtils;
 import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeLocalView;
@@ -94,40 +95,15 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "DIA" : shiftDays(); break;
-                case "SEM" : shiftWeeks(); break;
-                case "MES" : shiftMonths(); break;
-                case "ANO" : shiftYears(); break;
+                case "DIA" : model.shiftDateTimeLocal(ControllerUtils.shift("dias"),DAYS); break;
+                case "SEM" : model.shiftDateTimeLocal(ControllerUtils.shift("semanas"), WEEKS);; break;
+                case "MES" : model.shiftDateTimeLocal(ControllerUtils.shift("dias"),MONTHS); break;
+                case "ANO" : model.shiftDateTimeLocal(ControllerUtils.shift("anos"),YEARS); break;
                 case "S": break;
                 default: out.println("Opcão Inválida !"); break;
             }
         }
         while(!opcao.equals("S"));
-    }
-
-
-    private void shiftDays() {
-        out.print("(+|-) número de dias: ");
-        int n = Input.lerInt();
-        model.shiftDateTimeLocal(n, DAYS);
-    }
-
-    private void shiftWeeks() {
-        out.print("(+|-) número de semanas: ");
-        int n = Input.lerInt();
-        model.shiftDateTimeLocal(n, WEEKS);
-    }
-
-    private void shiftMonths() {
-        out.print("(+|-) número de meses: ");
-        int n = Input.lerInt();
-        model.shiftDateTimeLocal(n, MONTHS);
-    }
-
-    private void shiftYears() {
-        out.print("(+|-) número de anos: ");
-        int n = Input.lerInt();
-        model.shiftDateTimeLocal(n, YEARS);
     }
 
     //------------------------
@@ -144,18 +120,12 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "M" : shiftWorkDays(); break;
+                case "M" :  model.shiftWorkDaysDateTimeLocal(ControllerUtils.shift("dias")); break;
                 case "S": break;
                 default: out.println("Opcão Inválida !"); break;
             }
         }
         while(!opcao.equals("S"));
-    }
-
-    private void shiftWorkDays() {
-        out.print("(+|-) número de dias: ");
-        int n = Input.lerInt();
-        model.shiftWorkDaysDateTimeLocal(n);
     }
 
     //------------------------

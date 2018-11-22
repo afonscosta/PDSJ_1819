@@ -1,7 +1,10 @@
 package Utilities;
 
+import Model.Class.Slot;
+
 import java.text.DateFormatSymbols;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAdjuster;
@@ -473,6 +476,43 @@ public class BusinessUtils {
      */
     public static String getMonth(int month) {
         return new DateFormatSymbols().getMonths()[month-1];
+    }
+
+    //pode ir para o utils
+
+
+
+    //------------------------
+    // Business utils referentes ao slot
+    // Se a zoned for a de referencia, não quero imprimir a zoned
+    // A zoned de referencia é a dada no ficheiro de configuração
+    //------------------------
+    public static String DateSlotToString(Slot s,ZoneId referenceZone){
+        DateTimeFormatter formatterToShowLocalDateTime = DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm");
+        DateTimeFormatter formatterToShowZonedDateTime = DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm VV");
+        ZonedDateTime date = ZonedDateTime.from(s.getData());
+        boolean temp = isSlotfromReferenceZone(s,referenceZone);
+        if(temp==true) {
+            return date.format(formatterToShowLocalDateTime);
+        }
+        else{
+            return date.format(formatterToShowZonedDateTime);
+        }
+    }
+
+    public static boolean isSlotfromReferenceZone(Slot s, ZoneId referenceZone){
+        ZonedDateTime date = ZonedDateTime.from(s.getData());
+        if(date.getZone().equals(referenceZone))
+            return true;
+        else
+            return false;
+    }
+    public static ZonedDateTime convertZoneDateTimeToSpecificZone (Temporal data,ZoneId referenceZone) {
+        System.out.println(data);
+        ZonedDateTime zoneData= ZonedDateTime.from(data);
+        zoneData = zoneData.withZoneSameInstant(referenceZone);
+        System.out.println(zoneData);
+        return zoneData;
     }
 
 

@@ -2,6 +2,7 @@ package Controller.Class;
 
 import Controller.Interface.InterfCalcDateTimeZoneController;
 import Model.Interface.InterfCalcDateTimeModel;
+import Utilities.ControllerUtils;
 import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeZoneView;
@@ -18,6 +19,12 @@ import static Utilities.BusinessUtils.*;
 import static Utilities.ControllerUtils.getDateTimeFromInput;
 import static java.lang.System.out;
 import static java.time.temporal.ChronoUnit.*;
+
+/*TODO:
+    Edgar, resolver todos os pontos em que entro no navegador de zoned e quero sair logo sem ter que escolher nada
+    flowConvertZone() -> está com try catch (falaste em usar Optional)
+    há mais métodos para além deste que estão com o mesmo problema e não pus try catch
+    */
 
 public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneController {
     private InterfCalcDateTimeModel model;
@@ -172,19 +179,12 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "M" : shiftWorkDays(); break;
+                case "M" : model.shiftWorkDaysDateTimeZone(ControllerUtils.shift("dias")); break;
                 case "S": break;
                 default: out.println("Opcão Inválida !"); break;
             }
         }
         while(!opcao.equals("S"));
-    }
-
-
-    private void shiftWorkDays() {
-        out.print("(+|-) número de dias: ");
-        int n = Input.lerInt();
-        model.shiftWorkDaysDateTimeZone(n);
     }
 
     private void setDateTimeZone() {
@@ -221,10 +221,10 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
             menu.show();
             opcao = Input.lerString().toUpperCase();
             switch(opcao) {
-                case "DIA" : shiftDays(); break;
-                case "SEM" : shiftWeeks(); break;
-                case "MES" : shiftMonths(); break;
-                case "ANO" : shiftYears(); break;
+                case "DIA" : model.shiftDateTimeZone(ControllerUtils.shift("dias"),DAYS); break;
+                case "SEM" : model.shiftDateTimeZone(ControllerUtils.shift("semanas"), WEEKS);; break;
+                case "MES" : model.shiftDateTimeZone(ControllerUtils.shift("dias"),MONTHS); break;
+                case "ANO" : model.shiftDateTimeZone(ControllerUtils.shift("anos"),YEARS); break;
                 case "S": break;
                 default: out.println("Opcão Inválida !"); break;
             }
@@ -232,42 +232,19 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         while(!opcao.equals("S"));
     }
 
-
-    private void shiftDays() {
-        out.print("(+|-) número de dias: ");
-        int n = Input.lerInt();
-        model.shiftDateTimeZone(n, DAYS);
-    }
-
-    private void shiftWeeks() {
-        out.print("Número de semanas: ");
-        int n = Input.lerInt();
-        model.shiftDateTimeZone(n, WEEKS);
-    }
-
-    private void shiftMonths() {
-        out.print("Número de meses: ");
-        int n = Input.lerInt();
-        model.shiftDateTimeZone(n, MONTHS);
-    }
-
-    private void shiftYears() {
-        out.print("Número de anos: ");
-        int n = Input.lerInt();
-        model.shiftDateTimeZone(n, YEARS);
-    }
-
-
     //------------------------
     // FlowConvertZone
     //------------------------
     // Pedir para que zona queremos mudar a data
     private void flowConvertZone() {
-        String answerZone = flowShowAllAvailableTimezonesAndGetNZoneIds(1).get(0);
+        try {
+            String answerZone = flowShowAllAvailableTimezonesAndGetNZoneIds(1).get(0);
 
-        if (!answerZone.equals(("S"))) {
-            model.withZone(answerZone);
+            if (!answerZone.equals(("S"))) {
+                model.withZone(answerZone);
+            }
         }
+        catch (IndexOutOfBoundsException e){}
     }
 
 
