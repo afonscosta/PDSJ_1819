@@ -11,6 +11,8 @@ public interface InterfCalcDateTimeScheduleController {
 
     void setDateTimeFormatterZoned(DateTimeFormatter dtf);
 
+    void withZone(String zid);
+
     // Mostrar opções que podem ser feitas na agenda
     public void flowSchedule();
 

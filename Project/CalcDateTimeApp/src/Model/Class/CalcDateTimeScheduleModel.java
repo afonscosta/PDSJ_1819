@@ -21,7 +21,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     private Set<Slot> agenda;
     static final long serialVersionUID = 1L;
     //do ficheiro de configuração
-    private final ZoneId referenceZone= ZoneId.of("Europe/Lisbon");
+    private ZoneId referenceZone= ZoneId.of("Europe/Lisbon");
 
     public static CalcDateTimeScheduleModel of() {
         return new CalcDateTimeScheduleModel();

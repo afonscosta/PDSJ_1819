@@ -65,7 +65,7 @@ public final class CalcDateTimeApp {
         controlZone.setModel(model);
         controlZone.setView(viewZone);
 
-        InterfCalcDateTimeScheduleController controlSchedule = CalcDateTimeScheduleController.of(dateTimeFormatterLocal, dateTimeFormatterZoned);
+        InterfCalcDateTimeScheduleController controlSchedule = CalcDateTimeScheduleController.of(dateTimeFormatterLocal, dateTimeFormatterZoned, localZone);
         controlSchedule.setModel(model);
         controlSchedule.setView(viewSchedule);
 
