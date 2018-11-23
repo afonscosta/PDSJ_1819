@@ -109,7 +109,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     }
 
     private void flowDiffInTimeZones() {
-        List<String> zoneIdsTxt = flowShowAllAvailableTimezonesAndGetNZoneIds(2, viewZoneTxt.getMenu(4));
+        List<String> zoneIdsTxt = flowShowAllAvailableTimezonesAndGetNZoneIds(2, viewZoneTxt.getMenu(4), model.getZoneDateTimeZone());
 
         ZoneId zoneId1 = ZoneId.of(zoneIdsTxt.get(0));
         ZoneId zoneId2 = ZoneId.of(zoneIdsTxt.get(1));
@@ -222,7 +222,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     }
 
     private ZonedDateTime getZoneDateTimeFromInput() {
-        String zoneIdString = flowShowAllAvailableTimezonesAndGetNZoneIds(1, viewZoneTxt.getMenu(4)).get(0);
+        String zoneIdString = flowShowAllAvailableTimezonesAndGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneDateTimeZone()).get(0);
         ZoneId zoneId = ZoneId.of(zoneIdString);
 
         return getDateTimeFromInput((ZonedDateTime) model.getDateTimeZone(), zoneId);
@@ -233,7 +233,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     //------------------------
     // Saber que data atual é numa certa região
     private void flowShowCurrentTimeInZone() {
-        String answerZone = flowShowAllAvailableTimezonesAndGetNZoneIds(1, viewZoneTxt.getMenu(4)).get(0);
+        String answerZone = flowShowAllAvailableTimezonesAndGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneDateTimeZone()).get(0);
 
         if (!answerZone.equals(("S"))) {
             model.changeToCurrentDateInZone(answerZone);
@@ -271,7 +271,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     // Pedir para que zona queremos mudar a data
     private void flowConvertZone() {
         try {
-            String answerZone = flowShowAllAvailableTimezonesAndGetNZoneIds(1, viewZoneTxt.getMenu(4)).get(0);
+            String answerZone = flowShowAllAvailableTimezonesAndGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneDateTimeZone()).get(0);
 
             if (!answerZone.equals(("S"))) {
                 model.withZoneZone(answerZone);

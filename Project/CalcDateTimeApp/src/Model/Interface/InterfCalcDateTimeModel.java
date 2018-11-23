@@ -13,6 +13,9 @@ import java.util.List;
 
 public interface InterfCalcDateTimeModel {
         //extends InterfCalcDateTimeLocalModel, InterfCalcDateTimeZoneModel, InterfCalcDateTimeScheduleModel {
+
+    String getZoneDateTimeZone();
+
     Temporal getDateTimeLocal();
 
     Temporal getDateTimeZone();

@@ -8,6 +8,7 @@ import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeView;
 
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -185,7 +186,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
     private void setLocal() {
-        String zone = flowShowAllAvailableTimezonesAndGetNZoneIds(1,viewMainTxt.getMenu(2)).get(0);
+        String zone = flowShowAllAvailableTimezonesAndGetNZoneIds(1,viewMainTxt.getMenu(2), ZoneId.systemDefault().toString()).get(0);
         controlLocal.withZone(zone);
         controlSchedule.withZone(zone);
     }

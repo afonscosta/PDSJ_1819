@@ -1,11 +1,8 @@
 package Utilities;
 
-import Model.Interface.InterfCalcDateTimeModel;
-
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,13 +130,13 @@ public class ControllerUtils {
 
         }
         return ZonedDateTime.of(zdt.getYear(),
-                                zdt.getMonthValue(),
-                                zdt.getDayOfMonth(),
-                                hour,
-                                minute,
-                                second,
-                                nano,
-                                zdt.getZone());
+                zdt.getMonthValue(),
+                zdt.getDayOfMonth(),
+                hour,
+                minute,
+                second,
+                nano,
+                zdt.getZone());
     }
 
 
@@ -182,7 +179,7 @@ public class ControllerUtils {
         return dtf;
     }
 
-    public static List<String> flowShowAllAvailableTimezonesAndGetNZoneIds(int zoneIdsWanted, Menu menu) {
+    public static List<String> flowShowAllAvailableTimezonesAndGetNZoneIds(int zoneIdsWanted, Menu menu, String defaultZoneid) {
         List<String> zoneIdList = new ArrayList<>();
         Boolean flowDone = false;
         List<List<String>> chosenZoneIdsByPage = partitionIntoPages(getSortedAvailableZoneIds(),25); // If someone looks for "europe", place matches it here
@@ -202,7 +199,9 @@ public class ControllerUtils {
             }
 
             description.add(""); // Linha branca na descrição
-            description.add(String.format("Pagina (%s/%s)", pageIndex+1, totalPages));
+            int pageIndexToDisplay = (totalPages == 0) ? 0 : pageIndex + 1;
+            description.add(String.format("Pagina (%s/%s)", pageIndexToDisplay, totalPages));
+            description.add(String.format("ZoneIds adicionados: (%d/%d)", zoneIdList.size(), zoneIdsWanted));
 
             menu.addDescToTitle(description);
 
@@ -211,10 +210,8 @@ public class ControllerUtils {
             switch (opcao) {
                 case ">": if ((pageIndex + 1) < totalPages) { pageIndex++; } break;
                 case "<": if ((pageIndex - 1) >= 0) { pageIndex--; } break;
-                case "S": flowDone = true; break;
-                case "s": flowDone = true; break;
                 default:
-                    if (opcao.matches("\\/.*")) {
+                    if (opcao.matches("\\/.*")) { // Procurando por zoneId com "/<palavra>"
                         List<String> matches = new ArrayList<>();
                         pageIndex = 0;
                         String searchedWordNormalized = opcao.substring(1).toLowerCase(); // Remover o "?" e lowercase
@@ -227,13 +224,18 @@ public class ControllerUtils {
 
                         chosenZoneIdsByPage = partitionIntoPages(matches,25);
                         totalPages = chosenZoneIdsByPage.size();
-                    } else if (opcao.matches("=.*")) {
+                    } else if (opcao.matches("=.+")) { // Selecionando zoneId com "=<palavra>"
                         opcao = opcao.substring(1); // Remover o "="
                         if (getSortedAvailableZoneIds().contains(opcao)) {
                             zoneIdList.add(opcao);
                             if (zoneIdList.size() == zoneIdsWanted) {
                                 flowDone = true;
                             }
+                        }
+                    } else if (opcao.matches("=")) { // Selecionando o zoneId por defeito com "="
+                        zoneIdList.add(defaultZoneid);
+                        if (zoneIdList.size() == zoneIdsWanted) {
+                            flowDone = true;
                         }
                     }
                     break;

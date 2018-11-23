@@ -270,7 +270,8 @@ private void flowGetBusySlots() {
             }
 
             description.add(""); // Linha branca na descrição
-            description.add(String.format("Pagina (%s/%s)", pageIndex+1, totalPages));
+            int pageIndexToDisplay = (totalPages == 0) ? 0 : pageIndex + 1;
+            description.add(String.format("Pagina (%s/%s)", pageIndexToDisplay, totalPages));
 
             menu.addDescToTitle(description);
             menu.show();

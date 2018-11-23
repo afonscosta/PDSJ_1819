@@ -75,10 +75,11 @@ public class CalcDateTimeZoneView implements InterfCalcDateTimeZoneView {
         //------------------------
         op1 = new Opcao("Pagina anterior", "<");
         op2 = new Opcao("Procurar", "/<palavra>");
-        op3 = new Opcao("Pagina seguinte", ">");
-        op4 = new Opcao("Selecionar", "=<palavra>");
-        op5 = new Opcao("Voltar para Calc. de Zonas", "S");
-        linhas = Arrays.asList(op1, op2, op3, op4, op5);
+        op3 = new Opcao("Ver lista completa", "/");
+        op4 = new Opcao("Pagina seguinte", ">");
+        op5 = new Opcao("Selecionar", "=<palavra>");
+        op6 = new Opcao("Selecionar zoneID atual", "=");
+        linhas = Arrays.asList(op1, op2, op3, op4, op5, op6);
         Menu menuZoneIdNavigator = new Menu(linhas, "Navegador de ZoneIds");
         menusZoneTxt.addMenu(4, menuZoneIdNavigator);
         return menusZoneTxt;
