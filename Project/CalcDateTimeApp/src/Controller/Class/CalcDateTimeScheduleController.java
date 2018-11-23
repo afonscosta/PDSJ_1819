@@ -41,21 +41,33 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     //do ficheiro de configuração
     private DateTimeFormatter dateTimeFormatterLocal;
     private DateTimeFormatter dateTimeFormatterZoned;
-    private final ZoneId referenceZone= ZoneId.of("Europe/Lisbon");
+    private ZoneId referenceZone;
 
     public static CalcDateTimeScheduleController of() {
         return new CalcDateTimeScheduleController();
     }
 
-    public static CalcDateTimeScheduleController of(DateTimeFormatter dtfl, DateTimeFormatter dtfz) {
-        if (dtfl != null && dtfz != null)
-            return new CalcDateTimeScheduleController(dtfl, dtfz);
-        else if (dtfl != null)
-            return new CalcDateTimeScheduleController(dtfl, "local");
-        else if (dtfz != null)
-            return new CalcDateTimeScheduleController(dtfz, "zoned");
-        else
-            return new CalcDateTimeScheduleController();
+    public static CalcDateTimeScheduleController of(DateTimeFormatter dtfl, DateTimeFormatter dtfz,ZoneId referenceZone) {
+        if(referenceZone != null){
+            if (dtfl != null && dtfz != null)
+                return new CalcDateTimeScheduleController(dtfl, dtfz, referenceZone);
+            else if (dtfl != null)
+                return new CalcDateTimeScheduleController(dtfl, "local", referenceZone);
+            else if (dtfz != null)
+                return new CalcDateTimeScheduleController(dtfz, "zoned",referenceZone);
+            else
+                return new CalcDateTimeScheduleController(referenceZone);
+        }
+        else {
+            if (dtfl != null && dtfz != null)
+                return new CalcDateTimeScheduleController(dtfl, dtfz);
+            else if (dtfl != null)
+                return new CalcDateTimeScheduleController(dtfl, "local");
+            else if (dtfz != null)
+                return new CalcDateTimeScheduleController(dtfz, "zoned");
+            else
+                return new CalcDateTimeScheduleController();
+        }
     }
 
     private CalcDateTimeScheduleController(DateTimeFormatter dtf, String mode) {
@@ -67,16 +79,43 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             this.dateTimeFormatterLocal = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n");
             this.dateTimeFormatterZoned = dtf;
         }
+        this.referenceZone = ZoneId.systemDefault();
+    }
+
+    private CalcDateTimeScheduleController(DateTimeFormatter dtf, String mode,ZoneId referenceZone) {
+        if (mode.equals("local")) {
+            this.dateTimeFormatterLocal = dtf;
+            this.dateTimeFormatterZoned = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n [VV]");
+        }
+        else if (mode.equals("zoned")) {
+            this.dateTimeFormatterLocal = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n");
+            this.dateTimeFormatterZoned = dtf;
+        }
+        this.referenceZone = referenceZone;
     }
 
     private CalcDateTimeScheduleController() {
         this.dateTimeFormatterLocal = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n");
         this.dateTimeFormatterZoned = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n [VV]");
+        this.referenceZone = ZoneId.systemDefault();
+    }
+
+    private CalcDateTimeScheduleController(ZoneId referenceZone) {
+        this.dateTimeFormatterLocal = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n");
+        this.dateTimeFormatterZoned = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n [VV]");
+        this.referenceZone = referenceZone;
     }
 
     private CalcDateTimeScheduleController(DateTimeFormatter dtfl, DateTimeFormatter dtfz) {
         this.dateTimeFormatterLocal = dtfl;
         this.dateTimeFormatterZoned = dtfz;
+        this.referenceZone= ZoneId.systemDefault();
+    }
+
+    private CalcDateTimeScheduleController(DateTimeFormatter dtfl, DateTimeFormatter dtfz, ZoneId referenceZone) {
+        this.dateTimeFormatterLocal = dtfl;
+        this.dateTimeFormatterZoned = dtfz;
+        this.referenceZone= referenceZone;
     }
 
     @Override
@@ -99,11 +138,17 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         this.dateTimeFormatterZoned = dtf;
     }
 
+    public void withZone(String zid) {
+        model.withZoneLocal(zid);
+    }
+
     //------------------------
     // Fluxo inicial do menu agenda
     //------------------------
     public void flowSchedule(){
         Menu menu = viewScheduleTxt.getMenu(0);
+        out.println(dateTimeFormatterLocal.toString());
+        out.println(dateTimeFormatterZoned.toString());
         String opcao;
         do {
             menu.show();
@@ -119,62 +164,6 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         while(!opcao.equals("S"));
     }
 
-    private void help() {
-        Menu menu = viewScheduleTxt.getMenu(7);
-        List<String> l = asList(
-                BLACK_BOLD + "Opcoes:" + RESET,
-                BLACK_BOLD + "/<vista>" + RESET +
-                " Permite ter uma visao diaria, semanal ou mensal",
-                "         das reunioes. Se pretender uma visao diaria devera ",
-                "         introduzir" + RESET + BLACK_BOLD + " /diaria " + RESET + "onde lhe sera apresentado",
-                "         inicialmente as reunioes do dia corrente.",
-                "         Caso pretenda visualizar todas as reunioes",
-                "         agendadas devera introduzir apenas" + RESET + BLACK_BOLD + " /" + RESET + ".",
-                "         O principio e o mesmo para os restantes",
-                "         modos de visualizacao."+ RESET,
-                " ",
-                BLACK_BOLD + "<" + RESET +
-                "        Recuar a pagina que esta ser apresentada.",
-                BLACK_BOLD + ">" + RESET +
-                "        Avancar a pagina que esta ser apresentada.",
-                " ",
-                BLACK_BOLD + ">>" + RESET +
-                "       Caso prentenda avancar no dia/semana/mes referente",
-                "         ao modo de visualizacao. Por exemplo, foi selecionada",
-                "         a vista diaria em que inicialmente mostra as reunioes",
-                "         do dia corrente. Caso pretenda ver do dia seguinte,",
-                "         devera usar esta opcao, e assim sucessivamente.",
-                "         Para a vista semanal, ira apresentar da proxima semana",
-                "         e o mesmo principio para a vista mensal.",
-                BLACK_BOLD + "<<" + RESET +
-                "       Da mesma forma que a anterior, esta opcao permite recuar um",
-                "         dia, semana ou mes de acordo com o modo de visualizacao.",
-                "         Estas duas ultimas opcoes permitem navegar sempre com a",
-                "         apresentacao no mesmo intervalo.",
-                " ",
-                BLACK_BOLD + "=<id>" + RESET +
-                "   Cada reuniao contem antes da sua descricao",
-                "         um identificador.",
-                "         Pretendendo selecionar, por exemplo, a reuniao",
-                "         com o identifcador 0, o utilizador devera introduzir",
-                "         a opcao "+ RESET + BLACK_BOLD + "=0" + RESET +".",
-                "         No novo menu apresentado podera alterar qualquer ",
-                "         dado da reuniao, remover ou ver detalhes da mesma."
-                );
-
-        String opcao;
-        do {
-            menu.addDescToTitle(l);
-            menu.show();
-            opcao = Input.lerString();
-            opcao = opcao.toUpperCase();
-            switch(opcao) {
-                case "S": break;
-                default: out.println("Opcao Invalida!"); break;
-            }
-        }
-        while(!opcao.equals("S"));
-    }
     //------------------------
     // Fluxo de adicionar uma nova reunião
     // Pode-se optar por usar a data da calculora local, de zona ou inserir uma data manual.
@@ -211,7 +200,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         System.out.println(date);
         if(date==null){
             out.println("Introduza a data da nova reuniao:");
-            date = ControllerUtils.getDateTimeFromInput((ZonedDateTime) model.getDateTimeLocal(), null);
+            date = ControllerUtils.getDateTimeFromInput((ZonedDateTime) model.getDateTimeLocal(), referenceZone);
         }
         out.println("Duracao da nova reuniao");
         out.print("Horas ira demorar: ");
@@ -550,6 +539,63 @@ private void flowGetBusySlots() {
                 opcao = Input.lerString();
             }
             while(!opcao.equals("S"));
+    }
+
+    private void help() {
+        Menu menu = viewScheduleTxt.getMenu(7);
+        List<String> l = asList(
+                BLACK_BOLD + "Opcoes:" + RESET,
+                BLACK_BOLD + "/<vista>" + RESET +
+                        " Permite ter uma visao diaria, semanal ou mensal",
+                "         das reunioes. Se pretender uma visao diaria devera ",
+                "         introduzir" + RESET + BLACK_BOLD + " /diaria " + RESET + "onde lhe sera apresentado",
+                "         inicialmente as reunioes do dia corrente.",
+                "         Caso pretenda visualizar todas as reunioes",
+                "         agendadas devera introduzir apenas" + RESET + BLACK_BOLD + " /" + RESET + ".",
+                "         O principio e o mesmo para os restantes",
+                "         modos de visualizacao."+ RESET,
+                " ",
+                BLACK_BOLD + "<" + RESET +
+                        "        Recuar a pagina que esta ser apresentada.",
+                BLACK_BOLD + ">" + RESET +
+                        "        Avancar a pagina que esta ser apresentada.",
+                " ",
+                BLACK_BOLD + ">>" + RESET +
+                        "       Caso prentenda avancar no dia/semana/mes referente",
+                "         ao modo de visualizacao. Por exemplo, foi selecionada",
+                "         a vista diaria em que inicialmente mostra as reunioes",
+                "         do dia corrente. Caso pretenda ver do dia seguinte,",
+                "         devera usar esta opcao, e assim sucessivamente.",
+                "         Para a vista semanal, ira apresentar da proxima semana",
+                "         e o mesmo principio para a vista mensal.",
+                BLACK_BOLD + "<<" + RESET +
+                        "       Da mesma forma que a anterior, esta opcao permite recuar um",
+                "         dia, semana ou mes de acordo com o modo de visualizacao.",
+                "         Estas duas ultimas opcoes permitem navegar sempre com a",
+                "         apresentacao no mesmo intervalo.",
+                " ",
+                BLACK_BOLD + "=<id>" + RESET +
+                        "   Cada reuniao contem antes da sua descricao",
+                "         um identificador.",
+                "         Pretendendo selecionar, por exemplo, a reuniao",
+                "         com o identifcador 0, o utilizador devera introduzir",
+                "         a opcao "+ RESET + BLACK_BOLD + "=0" + RESET +".",
+                "         No novo menu apresentado podera alterar qualquer ",
+                "         dado da reuniao, remover ou ver detalhes da mesma."
+        );
+
+        String opcao;
+        do {
+            menu.addDescToTitle(l);
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "S": break;
+                default: out.println("Opcao Invalida!"); break;
+            }
+        }
+        while(!opcao.equals("S"));
     }
 
     //------------------------

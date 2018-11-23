@@ -16,6 +16,7 @@ import static Utilities.ConsoleColors.RESET;
 import static Utilities.ControllerUtils.*;
 import static java.lang.System.out;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.binarySearch;
 
 public class CalcDateTimeController implements InterfCalcDateTimeController {
 
@@ -79,8 +80,8 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "FL": setDateFormatLocal(); break;
-                case "FF": setDateFormatZoned(); break;
+                case "FL": flowSetDateFormatLocal(); break;
+                case "FF": flowSetDateFormatZoned(); break;
                 case "L": setLocal(); break;
                 case "H": setSchedule(); break;
                 case "?": helpConfig(); break;
@@ -91,23 +92,102 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         while(!opcao.equals("S"));
     }
 
-    private void setDateFormatLocal() {
+    private void flowSetDateFormatLocal(){
+        Menu menu = viewMainTxt.getMenu(4);
+        String opcao;
+        boolean flowDone=false;
+        do {
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "P": flowPreDefinedDateFormatLocal(); flowDone=true; break;
+                case "M": setDateFormatLocal(setDinamicDateFormatLocal()); flowDone=true; break;
+                case "S": flowDone=true; break;
+                default: System.out.println("Opcao Invalida!"); break;
+            }
+        }
+        while(!flowDone);
+    }
+
+    private void flowSetDateFormatZoned(){
+        Menu menu = viewMainTxt.getMenu(4);
+        String opcao;
+        boolean flowDone = false;
+        do {
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "P": flowPreDefinedDateFormatZoned(); flowDone=true; break;
+                case "M": setDateFormatZoned(setDinamicDateFormatZoned()); flowDone=true; break;
+                case "S": flowDone=true; break;
+                default: System.out.println("Opcao Invalida!"); break;
+            }
+        }
+        while(!flowDone);
+    }
+
+    private DateTimeFormatter setDinamicDateFormatLocal(){
         out.println("Insira o formato pretendido para datas locais: ");
-        DateTimeFormatter dtf = getDateTimeFormatterFromInput();
+        return getDateTimeFormatterFromInput();
+    }
+
+    private void setDateFormatLocal(DateTimeFormatter dtf) {
         controlLocal.setDateTimeFormatter(dtf);
         controlSchedule.setDateTimeFormatterLocal(dtf);
     }
+    private void flowPreDefinedDateFormatLocal(){
+        Menu menu = viewMainTxt.getMenu(5);
+        String opcao;
+        Boolean flowDone=false;
+        do {
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "1": setDateFormatLocal(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm")); flowDone=true; break;
+                case "2": setDateFormatLocal(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm:ss")); flowDone=true; break;
+                case "3": setDateFormatLocal(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm:ss:nn")); flowDone=true; break;
+                case "S": flowDone=true; break;
+                default: System.out.println("Opcao Invalida!"); break;
+            }
+        }
+        while(!flowDone);
+    }
 
-    private void setDateFormatZoned() {
+    private DateTimeFormatter setDinamicDateFormatZoned(){
         out.println("Insira o formato pretendido para datas com fuso: ");
-        DateTimeFormatter dtf = getDateTimeFormatterFromInput();
+        return getDateTimeFormatterFromInput();
+    }
+    private void setDateFormatZoned(DateTimeFormatter dtf) {
         controlZone.setDateTimeFormatter(dtf);
         controlSchedule.setDateTimeFormatterZoned(dtf);
+    }
+    private void flowPreDefinedDateFormatZoned(){
+        Menu menu = viewMainTxt.getMenu(6);
+        String opcao;
+        Boolean flowDone = false;
+        do {
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "1": setDateFormatZoned(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm VV")); flowDone=true; break;
+                case "2": setDateFormatZoned(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm:ss VV")); flowDone=true; break;
+                case "3": setDateFormatZoned(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm:ss O")); flowDone=true; break;
+                case "4": setDateFormatZoned(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm VV O")); flowDone=true; break;
+                case "S": flowDone=true; break;
+                default: System.out.println("Opcao Invalida!"); break;
+            }
+        }
+        while(!flowDone);
     }
 
     private void setLocal() {
         String zone = flowShowAllAvailableTimezonesAndGetNZoneIds(1,viewMainTxt.getMenu(2)).get(0);
         controlLocal.withZone(zone);
+        controlSchedule.withZone(zone);
     }
 
     private void setSchedule() {
