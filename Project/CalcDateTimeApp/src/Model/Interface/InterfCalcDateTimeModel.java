@@ -58,10 +58,23 @@ public interface InterfCalcDateTimeModel {
 
     Slot editDurationSlot(Slot s, Duration d);
 
-
     Slot editDateSLot(Slot s, Temporal data);
 
     Slot getSlot(String infoSlot);
 
     List<String> getRestrictSlots(String modeNormalized, int want);
+
+    String getLocalDateTimeFormat();
+
+    String getZoneDateTimeFormat();
+
+    void setZoneId(ZoneId zoneId);
+
+    void setZoneDateTimeFormat(String zoneDateTimeFormat);
+
+    void setLocalDateTimeFormat(String localDateTimeFormat);
+
+    void saveConfigs();
+
+    ZoneId getLocalZone();
 }

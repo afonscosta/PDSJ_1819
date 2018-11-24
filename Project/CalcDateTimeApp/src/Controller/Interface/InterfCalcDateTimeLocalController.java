@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 
 public interface InterfCalcDateTimeLocalController {
 
-
     void flowLocal();
 
     void setModel(InterfCalcDateTimeModel model);
@@ -16,6 +15,4 @@ public interface InterfCalcDateTimeLocalController {
     void setView(InterfCalcDateTimeLocalView viewLocal);
 
     void withZone(String zid);
-
-    void setDateTimeFormatter(DateTimeFormatter dtf);
 }

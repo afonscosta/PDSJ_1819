@@ -167,7 +167,7 @@ public class ControllerUtils {
     /*
      * Pede ao utilizador um DateTimeFormatter
      */
-    public static DateTimeFormatter getDateTimeFormatterFromInput() {
+    public static String getDateTimeFormatterFromInput() {
         String format = Input.lerString();
         DateTimeFormatter dtf = parseFormat(format);
         while (dtf == null) {
@@ -176,7 +176,7 @@ public class ControllerUtils {
             format = Input.lerString();
             dtf = parseFormat(format);
         }
-        return dtf;
+        return format;
     }
 
     public static List<String> flowShowAllAvailableTimezonesAndGetNZoneIds(int zoneIdsWanted, Menu menu, String defaultZoneid) {

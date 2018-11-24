@@ -40,10 +40,6 @@ public final class CalcDateTimeApp {
 
     public static void main(String[] args) {
 
-        DateTimeFormatter dateTimeFormatterLocal = DateTimeFormatter.ofPattern("yyyy/MM/dd k:m:s:n");
-        DateTimeFormatter dateTimeFormatterZoned = DateTimeFormatter.ofPattern("yyyy/MM/dd k:m:s:n - VV");
-        ZoneId localZone = ZoneId.systemDefault();
-
         //--------------------------------
         InterfCalcDateTimeLocalModel modelLocal = CalcDateTimeLocalModel.of();
         InterfCalcDateTimeZoneModel modelZone = CalcDateTimeZoneModel.of();
@@ -57,20 +53,20 @@ public final class CalcDateTimeApp {
         InterfCalcDateTimeView view = new CalcDateTimeView();
 
         //--------------------------------
-        InterfCalcDateTimeLocalController controlLocal = CalcDateTimeLocalController.of(dateTimeFormatterLocal, localZone);
+        InterfCalcDateTimeLocalController controlLocal = CalcDateTimeLocalController.of();
         controlLocal.setModel(model);
         controlLocal.setView(viewLocal);
 
-        InterfCalcDateTimeZoneController controlZone = CalcDateTimeZoneController.of(dateTimeFormatterZoned);
+        InterfCalcDateTimeZoneController controlZone = CalcDateTimeZoneController.of();
         controlZone.setModel(model);
         controlZone.setView(viewZone);
 
-        InterfCalcDateTimeScheduleController controlSchedule = CalcDateTimeScheduleController.of(dateTimeFormatterLocal, dateTimeFormatterZoned, localZone);
+        InterfCalcDateTimeScheduleController controlSchedule = CalcDateTimeScheduleController.of();
         controlSchedule.setModel(model);
         controlSchedule.setView(viewSchedule);
 
         InterfCalcDateTimeController control = CalcDateTimeController.of(controlLocal, controlZone, controlSchedule);
-        // Aqui não fiz 'control.setModel(model)' porque o Controller principal não acede ao model.
+        control.setModel(model);
         control.setView(view);
         control.startFlow();
 

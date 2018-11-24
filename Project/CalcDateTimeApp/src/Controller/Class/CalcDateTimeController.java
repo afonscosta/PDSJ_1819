@@ -4,6 +4,7 @@ import Controller.Interface.InterfCalcDateTimeController;
 import Controller.Interface.InterfCalcDateTimeLocalController;
 import Controller.Interface.InterfCalcDateTimeScheduleController;
 import Controller.Interface.InterfCalcDateTimeZoneController;
+import Model.Interface.InterfCalcDateTimeModel;
 import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeView;
@@ -21,6 +22,7 @@ import static java.util.Arrays.binarySearch;
 
 public class CalcDateTimeController implements InterfCalcDateTimeController {
 
+    private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeView viewMainTxt;
     private InterfCalcDateTimeLocalController controlLocal;
     private InterfCalcDateTimeZoneController controlZone;
@@ -45,7 +47,13 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         this.viewMainTxt = view;
     }
 
-    //------------------------
+    @Override
+    public void setModel(InterfCalcDateTimeModel model) {
+        this.model = model;
+    }
+
+
+        //------------------------
     // Fluxo inicial do programa
     //------------------------
     @Override
@@ -63,7 +71,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 case "A" : controlSchedule.flowSchedule(); break;
                 case "C" : flowConfig(); break;
                 case "?" : helpMain(); break;
-                case "S": controlSchedule.saveState(); break; //É aqui que se guarda os DateTimeFormatter's e o localZone
+                case "S": controlSchedule.saveState(); model.saveConfigs(); break; //É aqui que se guarda os DateTimeFormatter's e o localZone
                 default: System.out.println("Opcao Invalida!"); break;
             }
         }
@@ -103,7 +111,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             opcao = opcao.toUpperCase();
             switch(opcao) {
                 case "P": flowPreDefinedDateFormatLocal(); flowDone=true; break;
-                case "M": setDateFormatLocal(setDinamicDateFormatLocal()); flowDone=true; break;
+                case "M": model.setLocalDateTimeFormat(setDinamicDateFormatLocal()); flowDone=true; break;
                 case "S": flowDone=true; break;
                 default: System.out.println("Opcao Invalida!"); break;
             }
@@ -121,7 +129,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             opcao = opcao.toUpperCase();
             switch(opcao) {
                 case "P": flowPreDefinedDateFormatZoned(); flowDone=true; break;
-                case "M": setDateFormatZoned(setDinamicDateFormatZoned()); flowDone=true; break;
+                case "M": model.setLocalDateTimeFormat(setDinamicDateFormatZoned()); flowDone=true; break;
                 case "S": flowDone=true; break;
                 default: System.out.println("Opcao Invalida!"); break;
             }
@@ -129,15 +137,11 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         while(!flowDone);
     }
 
-    private DateTimeFormatter setDinamicDateFormatLocal(){
+    private String setDinamicDateFormatLocal(){
         out.println("Insira o formato pretendido para datas locais: ");
         return getDateTimeFormatterFromInput();
     }
 
-    private void setDateFormatLocal(DateTimeFormatter dtf) {
-        controlLocal.setDateTimeFormatter(dtf);
-        controlSchedule.setDateTimeFormatterLocal(dtf);
-    }
     private void flowPreDefinedDateFormatLocal(){
         Menu menu = viewMainTxt.getMenu(5);
         String opcao;
@@ -147,9 +151,9 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "1": setDateFormatLocal(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm")); flowDone=true; break;
-                case "2": setDateFormatLocal(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm:ss")); flowDone=true; break;
-                case "3": setDateFormatLocal(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm:ss:nn")); flowDone=true; break;
+                case "1": model.setLocalDateTimeFormat("dd-MM-yyy HH:mm"); flowDone=true; break;
+                case "2": model.setLocalDateTimeFormat("dd-MM-yyy HH:mm:ss"); flowDone=true; break;
+                case "3": model.setLocalDateTimeFormat("dd-MM-yyy HH:mm:ss:nn"); flowDone=true; break;
                 case "S": flowDone=true; break;
                 default: System.out.println("Opcao Invalida!"); break;
             }
@@ -157,14 +161,11 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         while(!flowDone);
     }
 
-    private DateTimeFormatter setDinamicDateFormatZoned(){
+    private String setDinamicDateFormatZoned(){
         out.println("Insira o formato pretendido para datas com fuso: ");
         return getDateTimeFormatterFromInput();
     }
-    private void setDateFormatZoned(DateTimeFormatter dtf) {
-        controlZone.setDateTimeFormatter(dtf);
-        controlSchedule.setDateTimeFormatterZoned(dtf);
-    }
+
     private void flowPreDefinedDateFormatZoned(){
         Menu menu = viewMainTxt.getMenu(6);
         String opcao;
@@ -174,10 +175,10 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "1": setDateFormatZoned(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm VV")); flowDone=true; break;
-                case "2": setDateFormatZoned(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm:ss VV")); flowDone=true; break;
-                case "3": setDateFormatZoned(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm:ss O")); flowDone=true; break;
-                case "4": setDateFormatZoned(DateTimeFormatter.ofPattern("dd-MM-yyy HH:mm VV O")); flowDone=true; break;
+                case "1": model.setZoneDateTimeFormat("dd-MM-yyy HH:mm VV"); flowDone=true; break;
+                case "2": model.setZoneDateTimeFormat("dd-MM-yyy HH:mm:ss VV"); flowDone=true; break;
+                case "3": model.setZoneDateTimeFormat("dd-MM-yyy HH:mm:ss O"); flowDone=true; break;
+                case "4": model.setZoneDateTimeFormat("dd-MM-yyy HH:mm VV O"); flowDone=true; break;
                 case "S": flowDone=true; break;
                 default: System.out.println("Opcao Invalida!"); break;
             }

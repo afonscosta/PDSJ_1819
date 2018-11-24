@@ -482,6 +482,7 @@ public class BusinessUtils {
     // A zoned de referencia é a dada no ficheiro de configuração
     //------------------------
     public static String DateSlotToString(Slot s,ZoneId referenceZone){
+        // TODO Tirar os formatters
         DateTimeFormatter formatterToShowLocalDateTime = ofPattern("dd-MM-yyy HH:mm");
         DateTimeFormatter formatterToShowZonedDateTime = ofPattern("dd-MM-yyy HH:mm VV");
         ZonedDateTime date = ZonedDateTime.from(s.getData());

@@ -5,9 +5,12 @@ import Model.Interface.InterfCalcDateTimeModel;
 import Model.Interface.InterfCalcDateTimeScheduleModel;
 import Model.Interface.InterfCalcDateTimeZoneModel;
 import Utilities.EnumEditSlotInfo;
+import org.json.simple.JSONObject;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
@@ -18,6 +21,7 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     private InterfCalcDateTimeLocalModel modelLocal;
     private InterfCalcDateTimeZoneModel modelZone;
     private InterfCalcDateTimeScheduleModel modelSchedule;
+
 
     public CalcDateTimeModel(InterfCalcDateTimeLocalModel modelLocal,
                              InterfCalcDateTimeZoneModel modelZone,
@@ -33,6 +37,44 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     @Override
     public Temporal getDateTimeLocal() {
         return modelLocal.getDateTime();
+    }
+
+    @Override
+    public String getLocalDateTimeFormat() {
+        return modelLocal.getLocalDateTimeFormat();
+    }
+
+    @Override
+    public void setLocalDateTimeFormat(String localDateTimeFormat) {
+        modelLocal.setLocalDateTimeFormat(localDateTimeFormat);
+    }
+
+    @Override
+    public void saveConfigs() {
+        JSONObject jsonObj = new JSONObject();
+
+        jsonObj.put("localDateTimeFormat",this.getLocalDateTimeFormat());
+        jsonObj.put("zoneDateTimeFormat",this.getZoneDateTimeFormat());
+        jsonObj.put("zoneId","\"" + this.getLocalZone() + "\"");
+
+        try {
+            FileWriter fw = new FileWriter("./date_dict_conf.json");
+            fw.write(jsonObj.toJSONString());
+            fw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public ZoneId getLocalZone() {
+        return modelLocal.getZone();
+    }
+
+    @Override
+    public void setZoneId(ZoneId zoneId) {
+        modelLocal.setZoneId(zoneId);
     }
 
     @Override
@@ -70,10 +112,20 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     //------------------------
 
     @Override
+    public String getZoneDateTimeFormat() {
+        return modelZone.getZoneDateTimeFormat();
+    }
+
+    @Override
     public String getZoneDateTimeZone() {
         ZonedDateTime zdt = (ZonedDateTime) modelZone.getDateTime();
 
         return zdt.getZone().toString();
+    }
+
+    @Override
+    public void setZoneDateTimeFormat(String zoneDateTimeFormat) {
+        modelZone.setZoneDateTimeFormat(zoneDateTimeFormat);
     }
 
     @Override
@@ -120,17 +172,22 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     //------------------------
     // Métodos Model Schedule
     //------------------------
+    @Override
     public boolean addSlot(Slot newSlot){
         return modelSchedule.addSlot(newSlot);
     }
 
+    @Override
     public void saveState(String nomeFicheiro) throws IOException {
         modelSchedule.saveState(nomeFicheiro);
     }
+
+    @Override
     public List<String> getMainInfoSlots(){
         return modelSchedule.getMainInfoSlots();
     }
 
+    @Override
     public boolean removeSlot(Slot slot){
         return modelSchedule.removeSlot(slot);
     }
@@ -150,8 +207,10 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
         return modelSchedule.editDateSLot(s,data);
     }
 
+    @Override
     public Slot getSlot(String infoSlot){ return modelSchedule.getSlot(infoSlot);}
 
+    @Override
     public List<String> getRestrictSlots(String modeNormalized, int want){
         return modelSchedule.getRestrictSlots(modeNormalized,want);
     }

@@ -2,7 +2,6 @@ package Controller.Class;
 
 import Controller.Interface.InterfCalcDateTimeZoneController;
 import Model.Interface.InterfCalcDateTimeModel;
-import Utilities.ControllerUtils;
 import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeZoneView;
@@ -12,14 +11,11 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static Utilities.BusinessUtils.*;
-import static Utilities.ControllerUtils.flowShowAllAvailableTimezonesAndGetNZoneIds;
-import static Utilities.ControllerUtils.getDateTimeFromInput;
-import static Utilities.ControllerUtils.shift;
+import static Utilities.BusinessUtils.zoneDateTimeToString;
+import static Utilities.ControllerUtils.*;
 import static java.lang.System.out;
 import static java.time.temporal.ChronoUnit.*;
 
@@ -36,32 +32,17 @@ Edgar
 public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneController {
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeZoneView viewZoneTxt;
-    private DateTimeFormatter dateTimeFormatter;
 
     public static CalcDateTimeZoneController of() {
         return new CalcDateTimeZoneController();
     }
 
-    public static CalcDateTimeZoneController of(DateTimeFormatter dtf) {
-        if (dtf != null)
-            return new CalcDateTimeZoneController(dtf);
-        else
-            return new CalcDateTimeZoneController();
-    }
-
     private CalcDateTimeZoneController() {
-        this.dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n [VV]");
-    }
-
-    private CalcDateTimeZoneController(DateTimeFormatter dtf) {
-        this.dateTimeFormatter = dtf;
     }
 
     @Override
     public void setModel(InterfCalcDateTimeModel model) {
         this.model = model;
-        // Utilizar o zoneId do ficheiro de configuração
-        this.model.fromDateTimeZone(ZonedDateTime.now());
     }
 
     @Override
@@ -69,14 +50,10 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         this.viewZoneTxt = viewZone;
     }
 
-    @Override
-    public void setDateTimeFormatter(DateTimeFormatter dtf) {
-        this.dateTimeFormatter = dtf;
-    }
 
     private String buildZoneDateTimeTitle() {
         ZonedDateTime zdt = (ZonedDateTime) model.getDateTimeZone();
-        return zoneDateTimeToString(zdt, dateTimeFormatter);
+        return zoneDateTimeToString(zdt, DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat()));
     }
 
     //------------------------

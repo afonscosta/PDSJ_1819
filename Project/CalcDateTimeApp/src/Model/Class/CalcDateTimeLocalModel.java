@@ -2,7 +2,12 @@ package Model.Class;
 
 import Model.Interface.InterfCalcDateTimeLocalModel;
 import Utilities.BusinessUtils;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -14,23 +19,15 @@ import static Utilities.BusinessUtils.*;
 public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 
     private ZonedDateTime ldt;
-
-    public static CalcDateTimeLocalModel of (ZoneId localZone) {
-        return new CalcDateTimeLocalModel(localZone);
-    }
+    private String localDateTimeFormat;
 
     public static CalcDateTimeLocalModel of () {
         return new CalcDateTimeLocalModel();
     }
 
-    // Está public para poder usar na subclasse
-    public CalcDateTimeLocalModel(ZoneId localZone) {
-        this.ldt = ZonedDateTime.now(localZone);
-    }
-
-    // Está public para poder usar na subclasse
-    public CalcDateTimeLocalModel() {
+    protected CalcDateTimeLocalModel() {
         this.ldt = ZonedDateTime.now();
+        readConfFileAndLoadLocalRelated();
     }
 
     @Override
@@ -69,6 +66,60 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
             ldt = ldt.withZoneSameInstant(ZoneId.of(zid));
         } catch (ZoneRulesException e) {
             // Zona inexistente? Ignorar..
+        }
+    }
+
+    @Override
+    public void setLocalDateTimeFormat(String localDateTimeFormat) {
+        this.localDateTimeFormat = localDateTimeFormat;
+
+    }
+
+    @Override
+    public void setZoneId(ZoneId zoneId) {
+        ldt = ldt.withZoneSameLocal(zoneId);
+    }
+
+    @Override
+    public String getLocalDateTimeFormat() {
+        return this.localDateTimeFormat;
+    }
+
+    @Override
+    public ZoneId getZone() {
+       return ldt.getZone();
+    }
+
+    private void readConfFileAndLoadLocalRelated() {
+
+        String pathToConfFile = "./date_dict_conf.json";
+
+        JSONParser parser = new JSONParser();
+
+        try {
+            Object obj = parser.parse(new FileReader(pathToConfFile));
+
+            JSONObject jsonObj = (JSONObject) obj;
+
+            String localDateTimeFormat = (String) jsonObj.get("localDateTimeFormat");
+
+            String zoneIdTxt = ((String) jsonObj.get("zoneId"));
+
+            // Json character escape nos ficheiros, portanto temos de os remover
+            zoneIdTxt = zoneIdTxt.replaceAll("\\\\","");
+
+            // Variavel vem no formato "palavra", temos de remover pelicas
+            zoneIdTxt = zoneIdTxt.replaceAll("\"","");
+
+            ZoneId zoneId = ZoneId.of(zoneIdTxt);
+
+            this.setLocalDateTimeFormat(localDateTimeFormat);
+            this.setZoneId(zoneId);
+
+            // Caso de erro, adicionar o default
+        } catch (Exception e) {
+            this.setLocalDateTimeFormat("yyyy/MM/dd k:m:s:n");
+            this.setZoneId(ZoneId.systemDefault());
         }
     }
 }
