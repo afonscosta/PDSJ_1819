@@ -6,6 +6,7 @@ import Utilities.EnumEditSlotInfo;
 
 import java.io.*;
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.temporal.Temporal;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public interface InterfCalcDateTimeScheduleModel {
 
         }
     }
-    List<String> getMainInfoSlots();
+    List<String> getMainInfoSlots(ZoneId referenceZoneId);
 
     boolean removeSlot(Slot slot);
 
@@ -42,6 +43,6 @@ public interface InterfCalcDateTimeScheduleModel {
 
     Slot getSlot(String infoSlot);
 
-    List<String> getRestrictSlots(String modeNormalized, int want);
+    List<String> getRestrictSlots(String modeNormalized, int want,ZoneId referenceZone);
 }
 

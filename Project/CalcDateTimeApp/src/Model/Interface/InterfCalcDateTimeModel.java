@@ -50,7 +50,7 @@ public interface InterfCalcDateTimeModel {
 
     void saveState(String nomeFicheiro) throws IOException;
 
-    List<String> getMainInfoSlots();
+    List<String> getMainInfoSlots(ZoneId referenceZoneId);
 
     boolean removeSlot(Slot slot);
 
@@ -62,7 +62,7 @@ public interface InterfCalcDateTimeModel {
 
     Slot getSlot(String infoSlot);
 
-    List<String> getRestrictSlots(String modeNormalized, int want);
+    List<String> getRestrictSlots(String modeNormalized, int want,ZoneId referenceZone);
 
     String getLocalDateTimeFormat();
 

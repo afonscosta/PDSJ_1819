@@ -32,12 +32,12 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         //------------------------
         // Menu Busy slots navigator
         //------------------------
-        op1 = new Opcao("Vista(diaria/semanal/mensal)", "/<vista>");
+        op1 = new Opcao("Selecionar", "=<id reuniao>");
         op2 = new Opcao("Pagina anterior", "<");
         op3 = new Opcao("Pagina seguinte", ">");
-        op4 = new Opcao("Avancar modo(dia/semana/mes)", ">>");
-        op5 = new Opcao("Recuar modo(dia/semana/mes)", "<<");
-        op6 = new Opcao("Selecionar", "=<id reuniao>");
+        op4 = new Opcao("Vista(diaria/semanal/mensal)", "/<vista>");
+        op5 = new Opcao("Avancar (dia/semana/mes) na vista", ">>");
+        op6 = new Opcao("Recuar (dia/semana/mes) na vista", "<<");
         op7 = new Opcao("Ajuda", "?");
         op8 = new Opcao("Voltar ao Menu Agenda", "S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5,op6,op7,op8);
@@ -82,10 +82,10 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         // Menu alter data
         //------------------------
 
-        op1 = new Opcao("Manipular dia", "D");
-        op2 = new Opcao("Manipular semana", "Sem");
-        op3 = new Opcao("Manipular mes", "M");
-        op4 = new Opcao("Manipular ano", "A");
+        op1 = new Opcao("Aritmetrica de dias", "D");
+        op2 = new Opcao("Aritmetrica de semanas", "Sem");
+        op3 = new Opcao("Aritmetrica de meses", "M");
+        op4 = new Opcao("Aritmetrica de anos", "A");
         op5 = new Opcao("Alterar horas","T");
         op6 = new Opcao("Voltar ao Menu reuniao", "S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5,op6);

@@ -183,8 +183,8 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     }
 
     @Override
-    public List<String> getMainInfoSlots(){
-        return modelSchedule.getMainInfoSlots();
+    public List<String> getMainInfoSlots(ZoneId referenceZoneId){
+        return modelSchedule.getMainInfoSlots(referenceZoneId);
     }
 
     @Override
@@ -211,7 +211,7 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     public Slot getSlot(String infoSlot){ return modelSchedule.getSlot(infoSlot);}
 
     @Override
-    public List<String> getRestrictSlots(String modeNormalized, int want){
-        return modelSchedule.getRestrictSlots(modeNormalized,want);
+    public List<String> getRestrictSlots(String modeNormalized, int want,ZoneId referenceZone){
+        return modelSchedule.getRestrictSlots(modeNormalized,want,referenceZone);
     }
 }

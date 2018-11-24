@@ -3,6 +3,8 @@ package Model.Class;
 import Model.Interface.InterfCalcDateTimeScheduleModel;
 import Utilities.BusinessUtils;
 import Utilities.EnumEditSlotInfo;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import java.io.*;
 import java.time.Duration;
@@ -20,8 +22,6 @@ import java.util.TreeSet;
 public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleModel,Serializable {
     private Set<Slot> agenda;
     static final long serialVersionUID = 1L;
-    //do ficheiro de configuração
-    private ZoneId referenceZone= ZoneId.of("Europe/Lisbon");
 
     public static CalcDateTimeScheduleModel of() {
         return new CalcDateTimeScheduleModel();
@@ -34,14 +34,15 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                                 Temporal data2 = s2.getData();
                                 LocalDateTime ldt1 = LocalDateTime.from(data1);
                                 LocalDateTime ldt2 = LocalDateTime.from(data2);
+                                ZoneId referenceZone = getReferenceZone();
 
                                 if (data1.equals(data2)) return 0;
                                 else {
                                     if (data1.getClass().getSimpleName().equals("ZonedDateTime")) {
-                                        ldt1 = BusinessUtils.convertZoneDateTimeToSpecificZone(data1, this.referenceZone).toLocalDateTime();
+                                        ldt1 = BusinessUtils.convertZoneDateTimeToSpecificZone(data1, referenceZone).toLocalDateTime();
                                     }
                                     if (data2.getClass().getSimpleName().equals("ZonedDateTime")) {
-                                        ldt2 = BusinessUtils.convertZoneDateTimeToSpecificZone(data2,this.referenceZone).toLocalDateTime();
+                                        ldt2 = BusinessUtils.convertZoneDateTimeToSpecificZone(data2,referenceZone).toLocalDateTime();
                                     }
                                     System.out.println("ldt1->" + ldt1.toString());
                                     System.out.println("ldt2->" + ldt2.toString());
@@ -70,6 +71,29 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                 this.agenda= new TreeSet<>(compDateSlots);
     }
 
+    //------------------------
+    // Retorna o ZonedId de definido no ficheiro de configurações
+    //------------------------
+    private ZoneId getReferenceZone(){
+        String pathToConfFile = "./date_dict_conf.json";
+        JSONParser parser = new JSONParser();
+        try {
+            Object obj = parser.parse(new FileReader(pathToConfFile));
+            JSONObject jsonObj = (JSONObject) obj;
+            String zoneIdTxt = ((String) jsonObj.get("zoneId"));
+            // Json character escape nos ficheiros, portanto temos de os remover
+            zoneIdTxt = zoneIdTxt.replaceAll("\\\\","");
+            ZoneId zoneId = ZoneId.of(zoneIdTxt);
+            System.out.println(zoneId);
+            return zoneId;
+
+        } catch (Exception e) {
+            return ZoneId.systemDefault();
+
+        }
+    }
+
+
     public Set<Slot> getAgenda() {
         return agenda;
     }
@@ -83,11 +107,11 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     // É apresentada cada reunião de forma aglutinada, pela sua data e local.
     // Se a reunião estiver na zoned default, não é apresentada a zoned
     //------------------------
-    public List<String> getMainInfoSlots(){
+    public List<String> getMainInfoSlots(ZoneId referenceZone){
         List<String> res= new ArrayList();
         int index =0;
         for(Slot s : agenda) {
-            res.add(index + ": " + BusinessUtils.DateSlotToString(s,this.referenceZone) + " || " + s.getLocal());
+            res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone) + " || " + s.getLocal());
             index ++;
         }
         return res;
@@ -99,38 +123,34 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     // Por exemplo, utilizador escolhe diaria -> want diz-me o dia referente
     //------------------------
 
-    public List<String> getRestrictSlots(String modeNormalized, int want){
+    public List<String> getRestrictSlots(String modeNormalized, int want, ZoneId referenceZone){
         List<String> res= new ArrayList();
         int index =0;
         for(Slot s : agenda) {
             ZonedDateTime date = ZonedDateTime.from(s.getData());
             switch (modeNormalized) {
                 case "diaria":
-                    System.out.print(date.getDayOfMonth() +"==" + want);
                     if(date.getDayOfMonth()==want){
-                        System.out.println("YES");
-                        res.add(index + ": " + BusinessUtils.DateSlotToString(s,this.referenceZone) + " || " + s.getLocal());
+                        res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone) + " || " + s.getLocal());
                         index ++;
                     }
                     break;
                 case "semanal":
-                    TemporalField woy = WeekFields.ISO.weekOfMonth();
+                    TemporalField woy = WeekFields.ISO.weekOfYear();
                     int weekNumber = date.get(woy);
-                    System.out.println(weekNumber);
                     if(weekNumber==want){
-                        res.add(index + ": " + BusinessUtils.DateSlotToString(s,this.referenceZone) + " || " + s.getLocal());
+                        res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone) + " || " + s.getLocal());
                         index ++;
                     }
                     break;
                 case "mensal":
                     if(date.getMonthValue()==want){
-                        res.add(index + ": " + BusinessUtils.DateSlotToString(s,this.referenceZone) + " || " + s.getLocal());
+                        res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone) + " || " + s.getLocal());
                         index ++;
                     }
                     break;
             }
         }
-        System.out.println(res);
         return res;
     }
 
@@ -171,8 +191,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     public Slot editDurationSlot(Slot s, Duration newDuration) {
         Slot temp = s.clone();
-        boolean res =removeSlot(s);
-        System.out.println("Remover o slot que quero substituir:" + res);
+        removeSlot(s);
         Slot newSlot = new Slot(temp.getData(),newDuration,temp.getLocal(),temp.getDescription());
         boolean add = addSlot(newSlot);
         if(add==false) {
@@ -188,12 +207,10 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     public Slot editDateSLot(Slot s, Temporal data){
         Slot temp = s.clone();
-        boolean res =removeSlot(s);
-        System.out.println("Remover o slot que quero substituir:" + res);
+        removeSlot(s);
         Slot newSlot = new Slot(data, temp.getDuration(),temp.getLocal(),temp.getDescription());
         boolean add = addSlot(newSlot);
         if(add==false){
-            System.out.println("NAO DEU PARA ALTERAR DATA");
             addSlot(temp);
             return temp;
         }
