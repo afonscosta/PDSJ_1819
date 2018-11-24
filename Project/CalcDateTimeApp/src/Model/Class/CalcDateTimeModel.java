@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.List;
@@ -183,8 +184,8 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     }
 
     @Override
-    public List<String> getMainInfoSlots(ZoneId referenceZoneId){
-        return modelSchedule.getMainInfoSlots(referenceZoneId);
+    public List<String> getMainInfoSlots(ZoneId referenceZoneId, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
+        return modelSchedule.getMainInfoSlots(referenceZoneId,dtfLocal,dtfZone);
     }
 
     @Override
@@ -211,7 +212,7 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     public Slot getSlot(String infoSlot){ return modelSchedule.getSlot(infoSlot);}
 
     @Override
-    public List<String> getRestrictSlots(String modeNormalized, int want,ZoneId referenceZone){
-        return modelSchedule.getRestrictSlots(modeNormalized,want,referenceZone);
+    public List<String> getRestrictSlots(String modeNormalized, int want, ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
+        return modelSchedule.getRestrictSlots(modeNormalized,want,referenceZone,dtfLocal,dtfZone);
     }
 }

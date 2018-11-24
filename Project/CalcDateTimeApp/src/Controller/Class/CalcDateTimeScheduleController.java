@@ -166,26 +166,28 @@ private void flowGetBusySlots() {
         String modeNormalized="";//identifca o modo geral
         int pageIndex = 0;
         ZoneId referenceZonedId = getRefereceZoneId();
-        List<List<String>> slotsOfMode = partitionIntoPages(model.getMainInfoSlots(referenceZonedId),25);
+        DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
+        DateTimeFormatter dtfZoned = getDateTimeFormatterZoned();
+        List<List<String>> slotsOfMode = partitionIntoPages(model.getMainInfoSlots(referenceZonedId,dtfLocal,dtfZoned),25);
         int totalPages = slotsOfMode.size();
         do {
             switch (modeNormalized){
                 case "":
-                    slotsOfMode = partitionIntoPages(model.getMainInfoSlots(referenceZonedId),25);
+                    slotsOfMode = partitionIntoPages(model.getMainInfoSlots(referenceZonedId,dtfLocal,dtfZoned),25);
                     totalPages =slotsOfMode.size();
                     break;
                 case "diaria":
-                    slotsOfMode = partitionIntoPages(model.getRestrictSlots(modeNormalized,currentDateMode.getDayOfMonth(),referenceZonedId),25);
+                    slotsOfMode = partitionIntoPages(model.getRestrictSlots(modeNormalized,currentDateMode.getDayOfMonth(),referenceZonedId,dtfLocal,dtfZoned),25);
                     totalPages = slotsOfMode.size();
                     break;
                 case"semanal":
                     TemporalField woy = WeekFields.ISO.weekOfYear();
                     int weekNumber = currentDateMode.get(woy);
-                    slotsOfMode = partitionIntoPages(model.getRestrictSlots(modeNormalized,weekNumber,referenceZonedId),25);
+                    slotsOfMode = partitionIntoPages(model.getRestrictSlots(modeNormalized,weekNumber,referenceZonedId,dtfLocal,dtfZoned),25);
                     totalPages = slotsOfMode.size();
                     break;
                 case"mensal":
-                    slotsOfMode = partitionIntoPages(model.getRestrictSlots(modeNormalized,currentDateMode.getMonthValue(),referenceZonedId),25);
+                    slotsOfMode = partitionIntoPages(model.getRestrictSlots(modeNormalized,currentDateMode.getMonthValue(),referenceZonedId,dtfLocal,dtfZoned),25);
                     totalPages = slotsOfMode.size();
                     break;
 
@@ -220,7 +222,7 @@ private void flowGetBusySlots() {
                     }
                     else if (opcao.matches("=.*")) {
                         opcao = opcao.substring(1); // Remover o "="
-                        for (String infoSlot : model.getMainInfoSlots(referenceZonedId)) {
+                        for (String infoSlot : model.getMainInfoSlots(referenceZonedId,dtfLocal,dtfZoned)) {
                             String idSlot = getIdSlot(infoSlot);
                             if(idSlot!=null & idSlot.equals(opcao)){
                                 Slot s= model.getSlot(idSlot);
@@ -274,8 +276,10 @@ private void flowGetBusySlots() {
     public void flowSelectBusySlot(Slot s) {
         Menu menu = viewScheduleTxt.getMenu(2);
         String opcao;
+        DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
+        DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
             do {
-                String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId());
+                String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
                 menu.addDescToTitle(Arrays.asList("Data: " + dataToShow));
                 menu.show();
                 opcao = Input.lerString();
@@ -320,8 +324,10 @@ private void flowGetBusySlots() {
     private Slot flowEditSlot(Slot s){
             Menu menu = viewScheduleTxt.getMenu(4);
             String opcao;
+            DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
+            DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
             do {
-                String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId());
+                String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
                 menu.addDescToTitle(Arrays.asList(dataToShow,
                         s.getLocal(), s.getDuration().toString(),
                         s.getDescription()));
@@ -398,9 +404,11 @@ private void flowGetBusySlots() {
      private Slot flowEditDataSlot(Slot s) {
             Menu menu = viewScheduleTxt.getMenu(5);
             String opcao;
+            DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
+            DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
             do {
                 Temporal data = s.getData();
-                String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId());
+                String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
                 menu.addDescToTitle(Arrays.asList(dataToShow));
                 menu.show();
                 opcao = Input.lerString();
@@ -449,8 +457,11 @@ private void flowGetBusySlots() {
     private void slotDetails(Slot s){
             String opcao;
             Menu menu = viewScheduleTxt.getMenu(6);
+            DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
+            DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
+
             do{
-                String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId());
+                String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
                 menu.addDescToTitle(Arrays.asList(dataToShow,
                                                 s.getDuration().toString(),
                                                 s.getDescription(),

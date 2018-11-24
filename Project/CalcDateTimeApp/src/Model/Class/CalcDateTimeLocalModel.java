@@ -26,8 +26,11 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
     }
 
     protected CalcDateTimeLocalModel() {
+        // Iniciar variável
         this.ldt = ZonedDateTime.now();
         readConfFileAndLoadLocalRelated();
+        // Colocar como default o "now" mas nesta nova zona
+        this.ldt = ZonedDateTime.now(this.ldt.getZone());
     }
 
     @Override

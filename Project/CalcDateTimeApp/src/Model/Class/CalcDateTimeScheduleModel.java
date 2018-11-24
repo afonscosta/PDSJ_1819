@@ -107,11 +107,11 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     // É apresentada cada reunião de forma aglutinada, pela sua data e local.
     // Se a reunião estiver na zoned default, não é apresentada a zoned
     //------------------------
-    public List<String> getMainInfoSlots(ZoneId referenceZone){
+    public List<String> getMainInfoSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
         List<String> res= new ArrayList();
         int index =0;
         for(Slot s : agenda) {
-            res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone) + " || " + s.getLocal());
+            res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone,dtfLocal,dtfZone) + " || " + s.getLocal());
             index ++;
         }
         return res;
@@ -123,7 +123,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     // Por exemplo, utilizador escolhe diaria -> want diz-me o dia referente
     //------------------------
 
-    public List<String> getRestrictSlots(String modeNormalized, int want, ZoneId referenceZone){
+    public List<String> getRestrictSlots(String modeNormalized, int want, ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
         List<String> res= new ArrayList();
         int index =0;
         for(Slot s : agenda) {
@@ -131,7 +131,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
             switch (modeNormalized) {
                 case "diaria":
                     if(date.getDayOfMonth()==want){
-                        res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone) + " || " + s.getLocal());
+                        res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone,dtfLocal,dtfZone) + " || " + s.getLocal());
                         index ++;
                     }
                     break;
@@ -139,13 +139,13 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                     TemporalField woy = WeekFields.ISO.weekOfYear();
                     int weekNumber = date.get(woy);
                     if(weekNumber==want){
-                        res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone) + " || " + s.getLocal());
+                        res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone,dtfLocal, dtfZone) + " || " + s.getLocal());
                         index ++;
                     }
                     break;
                 case "mensal":
                     if(date.getMonthValue()==want){
-                        res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone) + " || " + s.getLocal());
+                        res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone,dtfLocal,dtfZone) + " || " + s.getLocal());
                         index ++;
                     }
                     break;
