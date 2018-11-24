@@ -18,14 +18,12 @@ import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static Utilities.BusinessUtils.*;
 import static Utilities.ConsoleColors.*;
-import static Utilities.ControllerUtils.flowHelp;
 import static Utilities.EnumEditSlotInfo.DESC;
 import static Utilities.EnumEditSlotInfo.DURACAO;
 import static Utilities.EnumEditSlotInfo.LOCAL;
@@ -38,108 +36,41 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
 
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeScheduleView viewScheduleTxt;
-    //do ficheiro de configuração
-    private DateTimeFormatter dateTimeFormatterLocal;
-    private DateTimeFormatter dateTimeFormatterZoned;
-    private ZoneId referenceZone;
 
     public static CalcDateTimeScheduleController of() {
         return new CalcDateTimeScheduleController();
     }
 
-    public static CalcDateTimeScheduleController of(DateTimeFormatter dtfl, DateTimeFormatter dtfz,ZoneId referenceZone) {
-        if(referenceZone != null){
-            if (dtfl != null && dtfz != null)
-                return new CalcDateTimeScheduleController(dtfl, dtfz, referenceZone);
-            else if (dtfl != null)
-                return new CalcDateTimeScheduleController(dtfl, "local", referenceZone);
-            else if (dtfz != null)
-                return new CalcDateTimeScheduleController(dtfz, "zoned",referenceZone);
-            else
-                return new CalcDateTimeScheduleController(referenceZone);
-        }
-        else {
-            if (dtfl != null && dtfz != null)
-                return new CalcDateTimeScheduleController(dtfl, dtfz);
-            else if (dtfl != null)
-                return new CalcDateTimeScheduleController(dtfl, "local");
-            else if (dtfz != null)
-                return new CalcDateTimeScheduleController(dtfz, "zoned");
-            else
-                return new CalcDateTimeScheduleController();
-        }
-    }
+    private CalcDateTimeScheduleController() { }
 
-    private CalcDateTimeScheduleController(DateTimeFormatter dtf, String mode) {
-        if (mode.equals("local")) {
-            this.dateTimeFormatterLocal = dtf;
-            this.dateTimeFormatterZoned = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n [VV]");
-        }
-        else if (mode.equals("zoned")) {
-            this.dateTimeFormatterLocal = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n");
-            this.dateTimeFormatterZoned = dtf;
-        }
-        this.referenceZone = ZoneId.systemDefault();
-    }
-
-    private CalcDateTimeScheduleController(DateTimeFormatter dtf, String mode,ZoneId referenceZone) {
-        if (mode.equals("local")) {
-            this.dateTimeFormatterLocal = dtf;
-            this.dateTimeFormatterZoned = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n [VV]");
-        }
-        else if (mode.equals("zoned")) {
-            this.dateTimeFormatterLocal = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n");
-            this.dateTimeFormatterZoned = dtf;
-        }
-        this.referenceZone = referenceZone;
-    }
-
-    private CalcDateTimeScheduleController() {
-        this.dateTimeFormatterLocal = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n");
-        this.dateTimeFormatterZoned = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n [VV]");
-        this.referenceZone = ZoneId.systemDefault();
-    }
-
-    private CalcDateTimeScheduleController(ZoneId referenceZone) {
-        this.dateTimeFormatterLocal = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n");
-        this.dateTimeFormatterZoned = DateTimeFormatter.ofPattern("dd/MM/yyyy k:m:s:n [VV]");
-        this.referenceZone = referenceZone;
-    }
-
-    private CalcDateTimeScheduleController(DateTimeFormatter dtfl, DateTimeFormatter dtfz) {
-        this.dateTimeFormatterLocal = dtfl;
-        this.dateTimeFormatterZoned = dtfz;
-        this.referenceZone= ZoneId.systemDefault();
-    }
-
-    private CalcDateTimeScheduleController(DateTimeFormatter dtfl, DateTimeFormatter dtfz, ZoneId referenceZone) {
-        this.dateTimeFormatterLocal = dtfl;
-        this.dateTimeFormatterZoned = dtfz;
-        this.referenceZone= referenceZone;
-    }
-
-    @Override
     public void setView(InterfCalcDateTimeScheduleView viewSchedule) {
         this.viewScheduleTxt = viewSchedule;
     }
 
-    @Override
     public void setModel(InterfCalcDateTimeModel model) {
         this.model = model;
     }
 
-    @Override
-    public void setDateTimeFormatterLocal(DateTimeFormatter dtf) {
-        this.dateTimeFormatterLocal = dtf;
+    //------------------------
+    // Retorna o formato para LocalDateTime definido no ficheiro de configurações
+    //------------------------
+    public DateTimeFormatter getDateTimeFormatterLocal(){
+        return DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat());
     }
 
-    @Override
-    public void setDateTimeFormatterZoned(DateTimeFormatter dtf) {
-        this.dateTimeFormatterZoned = dtf;
+    //------------------------
+    // Retorna o formato para ZonedDateTime definido no ficheiro de configurações
+    //------------------------
+    public DateTimeFormatter getDateTimeFormatterZoned(){
+        return DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat());
     }
 
-    public void withZone(String zid) {
-        model.withZoneLocal(zid);
+    //------------------------
+    // Retorna o zonedId definido no ficheiro de configurações
+    //------------------------
+    public ZoneId getRefereceZoneId(){
+        ZonedDateTime zdt = ZonedDateTime.from(model.getDateTimeLocal());
+        return zdt.getZone();
     }
 
     //------------------------
@@ -147,8 +78,6 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     //------------------------
     public void flowSchedule(){
         Menu menu = viewScheduleTxt.getMenu(0);
-        out.println(dateTimeFormatterLocal.toString());
-        out.println(dateTimeFormatterZoned.toString());
         String opcao;
         do {
             menu.show();
@@ -174,10 +103,10 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         do {
             Temporal tempLocal = model.getDateTimeLocal();
             Temporal tempZone = model.getDateTimeZone();
-            String ldt = localDateTimeToString(tempLocal, dateTimeFormatterLocal);
-            String zdt = zoneDateTimeToString((ZonedDateTime)tempZone, dateTimeFormatterZoned);
+            String ldt = localDateTimeToString(tempLocal, getDateTimeFormatterLocal());
+            String zdt = zoneDateTimeToString((ZonedDateTime)tempZone, getDateTimeFormatterZoned());
             menu.addDescToTitle(Arrays.asList("Data calc. local: " + ldt,
-                    "Data calc. zona: " + zdt));
+                    "Data calc. com fusos: " + zdt));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -197,10 +126,9 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     // Adicionar uma nova reunião
     //------------------------
     private void addSlot(Temporal date){
-        System.out.println(date);
         if(date==null){
             out.println("Introduza a data da nova reuniao:");
-            date = ControllerUtils.getDateTimeFromInput((ZonedDateTime) model.getDateTimeLocal(), referenceZone);
+            date = ControllerUtils.getDateTimeFromInput((ZonedDateTime) model.getDateTimeLocal(), getRefereceZoneId());
         }
         out.println("Duracao da nova reuniao");
         out.print("Horas ira demorar: ");
@@ -217,7 +145,6 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         String description= Input.lerString();
         Slot newSlot = new Slot(date,duration,local,description);
         boolean res =model.addSlot(newSlot);
-        //vai transitar para a descrição do menu
         if(res == true){
             System.out.println(GREEN_BOLD +"Reuniao adicionada com sucesso!" + RESET);
         }
@@ -238,27 +165,29 @@ private void flowGetBusySlots() {
         String opcao;
         String modeNormalized="";//identifca o modo geral
         int pageIndex = 0;
-        List<List<String>> slotsOfMode = partitionIntoPages(model.getMainInfoSlots(),25);
+        ZoneId referenceZonedId = getRefereceZoneId();
+        DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
+        DateTimeFormatter dtfZoned = getDateTimeFormatterZoned();
+        List<List<String>> slotsOfMode = partitionIntoPages(model.getMainInfoSlots(referenceZonedId,dtfLocal,dtfZoned),25);
         int totalPages = slotsOfMode.size();
         do {
             switch (modeNormalized){
                 case "":
-                    slotsOfMode = partitionIntoPages(model.getMainInfoSlots(),25);
+                    slotsOfMode = partitionIntoPages(model.getMainInfoSlots(referenceZonedId,dtfLocal,dtfZoned),25);
                     totalPages =slotsOfMode.size();
                     break;
                 case "diaria":
-                    slotsOfMode = partitionIntoPages(model.getRestrictSlots(modeNormalized,currentDateMode.getDayOfMonth()),25);
+                    slotsOfMode = partitionIntoPages(model.getRestrictSlots(modeNormalized,currentDateMode.getDayOfMonth(),referenceZonedId,dtfLocal,dtfZoned),25);
                     totalPages = slotsOfMode.size();
                     break;
                 case"semanal":
-                    TemporalField woy = WeekFields.ISO.weekOfMonth();
+                    TemporalField woy = WeekFields.ISO.weekOfYear();
                     int weekNumber = currentDateMode.get(woy);
-                    System.out.println(weekNumber);
-                    slotsOfMode = partitionIntoPages(model.getRestrictSlots(modeNormalized,weekNumber),25);
+                    slotsOfMode = partitionIntoPages(model.getRestrictSlots(modeNormalized,weekNumber,referenceZonedId,dtfLocal,dtfZoned),25);
                     totalPages = slotsOfMode.size();
                     break;
                 case"mensal":
-                    slotsOfMode = partitionIntoPages(model.getRestrictSlots(modeNormalized,currentDateMode.getMonthValue()),25);
+                    slotsOfMode = partitionIntoPages(model.getRestrictSlots(modeNormalized,currentDateMode.getMonthValue(),referenceZonedId,dtfLocal,dtfZoned),25);
                     totalPages = slotsOfMode.size();
                     break;
 
@@ -293,10 +222,8 @@ private void flowGetBusySlots() {
                     }
                     else if (opcao.matches("=.*")) {
                         opcao = opcao.substring(1); // Remover o "="
-                        for (String infoSlot : model.getMainInfoSlots()) {
+                        for (String infoSlot : model.getMainInfoSlots(referenceZonedId,dtfLocal,dtfZoned)) {
                             String idSlot = getIdSlot(infoSlot);
-                            System.out.println(idSlot);
-                            System.out.println(opcao);
                             if(idSlot!=null & idSlot.equals(opcao)){
                                 Slot s= model.getSlot(idSlot);
                                 if(s!=null) {
@@ -349,8 +276,10 @@ private void flowGetBusySlots() {
     public void flowSelectBusySlot(Slot s) {
         Menu menu = viewScheduleTxt.getMenu(2);
         String opcao;
+        DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
+        DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
             do {
-                String dataToShow = BusinessUtils.DateSlotToString(s,referenceZone);
+                String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
                 menu.addDescToTitle(Arrays.asList("Data: " + dataToShow));
                 menu.show();
                 opcao = Input.lerString();
@@ -395,8 +324,10 @@ private void flowGetBusySlots() {
     private Slot flowEditSlot(Slot s){
             Menu menu = viewScheduleTxt.getMenu(4);
             String opcao;
+            DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
+            DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
             do {
-                String dataToShow = BusinessUtils.DateSlotToString(s,referenceZone);
+                String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
                 menu.addDescToTitle(Arrays.asList(dataToShow,
                         s.getLocal(), s.getDuration().toString(),
                         s.getDescription()));
@@ -473,10 +404,11 @@ private void flowGetBusySlots() {
      private Slot flowEditDataSlot(Slot s) {
             Menu menu = viewScheduleTxt.getMenu(5);
             String opcao;
+            DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
+            DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
             do {
                 Temporal data = s.getData();
-                out.println(data);
-                String dataToShow = BusinessUtils.DateSlotToString(s,referenceZone);
+                String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
                 menu.addDescToTitle(Arrays.asList(dataToShow));
                 menu.show();
                 opcao = Input.lerString();
@@ -484,27 +416,22 @@ private void flowGetBusySlots() {
                 switch (opcao) {
                     case "D":
                         data= BusinessUtils.shiftDateTime(data,ControllerUtils.shift("dias"), DAYS);
-                        out.println(data);
                         s = model.editDateSLot(s, data);
                         break;
                     case "SEM":
                         data = BusinessUtils.shiftDateTime(data,ControllerUtils.shift("semanas"), WEEKS);
-                        out.println(data);
                         s = model.editDateSLot(s, data);
                         break;
                     case "M":
                         data = BusinessUtils.shiftDateTime(data,ControllerUtils.shift("meses"), MONTHS);
-                        out.println(data);
                         s = model.editDateSLot(s, data);
                         break;
                     case "A":
                         data = BusinessUtils.shiftDateTime(data,ControllerUtils.shift("anos"), YEARS);
-                        out.println(data);
                         s = model.editDateSLot(s, data);
                         break;
                     case "T":
                         data = ControllerUtils.shitTime(ZonedDateTime.from(data));
-                        out.println(data);
                         s = model.editDateSLot(s,data);
                         break;
                     case "S":
@@ -530,8 +457,11 @@ private void flowGetBusySlots() {
     private void slotDetails(Slot s){
             String opcao;
             Menu menu = viewScheduleTxt.getMenu(6);
+            DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
+            DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
+
             do{
-                String dataToShow = BusinessUtils.DateSlotToString(s,referenceZone);
+                String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
                 menu.addDescToTitle(Arrays.asList(dataToShow,
                                                 s.getDuration().toString(),
                                                 s.getDescription(),
@@ -542,6 +472,9 @@ private void flowGetBusySlots() {
             while(!opcao.equals("S"));
     }
 
+    //------------------------
+    // Breve explicação das opções do menu de visualização de reuniões agendadas
+    //------------------------
     private void help() {
         Menu menu = viewScheduleTxt.getMenu(7);
         List<String> l = asList(
@@ -607,7 +540,9 @@ private void flowGetBusySlots() {
             model.saveState("AgendaReunioes");
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Problemas a guardar o estado");
+            out.println(RED_BOLD + "Não foi possivel guardar o estado da aplicação");
+            out.print("Prima Enter para continuar.");
+            Input.lerString();
         }
     }
 }
