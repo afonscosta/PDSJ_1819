@@ -71,7 +71,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 case "A" : controlSchedule.flowSchedule(); break;
                 case "C" : flowConfig(); break;
                 case "?" : helpMain(); break;
-                case "S": controlSchedule.saveState(); model.saveConfigs(); break; //É aqui que se guarda os DateTimeFormatter's e o localZone
+                case "S": controlSchedule.saveState(); break; //É aqui que se guarda os DateTimeFormatter's e o localZone
                 default: System.out.println("Opcao Invalida!"); break;
             }
         }
@@ -84,21 +84,26 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     private void flowConfig() {
         Menu menu = viewMainTxt.getMenu(1);
         String opcao;
+        Boolean configChanged = false;
         do {
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "FL": flowSetDateFormatLocal(); break;
-                case "FF": flowSetDateFormatZoned(); break;
-                case "L": setLocal(); break;
-                case "H": setSchedule(); break;
+                case "FL": flowSetDateFormatLocal(); configChanged = true; break;
+                case "FF": flowSetDateFormatZoned(); configChanged = true; break;
+                case "L": setLocal(); configChanged = true; break;
+                case "H": setSchedule(); configChanged = true; break;
                 case "?": helpConfig(); break;
                 case "S": break;
                 default: System.out.println("Opcao Invalida!"); break;
             }
         }
         while(!opcao.equals("S"));
+
+        if (configChanged) {
+            model.saveConfigs();
+        }
     }
 
     private void flowSetDateFormatLocal(){
