@@ -2,6 +2,7 @@ package Controller.Class;
 
 import Controller.Interface.InterfCalcDateTimeLocalController;
 import Model.Interface.InterfCalcDateTimeModel;
+import Utilities.BusinessUtils;
 import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeLocalView;
@@ -69,18 +70,23 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "C" : setDateTimeLocal(); statusMessage = "Data modificada com sucesso"; break;
-                case "A" : flowShiftDateTime(); break;
-                case "AU" : flowShiftWorkDaysDateTime(); break;
-                case "D" : flowDiffDateTime(); break;
-                case "DU" : flowDiffWorkDaysDateTime(); break;
-                case "O" : getDateTimeLocal(); statusMessage = "Data modificada com sucesso"; break;
-                case "?" : help(); statusMessage = "n/a"; break;
+                case "C": setDateTimeLocal(); statusMessage = "Data modificada com sucesso"; break;
+                case "R": resetDateTimeLocal(); statusMessage = "Data modificada com sucesso"; break;
+                case "A": flowShiftDateTime(); break;
+                case "AU": flowShiftWorkDaysDateTime(); break;
+                case "D": flowDiffDateTime(); break;
+                case "DU": flowDiffWorkDaysDateTime(); break;
+                case "O": getDateTimeLocal(); statusMessage = "Data modificada com sucesso"; break;
+                case "?": help(); statusMessage = "n/a"; break;
                 case "S": break;
                 default: errorMessage = "Opcao Invalida!"; break;
             }
         }
         while(!opcao.equals("S"));
+    }
+
+    private void resetDateTimeLocal() {
+        model.fromDateTimeLocal(getNowOfZone(model.getLocalZone()));
     }
 
     private void help() {
@@ -89,34 +95,35 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         Menu menu = viewLocalTxt.getMenu(1);
         List<String> l = asList(
             RED_BOLD + "Data: " + sld + RESET,
-            BLACK_BOLD + "^^^^" + RESET + " - A data presente no registo e usada por omissao ",
-            "       nos diferentes calculos possiveis neste menu. No ",
-            "       final de cada calculo o registo e atualizado de ",
-            "       forma a conter o resultado da operacao efetuada.",
+            BLACK_BOLD + "^^^^" + RESET + " - A data presente no registo e usada por omissao.",
+            "       No final de cada calculo o registo e atualizado.",
             " ",
-            BLACK_BOLD + "Opcao C:" + RESET + " permite ao utilizador alterar a data ",
-            "         que se encontra no registo 'Data' a cima.",
+            BLACK_BOLD + "Opcao C:" + RESET + " permite ao utilizador" + BLUE_BOLD + " alterar a data ",
+            "         que se encontra no registo." + RESET,
+            " ",
+            BLACK_BOLD + "Opcao R:" + RESET + " permite ao utilizador" + BLUE_BOLD + " alterar a data ",
+            "         que se encontra no registo" + RESET + " para a data ",
+            "         atual tendo em conta o fuso local.",
             " ",
             BLACK_BOLD + "Opcao A:" + RESET + " permite ao utilizador somar ou subtrair ",
             "         anos, meses, semanas, dias, horas, minutos, ",
-            "         segundos ou nanosegundos, a data que se ",
-            "         encontra no registo.",
+            "         segundos ou nanosegundos, a " + BLUE_BOLD + "data que se ",
+            "         encontra no registo." + RESET,
             " ",
             BLACK_BOLD + "Opcao AU:" + RESET + " permite ao utilizador somar ou subtrair ",
-            "          dias uteis a data que se encontra no registo.",
+            "          dias uteis a " + BLUE_BOLD + "data que se encontra no registo." + RESET,
             " ",
             BLACK_BOLD + "Opcao D:" + RESET + " permite ao utilizador realizar a diferenca ",
-            "         entre datas, sendo que o resultado e ",
-            "         apresentado em anos, meses, dias, horas, ",
-            "         minutos, segundos e nanosegundos.",
+            "         entre datas.",
             " ",
-            BLACK_BOLD + "Opcao DU:" + RESET + " permite ao utilizador realizar a diferenca ",
-            "          entre datas, sendo que o resultado e apresentado ",
-            "          em dias uteis.",
+            BLACK_BOLD + "Opcao DU:" + RESET + " permite ao utilizador realizar a diferenca, ",
+            "          em dias uteis, entre datas. A data inicial não ",
+            "          entra para os calculos.",
             " ",
             BLACK_BOLD + "Opcao O:" + RESET + " permite ao utilizador saber a data dando um ano, ",
             "         mes, numero da semana nesse mes e numero do dia ",
             "         nessa semana.",
+            BLUE_BOLD + "         Altera a data que se encontra no registo!" + RESET,
             " ",
             BLACK_BOLD + "Opcao ?:" + RESET + " permite ao utilizador visualizar este menu.",
             " ",
@@ -152,6 +159,8 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             "   Semana: 5",
             "   Dia: 3",
             "Obtem-se como resultado: o dia 28 de novembro de 2018.",
+            "Este, " + RED_BOLD + "substituiu o valor que se encontra no registo da ",
+            "data" + RESET + " na seccao superior do menu da calculadora.",
             " ",
             "Isto porque o mes 11 de 2018 esta dividido nas seguintes",
             "semanas:",
@@ -164,19 +173,17 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             "            26 27 28 29 30       (Semana 5)" + RESET,
             " ",
             "Desta forma, a quinta semana contem os seguintes dias:",
-            " ",
             BLACK_BOLD + "                novembro 2018   ",
             "            se te qu qu se sá do",
             "            26 27 28 29 30      " + RESET,
-            " ",
             "O primeiro dia da semana é o 26. O segundo dia é o 27. O",
             "terceiro é o 28 e assim sucessivamente.",
             " ",
             "Por fim, importa referir que casa seja introduzida uma",
-            "semana em branco é apresentado o mes completo no forma",
+            BLACK_BOLD + "semana em branco" + RESET + " é apresentado o " + BLACK_BOLD + "mes completo" + RESET + " no forma",
             "apresentado a cima. O mesmo acontece para a semana, caso",
-            "o dia seja inserido em branco é apresentada a semana no",
-            "formato apresentado em cima.");
+            "o " + BLACK_BOLD + "dia" + RESET + " seja inserido em" + BLACK_BOLD + " branco" + RESET + " é apresentada a " + BLACK_BOLD + "semana ",
+            "inteira" + RESET + " no formato apresentado em cima.");
         flowHelp(viewLocalTxt.getMenu(2), l);
     }
 
