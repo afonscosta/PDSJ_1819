@@ -15,6 +15,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.util.Collection;
 import java.util.List;
 
 public class CalcDateTimeModel implements InterfCalcDateTimeModel {
@@ -174,8 +175,8 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     // Métodos Model Schedule
     //------------------------
     @Override
-    public boolean addSlot(Slot newSlot){
-        return modelSchedule.addSlot(newSlot);
+    public boolean addSlot(Slot newSlot, Collection c){
+        return modelSchedule.addSlot(newSlot,c);
     }
 
     @Override
@@ -189,8 +190,29 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     }
 
     @Override
-    public boolean removeSlot(Slot slot){
-        return modelSchedule.removeSlot(slot);
+    public List<String> getModeSlots(String modeNormalized, int want, ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
+        return modelSchedule.getModeSlots(modeNormalized,want,referenceZone,dtfLocal,dtfZone);
+    }
+
+    public List<String> getRestrictSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
+        return modelSchedule.getRestrictSlots(referenceZone,dtfLocal,dtfZone);
+    }
+
+    @Override
+    public Slot getSlot(String infoSlot,Collection c){ return modelSchedule.getSlot(infoSlot,c);}
+
+
+    public Collection getSchedule(){
+        return modelSchedule.getSchedule();
+    }
+
+    public Collection getScheduleRestrictions(){
+        return modelSchedule.getScheduleRestrictions();
+    }
+
+    @Override
+    public boolean removeSlot(Slot slot, Collection c){
+        return modelSchedule.removeSlot(slot,c);
     }
 
     @Override
@@ -208,11 +230,4 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
         return modelSchedule.editDateSLot(s,data);
     }
 
-    @Override
-    public Slot getSlot(String infoSlot){ return modelSchedule.getSlot(infoSlot);}
-
-    @Override
-    public List<String> getRestrictSlots(String modeNormalized, int want, ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
-        return modelSchedule.getRestrictSlots(modeNormalized,want,referenceZone,dtfLocal,dtfZone);
-    }
 }

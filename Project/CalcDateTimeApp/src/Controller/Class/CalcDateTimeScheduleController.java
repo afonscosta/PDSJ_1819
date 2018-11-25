@@ -19,8 +19,6 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static Utilities.BusinessUtils.*;
 import static Utilities.ConsoleColors.*;
@@ -163,8 +161,8 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             out.print("Nova descricao: ");
             desc = Input.lerString();
         }
-        Slot newSlot = new Slot(date,duration,local,desc);
-        boolean res =model.addSlot(newSlot);
+        Slot newSlot = Slot.of(date,duration,local,desc);
+        boolean res =model.addSlot(newSlot,model.getSchedule());
         if(res == true){
             System.out.println(GREEN_BOLD +"Reuniao adicionada com sucesso!" + RESET);
         }
@@ -197,17 +195,17 @@ private void flowGetBusySlots() {
                     totalPages =slotsOfMode.size();
                     break;
                 case "diaria":
-                    slotsOfMode = partitionIntoPages(model.getRestrictSlots(modeNormalized,currentDateMode.getDayOfMonth(),referenceZonedId,dtfLocal,dtfZoned),25);
+                    slotsOfMode = partitionIntoPages(model.getModeSlots(modeNormalized,currentDateMode.getDayOfMonth(),referenceZonedId,dtfLocal,dtfZoned),25);
                     totalPages = slotsOfMode.size();
                     break;
                 case"semanal":
                     TemporalField woy = WeekFields.ISO.weekOfYear();
                     int weekNumber = currentDateMode.get(woy);
-                    slotsOfMode = partitionIntoPages(model.getRestrictSlots(modeNormalized,weekNumber,referenceZonedId,dtfLocal,dtfZoned),25);
+                    slotsOfMode = partitionIntoPages(model.getModeSlots(modeNormalized,weekNumber,referenceZonedId,dtfLocal,dtfZoned),25);
                     totalPages = slotsOfMode.size();
                     break;
                 case"mensal":
-                    slotsOfMode = partitionIntoPages(model.getRestrictSlots(modeNormalized,currentDateMode.getMonthValue(),referenceZonedId,dtfLocal,dtfZoned),25);
+                    slotsOfMode = partitionIntoPages(model.getModeSlots(modeNormalized,currentDateMode.getMonthValue(),referenceZonedId,dtfLocal,dtfZoned),25);
                     totalPages = slotsOfMode.size();
                     break;
 
@@ -225,6 +223,7 @@ private void flowGetBusySlots() {
             menu.addDescToTitle(description);
             menu.show();
             opcao = Input.lerString();
+            opcao.toUpperCase();
             switch (opcao) {
                 case ">": if ((pageIndex + 1) < totalPages) { pageIndex++; } break;
                 case "<": if ((pageIndex - 1) >= 0) { pageIndex--; } break;
@@ -232,7 +231,6 @@ private void flowGetBusySlots() {
                 case "<<": currentDateMode = changeDataMode(currentDateMode,modeNormalized,-1); break;
                 case "?" : help(); break;
                 case "S": flowDone = true; break;
-                case "s": flowDone = true; break;
                 default:
                     if (opcao.matches("\\/.*")) {
                         List<String> matches = new ArrayList<>();
@@ -245,7 +243,7 @@ private void flowGetBusySlots() {
                         for (String infoSlot : model.getMainInfoSlots(referenceZonedId,dtfLocal,dtfZoned)) {
                             String idSlot = getIdSlot(infoSlot);
                             if(idSlot!=null & idSlot.equals(opcao)){
-                                Slot s= model.getSlot(idSlot);
+                                Slot s= model.getSlot(idSlot,model.getSchedule());
                                 if(s!=null) {
                                     flowSelectBusySlot(s);
                                     break;
@@ -275,18 +273,6 @@ private void flowGetBusySlots() {
 
             }
             return currentDateMode;
-    }
-    //------------------------
-    // Dado a caracterização da reunião(id, data, local) devolve apenas o seu identificador gerado ao nivel da interface
-    // null caso de erro
-    //------------------------
-    public String getIdSlot(String infoSlot){
-        Pattern p = Pattern.compile("^[0-9]+");
-        Matcher m = p.matcher(infoSlot);
-        if(m.find()){
-            return m.group(0);
-        }
-        else return null;
     }
 
     //------------------------
@@ -325,7 +311,7 @@ private void flowGetBusySlots() {
     // Remover uma reunião da agenda
     //------------------------
     private void removeSlot(Slot s){
-                boolean res =model.removeSlot(s);
+                boolean res =model.removeSlot(s, model.getSchedule());
                 if(res== true){
                     out.println(GREEN_BOLD +"Removido com sucesso!" + RESET);
                 }

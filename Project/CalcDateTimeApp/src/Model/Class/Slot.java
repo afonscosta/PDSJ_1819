@@ -11,7 +11,11 @@ public class Slot implements Serializable {
     private String description;
     static final long serialVersionUID = 2L;
 
-    public Slot(Temporal data, Duration duration, String local, String description) {
+    public static Slot of (Temporal data, Duration duration, String local, String description) {
+        return new Slot(data,duration,local,description);
+    }
+
+    protected Slot(Temporal data, Duration duration, String local, String description) {
         this.data = data;
         this.duration = duration;
         this.local = local;
@@ -51,7 +55,7 @@ public class Slot implements Serializable {
     }
 
     public Slot clone(){
-        Slot res = new Slot(data,duration,local,description);
+        Slot res = of(data,duration,local,description);
         return res;
     }
 }

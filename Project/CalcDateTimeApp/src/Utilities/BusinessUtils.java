@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.lang.Math.abs;
 import static java.time.DayOfWeek.*;
@@ -540,6 +542,19 @@ public class BusinessUtils {
         zoneData = zoneData.withZoneSameInstant(referenceZone);
         System.out.println(zoneData);
         return zoneData;
+    }
+
+    //------------------------
+    // Dado a caracterização da reunião(id, data, local) devolve apenas o seu identificador gerado ao nivel da interface
+    // null caso de erro
+    //------------------------
+    public static String getIdSlot(String infoSlot){
+        Pattern p = Pattern.compile("^[0-9]+");
+        Matcher m = p.matcher(infoSlot);
+        if(m.find()){
+            return m.group(0);
+        }
+        else return null;
     }
 
     /*
