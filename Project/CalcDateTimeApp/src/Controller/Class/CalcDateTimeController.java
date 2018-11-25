@@ -124,6 +124,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             switch(opcao) {
                 case "P": flowPreDefinedDateFormatLocal(); flowDone=true; break;
                 case "M": model.setLocalDateTimeFormat(setDinamicDateFormatLocal()); flowDone=true; break;
+                case "?": helpFormatLocal(); break;
                 case "S": flowDone=true; break;
                 default: System.out.println("Opcao Invalida!"); break;
             }
@@ -142,6 +143,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             switch(opcao) {
                 case "P": flowPreDefinedDateFormatZoned(); flowDone=true; break;
                 case "M": model.setLocalDateTimeFormat(setDinamicDateFormatZoned()); flowDone=true; break;
+                case "?": helpFormatZone(); break;
                 case "S": flowDone=true; break;
                 default: System.out.println("Opcao Invalida!"); break;
             }
@@ -204,8 +206,22 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
     private void setSchedule() {
-        out.println("Menu de definicao do horario da agenda");
-        Input.lerString();
+        Menu menu = viewMainTxt.getMenu(7);
+        String opcao;
+        do {
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "S": break;
+                default: addRestrictSchedule();
+            }
+        }
+        while(!opcao.equals("S"));
+    }
+
+    private void addRestrictSchedule(){
+
     }
 
     private void helpConfig() {
@@ -231,6 +247,68 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 BLACK_BOLD + "Opcao ?:" + RESET + " permite ao utilizador visualizar este menu.",
                 " ",
                 BLACK_BOLD + "Opcao S:" + RESET + " permite ao utilizador sair da aplicacao.");
+        flowHelp(viewMainTxt.getMenu(3), l);
+    }
+
+    //------------------------
+    // Breve explicação das opções do menu de visualização de reuniões agendadas
+    //------------------------
+    private void helpFormatZone() {
+        List<String> l = asList(
+                "Pode ser feita qualquer combinacao com:",
+                "   G: era formato textual",
+                "   y: ano (2018)",
+                "   M: mes formato numero(12)",
+                "   L: mes formato textual(Dezembro)",
+                "   d: dia do mes(24)",
+                "   D: dia do ano(189)",
+                "",
+                "   W: Semana do mes com base no primeiro dia da semana",
+                "   E : dia da semana formato textual(Tuesday)",
+                "",
+                "   a: am ou pm",
+                "   h: horas apresentadas(1-12)",
+                "   k: horas apresentadas(1-24)",
+                "   H: horas de um dia(0-23)",
+                "   m: minutos de uma hora",
+                "   s: segundos de um minuto",
+                "   A: mili de um dia",
+                "   n: nano-segundos",
+                "   N: nano de um dia",
+                "",
+                "   VV: identificador do fuso (Europe/Lisbon)",
+                "   z: nome do fuso (Portugal)",
+                "   O: zone-offset(GMT+0)"
+            );
+        flowHelp(viewMainTxt.getMenu(3), l);
+    }
+
+    //------------------------
+    // Breve explicação das opções do menu de visualização de reuniões agendadas
+    //------------------------
+    private void helpFormatLocal() {
+        List<String> l = asList(
+                "Pode ser feita qualquer combinacao com:",
+                "   G: era formato textual",
+                "   y: ano (2018)",
+                "   M: mes formato numero(12)",
+                "   L: mes formato textual(Dezembro)",
+                "   d: dia do mes(24)",
+                "   D: dia do ano(189)",
+                "",
+                "   W: Semana do mes com base no primeiro dia da semana",
+                "   E : dia da semana formato textual(Tuesday)",
+                "",
+                "   a: am ou pm",
+                "   h: horas apresentadas(1-12)",
+                "   k: horas apresentadas(1-24)",
+                "   H: horas de um dia(0-23)",
+                "   m: minutos de uma hora",
+                "   s: segundos de um minuto",
+                "   A: mili de um dia",
+                "   n: nano-segundos",
+                "   N: nano de um dia"
+        );
         flowHelp(viewMainTxt.getMenu(3), l);
     }
 }
