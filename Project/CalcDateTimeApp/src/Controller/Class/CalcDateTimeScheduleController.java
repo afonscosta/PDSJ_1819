@@ -24,6 +24,8 @@ import java.util.regex.Pattern;
 
 import static Utilities.BusinessUtils.*;
 import static Utilities.ConsoleColors.*;
+import static Utilities.ControllerUtils.flowShowAllAvailableTimezonesAndGetNZoneIds;
+import static Utilities.ControllerUtils.getDateTimeFromInput;
 import static Utilities.EnumEditSlotInfo.DESC;
 import static Utilities.EnumEditSlotInfo.DURACAO;
 import static Utilities.EnumEditSlotInfo.LOCAL;
@@ -113,7 +115,8 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             switch(opcao) {
                 case "L" : addSlot(tempLocal); break;
                 case "Z" : addSlot(tempZone); break;
-                case "M" : addSlot(null); break;
+                case "ML": Temporal date = getDateFromInput("ML");addSlot(date); break;
+                case "MF":  date = getDateFromInput("MF");addSlot(date); break;
                 case "S": break;
                 default: System.out.println("Opcao Invalida !"); break;
             }
@@ -122,14 +125,20 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         while(!(opcao.equals("S")| opcao.equals("L") | opcao.equals("Z") | opcao.equals("M")));
     }
 
+    public Temporal getDateFromInput(String typeOfDate){
+        ZoneId zonedId = getRefereceZoneId();
+        if(typeOfDate.equals("MF")){
+            String zoneIdString = flowShowAllAvailableTimezonesAndGetNZoneIds(1, viewScheduleTxt.getMenu(8), model.getZoneDateTimeZone()).get(0);
+            zonedId = ZoneId.of(zoneIdString);
+        }
+
+        return  getDateTimeFromInput((ZonedDateTime) model.getDateTimeLocal(), zonedId);
+    }
+
     //------------------------
     // Adicionar uma nova reunião
     //------------------------
     private void addSlot(Temporal date){
-        if(date==null){
-            out.println("Introduza a data da nova reuniao:");
-            date = ControllerUtils.getDateTimeFromInput((ZonedDateTime) model.getDateTimeLocal(), getRefereceZoneId());
-        }
         out.println("Duracao da nova reuniao");
         out.print("Horas ira demorar: ");
         int horas = Input.lerInt();
@@ -140,10 +149,20 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
 
         out.print("Introduza o local da nova reuniao: ");
         String local = Input.lerString();
+        while (local.equals("")) {
+            out.println("[!] Insira um local");
+            out.print("Novo local: ");
+            local = Input.lerString();
+        }
 
         out.print("Introduza uma descricao da nova reuniao: ");
-        String description= Input.lerString();
-        Slot newSlot = new Slot(date,duration,local,description);
+        String desc= Input.lerString();
+        while (desc.equals("")) {
+            out.println("[!] Insira uma descricao");
+            out.print("Nova descricao: ");
+            desc = Input.lerString();
+        }
+        Slot newSlot = new Slot(date,duration,local,desc);
         boolean res =model.addSlot(newSlot);
         if(res == true){
             System.out.println(GREEN_BOLD +"Reuniao adicionada com sucesso!" + RESET);
@@ -298,7 +317,7 @@ private void flowGetBusySlots() {
                         break;
                 }
             }
-            while (!(opcao.equals("S") | opcao.equals("R")));
+            while (!(opcao.equals("S") | opcao.equals("R") | opcao.equals("A") | opcao.equals("D")));
         }
 
     //------------------------
@@ -306,7 +325,6 @@ private void flowGetBusySlots() {
     //------------------------
     private void removeSlot(Slot s){
                 boolean res =model.removeSlot(s);
-                //para adicioanar ao cabeçalho
                 if(res== true){
                     out.println(GREEN_BOLD +"Removido com sucesso!" + RESET);
                 }
@@ -381,12 +399,22 @@ private void flowGetBusySlots() {
                 case DESC:
                     out.print("Nova descricao: ");
                     String desc = Input.lerString();
+                    while (desc.equals("")) {
+                        out.println("[!] Insira uma descricao");
+                        out.print("Nova descricao: ");
+                        desc = Input.lerString();
+                    }
                     model.editSlot(s,e,desc);
                     out.println(GREEN_BOLD + "Descricao alterada com sucesso!"+ RESET);
                     break;
                 case LOCAL:
                     out.print("Novo local: ");
                     String local = Input.lerString();
+                    while (local.equals("")) {
+                        out.println("[!] Insira um local");
+                        out.print("Novo local: ");
+                        local = Input.lerString();
+                    }
                     model.editSlot(s,e,local);
                     out.println(GREEN_BOLD +"Local alterado com sucesso!" + RESET);
                     break;
