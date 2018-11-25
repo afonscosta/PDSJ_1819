@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 import static Utilities.BusinessUtils.*;
 import static Utilities.ConsoleColors.*;
+import static Utilities.ControllerUtils.flowHelp;
 import static Utilities.ControllerUtils.flowShowAllAvailableTimezonesAndGetNZoneIds;
 import static Utilities.ControllerUtils.getDateTimeFromInput;
 import static Utilities.EnumEditSlotInfo.DESC;
@@ -504,7 +505,6 @@ private void flowGetBusySlots() {
     // Breve explicação das opções do menu de visualização de reuniões agendadas
     //------------------------
     private void help() {
-        Menu menu = viewScheduleTxt.getMenu(7);
         List<String> l = asList(
                 BLACK_BOLD + "Opcoes:" + RESET,
                 BLACK_BOLD + "/<vista>" + RESET +
@@ -545,19 +545,7 @@ private void flowGetBusySlots() {
                 "         No novo menu apresentado podera alterar qualquer ",
                 "         dado da reuniao, remover ou ver detalhes da mesma."
         );
-
-        String opcao;
-        do {
-            menu.addDescToTitle(l);
-            menu.show();
-            opcao = Input.lerString();
-            opcao = opcao.toUpperCase();
-            switch(opcao) {
-                case "S": break;
-                default: out.println("Opcao Invalida!"); break;
-            }
-        }
-        while(!opcao.equals("S"));
+        flowHelp(viewScheduleTxt.getMenu(7),l);
     }
 
     //------------------------

@@ -42,7 +42,7 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         op1 = new Opcao("Definir o formato das datas locais", "FL");
         op2 = new Opcao("Definir o formato das datas com fusos", "FF");
         op3 = new Opcao("Definir o fuso", "F");
-        op4 = new Opcao("Definir horario da agenda","H");
+        op4 = new Opcao("Definir restricoes sobre o agendamento de reunioes","H");
         op5 = new Opcao("Ajuda", "?");
         op6 = new Opcao("Voltar ao Menu Principal", "S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5, op6);
@@ -74,8 +74,9 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         //------------------------
         op1 = new Opcao("Escolher pre-definidos", "P");
         op2 = new Opcao("Manualmente", "M");
-        op3 = new Opcao("Voltar ao menu Configuracoes","S");
-        linhas = Arrays.asList(op1, op2,op3);
+        op3 = new Opcao("Ajuda","?");
+        op4 = new Opcao("Voltar ao Menu Configuracoes","S");
+        linhas = Arrays.asList(op1, op2,op3,op4);
         Menu menuAlterFormatter = new Menu(linhas, "Alterar formato");
         menuMainTxt.addMenu(4, menuAlterFormatter);
 
@@ -85,7 +86,7 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         op1 = new Opcao("dd-MM-yyy HH:mm", "1");
         op2 = new Opcao("dd-MM-yyy HH:mm:ss", "2");
         op3 = new Opcao("dd-MM-yyy HH:mm:ss:nn","3");
-        op4 = new Opcao("Voltar ao menu configuracoes","S");
+        op4 = new Opcao("Voltar ao Menu Configuracoes","S");
         linhas = Arrays.asList(op1, op2, op3, op4);
         Menu menuLocalFormatter = new Menu(linhas, "Escolha do formato da data local");
         menuMainTxt.addMenu(5, menuLocalFormatter);
@@ -97,10 +98,19 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         op2 = new Opcao("dd-MM-yyy HH:mm:ss VV", "2");
         op3 = new Opcao("dd-MM-yyy HH:mm:ss O", "3");
         op4 = new Opcao("dd-MM-yyy HH:mm VV O", "4");
-        op5 = new Opcao("Voltar ao menu configuracoes","S");
+        op5 = new Opcao("Voltar ao Menu Configuracoes","S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5);
         Menu menuZonedFormatter = new Menu(linhas, "Escolha do formato da data com fusos");
         menuMainTxt.addMenu(6, menuZonedFormatter);
+
+        //------------------------
+        // Menu Configurações
+        //------------------------
+        op1 = new Opcao("Voltar ao Menu Configuracoes", "S");
+        linhas = Arrays.asList(op1);
+        Menu menuRetrictSlots = new Menu(linhas, "Nao permitir que haja agendamento de reunioes");
+        menuMainTxt.addMenu(7, menuRetrictSlots);
+
 
         return menuMainTxt;
     }
