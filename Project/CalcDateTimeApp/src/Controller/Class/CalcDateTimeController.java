@@ -198,6 +198,11 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         while(!flowDone);
     }
 
+    private void setLocal() {
+        String zone = flowShowAllAvailableTimezonesAndGetNZoneIds(1,viewMainTxt.getMenu(2), ZoneId.systemDefault().toString()).get(0);
+        controlLocal.withZone(zone);
+    }
+
     private void setSchedule() {
         out.println("Menu de definicao do horario da agenda");
         Input.lerString();

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.List;
@@ -50,7 +51,7 @@ public interface InterfCalcDateTimeModel {
 
     void saveState(String nomeFicheiro) throws IOException;
 
-    List<String> getMainInfoSlots();
+    List<String> getMainInfoSlots(ZoneId referenceZoneId, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
 
     boolean removeSlot(Slot slot);
 
@@ -62,7 +63,7 @@ public interface InterfCalcDateTimeModel {
 
     Slot getSlot(String infoSlot);
 
-    List<String> getRestrictSlots(String modeNormalized, int want);
+    List<String> getRestrictSlots(String modeNormalized, int want, ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
 
     String getLocalDateTimeFormat();
 
