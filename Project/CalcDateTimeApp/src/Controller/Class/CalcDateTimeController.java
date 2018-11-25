@@ -7,6 +7,7 @@ import Controller.Interface.InterfCalcDateTimeZoneController;
 import Model.Class.RestrictSlot;
 import Model.Class.Slot;
 import Model.Interface.InterfCalcDateTimeModel;
+import Utilities.BusinessUtils;
 import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeView;
@@ -20,6 +21,7 @@ import java.time.temporal.Temporal;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static Utilities.BusinessUtils.getIdSlot;
@@ -198,7 +200,15 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         Menu menu = viewMainTxt.getMenu(10);
         String opcao;
         boolean flowDone=false;
+        ZoneId referenceZone = ZonedDateTime.from(model.getDateTimeLocal()).getZone();
+        DateTimeFormatter dtfLocal= DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat());
+        DateTimeFormatter dtfZone = DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat());
         do{
+            String dataToShow = BusinessUtils.DateSlotToString(s,referenceZone,dtfLocal,dtfZone);
+            menu.addDescToTitle(Arrays.asList(dataToShow,
+                                            s.getDuration().toString(),
+                                            s.getDescription())
+            );
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
