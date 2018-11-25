@@ -60,10 +60,11 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         //------------------------
         op1 = new Opcao("Usar a data da calculadora data/tempo local", "L");
         op2 = new Opcao("Usar a data da calculadora data/tempo com fusos", "Z");
-        op3 = new Opcao("Inserir data manualmente", "M");
-        op4 = new Opcao("Voltar ao Menu Agenda", "S");
-        linhas = Arrays.asList(op1, op2,op3,op4);
-        Menu menuDateChoice = new Menu(linhas, "Data da reuniao a inserir");
+        op3 = new Opcao("Inserir manualmente uma reuniao local", "ML");
+        op4 = new Opcao("Inserir manualmente uma reuniao com fusos", "MF");
+        op5 = new Opcao("Voltar ao Menu Agenda", "S");
+        linhas = Arrays.asList(op1, op2,op3,op4,op5);
+        Menu menuDateChoice = new Menu(linhas, "Dados da reuniao a inserir");
         menusScheduleTxt.addMenu(3, menuDateChoice);
 
         //------------------------
@@ -108,6 +109,18 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         linhas = Arrays.asList(op1);
         Menu menuHelp = new Menu(linhas, "Menu Ajuda");
         menusScheduleTxt.addMenu(7, menuHelp);
+
+        //------------------------
+        // Menu Navegador de ZoneIds
+        //------------------------
+        op1 = new Opcao("Pagina anterior", "<");
+        op2 = new Opcao("Procurar", "/<palavra>");
+        op3 = new Opcao("Pagina seguinte", ">");
+        op4 = new Opcao("Selecionar", "=<palavra>");
+        op5 = new Opcao("Voltar para Calc. de Zonas", "S");
+        linhas = Arrays.asList(op1, op2, op3, op4, op5);
+        Menu menuZoneIdNavigator = new Menu(linhas, "Navegador de ZoneIds");
+        menusScheduleTxt.addMenu(8, menuZoneIdNavigator);
 
         return menusScheduleTxt;
     }
