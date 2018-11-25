@@ -14,6 +14,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
+import static Utilities.BusinessUtils.getNowOfZone;
 import static Utilities.BusinessUtils.zoneDateTimeToString;
 import static Utilities.ConsoleColors.*;
 import static Utilities.ControllerUtils.*;
@@ -75,6 +76,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
             opcao = Input.lerString().toUpperCase();
             switch(opcao) {
                 case "C": setDateTimeZone(); statusMessage = "Data modificada com sucesso"; break;
+                case "R": resetDateTimeZone(); statusMessage = "Data modificada com sucesso";  break;
                 case "A": flowShiftZoneDateTime(); break;
                 case "AU": flowShiftWorkDaysDateTimeZone(); break;
                 case "D": flowDiffDateTimeZone(); break;
@@ -87,6 +89,10 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
                 default: errorMessage = "Opcao Invalida!"; break;
             }
         } while(!opcao.equals("S"));
+    }
+
+    private void resetDateTimeZone() {
+        model.fromDateTimeZone(getNowOfZone(model.getZoneZone()));
     }
 
     private void help() {
