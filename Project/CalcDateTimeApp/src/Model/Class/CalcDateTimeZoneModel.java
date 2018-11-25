@@ -1,6 +1,7 @@
 package Model.Class;
 
 import Model.Interface.InterfCalcDateTimeZoneModel;
+import Utilities.Configs;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -20,11 +21,17 @@ public class CalcDateTimeZoneModel extends CalcDateTimeLocalModel implements Int
 
     private CalcDateTimeZoneModel() {
         super();
-        readConfFileAndLoadZonedRelated();
+        this.zoneDateTimeFormat = "yyyy/MM/dd H:m:s:n - VV";
     }
 
     public static CalcDateTimeZoneModel of () {
         return new CalcDateTimeZoneModel();
+    }
+
+
+    public void loadConfigs(Configs configs) {
+        super.loadConfigs(configs);
+        this.setZoneDateTimeFormat(configs.getZoneDateTimeFormat());
     }
 
     @Override
@@ -57,25 +64,5 @@ public class CalcDateTimeZoneModel extends CalcDateTimeLocalModel implements Int
     @Override
     public String getZoneDateTimeFormat() {
         return this.zoneDateTimeFormat;
-    }
-
-    private void readConfFileAndLoadZonedRelated() {
-        String pathToConfFile = "./date_dict_conf.json";
-
-        JSONParser parser = new JSONParser();
-
-        try {
-            Object obj = parser.parse(new FileReader(pathToConfFile));
-
-            JSONObject jsonObj = (JSONObject) obj;
-
-            String zoneDateTimeFormat = (String) jsonObj.get("zoneDateTimeFormat");
-
-            this.setZoneDateTimeFormat(zoneDateTimeFormat);
-
-            // Caso de erro, adicionar o default
-        } catch (IOException | ParseException e) {
-            this.setZoneDateTimeFormat("yyyy/MM/dd H:m:s:n - VV");
-        }
     }
 }

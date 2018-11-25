@@ -11,11 +11,14 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.List;
+import java.util.Set;
 
 public interface InterfCalcDateTimeModel {
         //extends InterfCalcDateTimeLocalModel, InterfCalcDateTimeZoneModel, InterfCalcDateTimeScheduleModel {
 
     ZoneId getZoneZone();
+
+    Set<Slot> getAgenda();
 
     String getZoneDateTimeZone();
 

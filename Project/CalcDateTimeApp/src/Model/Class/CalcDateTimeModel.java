@@ -4,10 +4,9 @@ import Model.Interface.InterfCalcDateTimeLocalModel;
 import Model.Interface.InterfCalcDateTimeModel;
 import Model.Interface.InterfCalcDateTimeScheduleModel;
 import Model.Interface.InterfCalcDateTimeZoneModel;
+import Utilities.Configs;
 import Utilities.EnumEditSlotInfo;
-import org.json.simple.JSONObject;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.ZoneId;
@@ -16,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.List;
+import java.util.Set;
 
 public class CalcDateTimeModel implements InterfCalcDateTimeModel {
 
@@ -26,10 +26,15 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
 
     public CalcDateTimeModel(InterfCalcDateTimeLocalModel modelLocal,
                              InterfCalcDateTimeZoneModel modelZone,
-                             InterfCalcDateTimeScheduleModel modelSchedule) {
+                             InterfCalcDateTimeScheduleModel modelSchedule,
+                             Configs configs) {
         this.modelLocal = modelLocal;
         this.modelZone = modelZone;
         this.modelSchedule = modelSchedule;
+
+        this.modelLocal.loadConfigs(configs);
+        this.modelZone.loadConfigs(configs);
+        this.modelSchedule.loadConfigs(configs);
     }
 
     //------------------------
@@ -52,20 +57,20 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
 
     @Override
     public void saveConfigs() {
-        JSONObject jsonObj = new JSONObject();
+        Configs configs = new Configs();
 
-        jsonObj.put("localDateTimeFormat",this.getLocalDateTimeFormat());
-        jsonObj.put("zoneDateTimeFormat",this.getZoneDateTimeFormat());
-        jsonObj.put("zoneId","\"" + this.getLocalZone() + "\"");
+        configs.setLocalDateTimeFormat(this.getLocalDateTimeFormat());
+        configs.setZoneDateTimeFormat(this.getZoneDateTimeFormat());
+        configs.setZoneId(this.getLocalZone().toString());
+        configs.setAgenda(this.getAgenda());
 
-        try {
-            FileWriter fw = new FileWriter("./date_dict_conf.json");
-            fw.write(jsonObj.toJSONString());
-            fw.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // re-writes over old file
+        configs.saveConfigs("./Configs");
+    }
 
+    @Override
+    public Set<Slot> getAgenda() {
+       return this.modelSchedule.getAgenda();
     }
 
     @Override

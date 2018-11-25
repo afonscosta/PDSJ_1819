@@ -2,6 +2,7 @@ package Model.Interface;
 
 import Model.Class.CalcDateTimeScheduleModel;
 import Model.Class.Slot;
+import Utilities.Configs;
 import Utilities.EnumEditSlotInfo;
 
 import java.io.*;
@@ -10,8 +11,13 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.List;
+import java.util.Set;
 
 public interface InterfCalcDateTimeScheduleModel {
+
+    void loadConfigs(Configs configs);
+
+    Set<Slot> getAgenda();
 
     boolean addSlot(Slot newSlot);
 

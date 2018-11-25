@@ -15,7 +15,6 @@ import java.util.List;
 import static Utilities.ConsoleColors.BLACK_BOLD;
 import static Utilities.ConsoleColors.RESET;
 import static Utilities.ControllerUtils.*;
-import static java.lang.System.err;
 import static java.lang.System.out;
 import static java.util.Arrays.asList;
 
@@ -73,7 +72,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 case "A" : controlSchedule.flowSchedule(); break;
                 case "C" : flowConfig(); break;
                 case "?" : helpMain(); break;
-                case "S": controlSchedule.saveState(); break; //É aqui que se guarda os DateTimeFormatter's e o localZone
+                case "S": model.saveConfigs(); break; //É aqui que se guarda os DateTimeFormatter's e o localZone
                 default: errorMessage = "Opcao Invalida!"; break;
             }
         }

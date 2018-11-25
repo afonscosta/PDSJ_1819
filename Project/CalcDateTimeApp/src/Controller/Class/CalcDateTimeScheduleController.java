@@ -558,18 +558,4 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         );
         flowHelp(viewScheduleTxt.getMenu(7),l);
     }
-
-    //------------------------
-    // Persistência ao nivel do model das reuniões
-    //------------------------
-    public void saveState(){
-        try{
-            model.saveState("AgendaReunioes");
-        } catch (IOException e) {
-            e.printStackTrace();
-            out.println(RED_BOLD + "Não foi possivel guardar o estado da aplicação");
-            out.print("Prima Enter para continuar.");
-            Input.lerString();
-        }
-    }
 }

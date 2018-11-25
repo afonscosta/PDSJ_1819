@@ -14,6 +14,7 @@ import Model.Interface.InterfCalcDateTimeLocalModel;
 import Model.Interface.InterfCalcDateTimeModel;
 import Model.Interface.InterfCalcDateTimeScheduleModel;
 import Model.Interface.InterfCalcDateTimeZoneModel;
+import Utilities.Configs;
 import View.Class.CalcDateTimeLocalView;
 import View.Class.CalcDateTimeScheduleView;
 import View.Class.CalcDateTimeView;
@@ -39,12 +40,13 @@ public final class CalcDateTimeApp {
      */
 
     public static void main(String[] args) {
+        Configs configs = Configs.of("./Configs");
 
         //--------------------------------
         InterfCalcDateTimeLocalModel modelLocal = CalcDateTimeLocalModel.of();
         InterfCalcDateTimeZoneModel modelZone = CalcDateTimeZoneModel.of();
-        InterfCalcDateTimeScheduleModel modelSchedule = CalcDateTimeScheduleModel.of("AgendaReunioes");
-        InterfCalcDateTimeModel model = new CalcDateTimeModel(modelLocal, modelZone, modelSchedule);
+        InterfCalcDateTimeScheduleModel modelSchedule = CalcDateTimeScheduleModel.of();
+        InterfCalcDateTimeModel model = new CalcDateTimeModel(modelLocal, modelZone, modelSchedule, configs);
 
         //--------------------------------
         InterfCalcDateTimeLocalView viewLocal = new CalcDateTimeLocalView();
@@ -69,10 +71,6 @@ public final class CalcDateTimeApp {
         control.setModel(model);
         control.setView(view);
         control.startFlow();
-
-        //--------------------------------
-        //System.out.println("Fim da Aplicação >> "
-        //    + java.time.LocalDateTime.now());
 
         System.exit(0);
     }
