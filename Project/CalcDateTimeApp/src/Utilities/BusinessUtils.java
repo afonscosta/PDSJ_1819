@@ -89,6 +89,8 @@ public class BusinessUtils {
     public static Temporal shiftWorkDays(Temporal temp, int n) {
         int conta = 0;  // conta dias úteis
         DayOfWeek dia;
+        if ((dia = getDayOfWeek(temp)) == null) return null;
+        if (dia.equals(SATURDAY) || dia.equals(SUNDAY)) conta = 1;
         while (conta < abs(n)) {
             if ((dia = getDayOfWeek(temp)) == null) return null;
             if (!(dia.equals(SATURDAY) || dia.equals(SUNDAY))) conta++;
@@ -441,14 +443,6 @@ public class BusinessUtils {
         return ret;
     }
 
-    /**
-     * TODO: VERIFICAR SE É CORRETO USAR CLEARCONSOLE COMO UM MÉTODO ESTÁTICO
-     */
-    public static void clearConsole() {
-        //Só deve funcionar para linux
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-    }
 
     /*
      * StringBuilder, int -> StringBuilder

@@ -44,10 +44,10 @@ public class CalcDateTimeZoneModel extends CalcDateTimeLocalModel implements Int
 
     }
 
-    @Override
+/*    @Override
     public String getLocalDateTimeFormat() {
         return null;
-    }
+    }*/
 
     @Override
     public void setZoneDateTimeFormat(String zoneDateTimeFormat) {
@@ -75,7 +75,7 @@ public class CalcDateTimeZoneModel extends CalcDateTimeLocalModel implements Int
 
             // Caso de erro, adicionar o default
         } catch (IOException | ParseException e) {
-            this.setZoneDateTimeFormat("yyyy/MM/dd k:m:s:n - VV");
+            this.setZoneDateTimeFormat("yyyy/MM/dd H:m:s:n - VV");
         }
     }
 }

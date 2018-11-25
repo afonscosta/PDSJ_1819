@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static Utilities.BusinessUtils.repeatStringN;
-import static Utilities.ConsoleColors.GREEN_BOLD;
-import static Utilities.ConsoleColors.RESET;
+import static Utilities.ConsoleColors.*;
 
 public class Menu {
 
@@ -13,9 +12,11 @@ public class Menu {
     private String titulo;
     private List<String> desc;
     private String statusMessage;
+    private String errorMessage;
 
     public Menu(List<Opcao> linhas, String titulo) {
-        statusMessage = "n/a";
+        this.statusMessage = "n/a";
+        this.errorMessage = "n/a";
         this.linhas = linhas;
         this.titulo = titulo;
         this.desc = new ArrayList<>();
@@ -56,6 +57,12 @@ public class Menu {
 
             // Alerta só é mostrado uma vez
             statusMessage = "n/a";
+        }
+        if (!errorMessage.equals("n/a")) {
+            System.out.println(RED_BOLD + errorMessage + RESET);
+
+            // Alerta só é mostrado uma vez
+            errorMessage = "n/a";
         }
         System.out.print("Insira a sua opcao: ");
     }
@@ -109,5 +116,9 @@ public class Menu {
 
     public void addStatusMessage(String statusMessage) {
        this.statusMessage = statusMessage;
+    }
+
+    public void addErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }

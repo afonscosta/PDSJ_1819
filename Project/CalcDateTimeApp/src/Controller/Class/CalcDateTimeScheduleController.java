@@ -27,6 +27,7 @@ import static Utilities.ConsoleColors.*;
 import static Utilities.EnumEditSlotInfo.DESC;
 import static Utilities.EnumEditSlotInfo.DURACAO;
 import static Utilities.EnumEditSlotInfo.LOCAL;
+import static java.lang.System.err;
 import static java.lang.System.out;
 import static java.time.temporal.ChronoUnit.*;
 import static java.time.temporal.ChronoUnit.YEARS;
@@ -79,7 +80,10 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     public void flowSchedule(){
         Menu menu = viewScheduleTxt.getMenu(0);
         String opcao;
+        String errorMessage = "n/a";
         do {
+            menu.addErrorMessage(errorMessage);
+            errorMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -87,7 +91,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                 case "I" : flowAddSlot(); break;
                 case "V" : flowGetBusySlots(); break;
                 case "S": break;
-                default: out.println("Opcao Invalida !"); break;
+                default: errorMessage = "Opcao Invalida !"; break;
             }
         }
         while(!opcao.equals("S"));
@@ -100,6 +104,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     private void flowAddSlot(){
         Menu menu = viewScheduleTxt.getMenu(3);
         String opcao;
+        String errorMessage = "n/a";
         do {
             Temporal tempLocal = model.getDateTimeLocal();
             Temporal tempZone = model.getDateTimeZone();
@@ -107,6 +112,8 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             String zdt = zoneDateTimeToString((ZonedDateTime)tempZone, getDateTimeFormatterZoned());
             menu.addDescToTitle(Arrays.asList("Data calc. local: " + ldt,
                     "Data calc. com fusos: " + zdt));
+            menu.addErrorMessage(errorMessage);
+            errorMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -115,7 +122,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                 case "Z" : addSlot(tempZone); break;
                 case "M" : addSlot(null); break;
                 case "S": break;
-                default: System.out.println("Opcao Invalida !"); break;
+                default: errorMessage = "Opcao Invalida !"; break;
             }
         }
         //Come back to init menu of Agenda
@@ -157,12 +164,13 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     //------------------------
     // Fluxo de visualizar reuniões agendadas
     //------------------------
-private void flowGetBusySlots() {
+    private void flowGetBusySlots() {
         Boolean flowDone = false;
         LocalDate currentDateMode = LocalDate.now();
         Menu menu = viewScheduleTxt.getMenu(1);
         List<String> description;
         String opcao;
+        String errorMessage = "n/a";
         String modeNormalized="";//identifca o modo geral
         int pageIndex = 0;
         ZoneId referenceZonedId = getRefereceZoneId();
@@ -203,6 +211,8 @@ private void flowGetBusySlots() {
             description.add(String.format("Pagina (%s/%s)", pageIndexToDisplay, totalPages));
 
             menu.addDescToTitle(description);
+            menu.addErrorMessage(errorMessage);
+            errorMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
             switch (opcao) {
@@ -234,6 +244,9 @@ private void flowGetBusySlots() {
 
                         }
                     }
+                    else {
+                        errorMessage = "Opcao Invalida!";
+                    }
                     break;
             }
         } while(!flowDone);
@@ -243,18 +256,17 @@ private void flowGetBusySlots() {
     // Dado modo, a data atual do modo e a operação desejada pelo utilizador, atualiza a data do modo.
     //------------------------
     public LocalDate changeDataMode(LocalDate currentDateMode, String mode, int n){
-            switch (mode){
-                case "":
-                    return currentDateMode;
-                case "diaria":
-                    return (LocalDate)BusinessUtils.shiftDateTime(currentDateMode,n,DAYS);
-                case"semanal":
-                    return (LocalDate)BusinessUtils.shiftDateTime(currentDateMode,n,WEEKS);
-                case"mensal":
-                    return (LocalDate)BusinessUtils.shiftDateTime(currentDateMode,n,MONTHS);
-
-            }
-            return currentDateMode;
+        switch (mode){
+            case "":
+                return currentDateMode;
+            case "diaria":
+                return (LocalDate)BusinessUtils.shiftDateTime(currentDateMode,n,DAYS);
+            case"semanal":
+                return (LocalDate)BusinessUtils.shiftDateTime(currentDateMode,n,WEEKS);
+            case"mensal":
+                return (LocalDate)BusinessUtils.shiftDateTime(currentDateMode,n,MONTHS);
+        }
+        return currentDateMode;
     }
     //------------------------
     // Dado a caracterização da reunião(id, data, local) devolve apenas o seu identificador gerado ao nivel da interface
@@ -276,44 +288,41 @@ private void flowGetBusySlots() {
     public void flowSelectBusySlot(Slot s) {
         Menu menu = viewScheduleTxt.getMenu(2);
         String opcao;
+        String errorMessage = "n/a";
         DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
         DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
-            do {
-                String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
-                menu.addDescToTitle(Arrays.asList("Data: " + dataToShow));
-                menu.show();
-                opcao = Input.lerString();
-                opcao = opcao.toUpperCase();
-                switch (opcao) {
-                    case "A":
-                        s= flowEditSlot(s);
-                        break;
-                    case "R":
-                        removeSlot(s);
-                        break;
-                    case "D":
-                        slotDetails(s);
-                        break;
-                    case "S":
-                        break;
-                }
+        do {
+            String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
+            menu.addDescToTitle(Arrays.asList("Data: " + dataToShow));
+            menu.addErrorMessage(errorMessage);
+            errorMessage = "n/a";
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch (opcao) {
+                case "A": s = flowEditSlot(s); break;
+                case "R": removeSlot(s); break;
+                case "D": slotDetails(s); break;
+                case "S": break;
+                default: errorMessage = "Opcao Invalida !"; break;
             }
-            while (!(opcao.equals("S") | opcao.equals("R")));
         }
+        while (!(opcao.equals("S") | opcao.equals("R")));
+    }
 
     //------------------------
     // Remover uma reunião da agenda
     //------------------------
     private void removeSlot(Slot s){
-                boolean res =model.removeSlot(s);
-                //para adicioanar ao cabeçalho
-                if(res== true){
-                    out.println(GREEN_BOLD +"Removido com sucesso!" + RESET);
-                }
-                else
-                    out.println(RED_BOLD + "De momento, não e possivel remover o slot!" + RESET);
-                out.print("Prima Enter para continuar.");
-                Input.lerString();
+        boolean res =model.removeSlot(s);
+        //para adicioanar ao cabeçalho
+        if(res== true){
+            out.println(GREEN_BOLD +"Removido com sucesso!" + RESET);
+        }
+        else
+            out.println(RED_BOLD + "De momento, não e possivel remover o slot!" + RESET);
+        out.print("Prima Enter para continuar.");
+        Input.lerString();
     }
 
     //------------------------
@@ -322,38 +331,32 @@ private void flowGetBusySlots() {
     // Devolve o slot alterado ou o slot original
     //------------------------
     private Slot flowEditSlot(Slot s){
-            Menu menu = viewScheduleTxt.getMenu(4);
-            String opcao;
-            DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
-            DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
-            do {
-                String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
-                menu.addDescToTitle(Arrays.asList(dataToShow,
-                        s.getLocal(), s.getDuration().toString(),
-                        s.getDescription()));
-                menu.show();
-                opcao = Input.lerString();
-                opcao = opcao.toUpperCase();
-                switch (opcao) {
-                    case "DATA":
-                        s= flowEditDataSlot(s);
-                        break;
-                    case "D":
-                        s= editSlot(s,DURACAO);
-                        break;
-                    case "L":
-                        s= editSlot(s,LOCAL);
-                        break;
-                    case "DESC":
-                        s= editSlot(s,DESC);
-                        break;
-                    case "S":
-                        break;
-                }
-
+        Menu menu = viewScheduleTxt.getMenu(4);
+        String opcao;
+        String errorMessage = "n/a";
+        DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
+        DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
+        do {
+            String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
+            menu.addDescToTitle(Arrays.asList(dataToShow,
+                    s.getLocal(), s.getDuration().toString(),
+                    s.getDescription()));
+            menu.addErrorMessage(errorMessage);
+            errorMessage = "n/a";
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch (opcao) {
+                case "DATA": s = flowEditDataSlot(s); break;
+                case "D": s = editSlot(s, DURACAO); break;
+                case "L": s = editSlot(s, LOCAL); break;
+                case "DESC": s = editSlot(s, DESC); break;
+                case "S": break;
+                default: errorMessage = "Opcao Invalida !"; break;
             }
-            while (!opcao.equals("S"));
-            return s;
+        }
+        while (!opcao.equals("S"));
+        return s;
     }
 
     //------------------------
@@ -361,115 +364,124 @@ private void flowGetBusySlots() {
     // Devolve o slot com a informação alterada caso seja possivel alterar
     //------------------------
     private Slot editSlot(Slot s, EnumEditSlotInfo e){
-            switch (e){
-                case DURACAO:
-                    out.print("Horas da nova duracao: ");
-                    int horas = Input.lerInt();
-                    out.print("Minutos da nova duracao: ");
-                    int min = Input.lerInt();
-                    Duration newDuration = Duration.of(horas, ChronoUnit.HOURS);
-                    newDuration= newDuration.plus(min,ChronoUnit.MINUTES);
-                    s =model.editDurationSlot(s,newDuration);
-                    if(s.getDuration().equals(newDuration)){
-                        out.println(GREEN_BOLD + "Duracao alterada com sucesso!"+ RESET);
-                    }
-                    else{
-                        out.println(RED_BOLD + "Sobreposicao com outras reunioes ja agendadas!"+ RESET);
-
-                    }
-                    break;
-                case DESC:
-                    out.print("Nova descricao: ");
-                    String desc = Input.lerString();
-                    model.editSlot(s,e,desc);
-                    out.println(GREEN_BOLD + "Descricao alterada com sucesso!"+ RESET);
-                    break;
-                case LOCAL:
-                    out.print("Novo local: ");
-                    String local = Input.lerString();
-                    model.editSlot(s,e,local);
-                    out.println(GREEN_BOLD +"Local alterado com sucesso!" + RESET);
-                    break;
-            }
-            out.print("Prima Enter para continuar.");
-            Input.lerString();
-            return s;
+        switch (e){
+            case DURACAO:
+                out.print("Horas da nova duracao: ");
+                int horas = Input.lerInt();
+                out.print("Minutos da nova duracao: ");
+                int min = Input.lerInt();
+                Duration newDuration = Duration.of(horas, ChronoUnit.HOURS);
+                newDuration= newDuration.plus(min,ChronoUnit.MINUTES);
+                s =model.editDurationSlot(s,newDuration);
+                if(s.getDuration().equals(newDuration)){
+                    out.println(GREEN_BOLD + "Duracao alterada com sucesso!"+ RESET);
+                }
+                else{
+                    out.println(RED_BOLD + "Sobreposicao com outras reunioes ja agendadas!"+ RESET);
+                }
+                break;
+            case DESC:
+                out.print("Nova descricao: ");
+                String desc = Input.lerString();
+                model.editSlot(s,e,desc);
+                out.println(GREEN_BOLD + "Descricao alterada com sucesso!"+ RESET);
+                break;
+            case LOCAL:
+                out.print("Novo local: ");
+                String local = Input.lerString();
+                model.editSlot(s,e,local);
+                out.println(GREEN_BOLD +"Local alterado com sucesso!" + RESET);
+                break;
         }
+        out.print("Prima Enter para continuar.");
+        Input.lerString();
+        return s;
+    }
 
     //------------------------
     // Fluxo para editar data de uma reunião
     // Avançar ou recuar dias, semanas, meses ou anos
     // Devolve o slot com a informação alterada caso seja possivel alterar
     //------------------------
-     private Slot flowEditDataSlot(Slot s) {
-            Menu menu = viewScheduleTxt.getMenu(5);
-            String opcao;
-            DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
-            DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
-            do {
-                Temporal data = s.getData();
-                String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
-                menu.addDescToTitle(Arrays.asList(dataToShow));
-                menu.show();
-                opcao = Input.lerString();
-                opcao = opcao.toUpperCase();
-                switch (opcao) {
-                    case "D":
-                        data= BusinessUtils.shiftDateTime(data,ControllerUtils.shift("dias"), DAYS);
-                        s = model.editDateSLot(s, data);
-                        break;
-                    case "SEM":
-                        data = BusinessUtils.shiftDateTime(data,ControllerUtils.shift("semanas"), WEEKS);
-                        s = model.editDateSLot(s, data);
-                        break;
-                    case "M":
-                        data = BusinessUtils.shiftDateTime(data,ControllerUtils.shift("meses"), MONTHS);
-                        s = model.editDateSLot(s, data);
-                        break;
-                    case "A":
-                        data = BusinessUtils.shiftDateTime(data,ControllerUtils.shift("anos"), YEARS);
-                        s = model.editDateSLot(s, data);
-                        break;
-                    case "T":
-                        data = ControllerUtils.shitTime(ZonedDateTime.from(data));
-                        s = model.editDateSLot(s,data);
-                        break;
-                    case "S":
-                        break;
-                }
-                if(opcao.equals("D") | opcao.equals("SEM") | opcao.equals("M") | opcao.equals("A") | opcao.equals("T")) {
-                    if (s.getData().equals(data)) {
-                        out.println(GREEN_BOLD + "Alteracao efetuada com sucesso!" + RESET);
-                    } else {
-                        out.println(RED_BOLD + "Sobreposicao de reunioes!" + RESET);
-                    }
-                    out.print("Prima Enter para continuar.");
-                    Input.lerString();
-                }
+    private Slot flowEditDataSlot(Slot s) {
+        Menu menu = viewScheduleTxt.getMenu(5);
+        String opcao;
+        String errorMessage = "n/a";
+        DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
+        DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
+        do {
+            Temporal data = s.getData();
+            String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
+            menu.addDescToTitle(Arrays.asList(dataToShow));
+            menu.addErrorMessage(errorMessage);
+            errorMessage = "n/a";
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch (opcao) {
+                case "D":
+                    data= BusinessUtils.shiftDateTime(data,ControllerUtils.shift("dias"), DAYS);
+                    s = model.editDateSLot(s, data);
+                    break;
+                case "SEM":
+                    data = BusinessUtils.shiftDateTime(data,ControllerUtils.shift("semanas"), WEEKS);
+                    s = model.editDateSLot(s, data);
+                    break;
+                case "M":
+                    data = BusinessUtils.shiftDateTime(data,ControllerUtils.shift("meses"), MONTHS);
+                    s = model.editDateSLot(s, data);
+                    break;
+                case "A":
+                    data = BusinessUtils.shiftDateTime(data,ControllerUtils.shift("anos"), YEARS);
+                    s = model.editDateSLot(s, data);
+                    break;
+                case "T":
+                    data = ControllerUtils.shitTime(ZonedDateTime.from(data));
+                    s = model.editDateSLot(s,data);
+                    break;
+                case "S": break;
+                default: errorMessage = "Opcao Invalida !"; break;
             }
-            while (!opcao.equals("S")) ;
-            return s;
+            if(opcao.equals("D") | opcao.equals("SEM") | opcao.equals("M") | opcao.equals("A") | opcao.equals("T")) {
+                if (s.getData().equals(data)) {
+                    out.println(GREEN_BOLD + "Alteracao efetuada com sucesso!" + RESET);
+                } else {
+                    out.println(RED_BOLD + "Sobreposicao de reunioes!" + RESET);
+                }
+                out.print("Prima Enter para continuar.");
+                Input.lerString();
+            }
+        }
+        while (!opcao.equals("S")) ;
+        return s;
     }
 
     //------------------------
     // Detalhes do slot selecionado
     //------------------------
     private void slotDetails(Slot s){
-            String opcao;
-            Menu menu = viewScheduleTxt.getMenu(6);
-            DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
-            DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
+        String opcao;
+        String errorMessage = "n/a";
+        Menu menu = viewScheduleTxt.getMenu(6);
+        DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
+        DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
 
-            do{
-                String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
-                menu.addDescToTitle(Arrays.asList(dataToShow,
-                                                s.getDuration().toString(),
-                                                s.getDescription(),
-                                                s.getLocal()));
-                menu.show();
-                opcao = Input.lerString();
+        do{
+            String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
+            menu.addDescToTitle(Arrays.asList(dataToShow,
+                                            s.getDuration().toString(),
+                                            s.getDescription(),
+                                            s.getLocal()));
+            menu.addErrorMessage(errorMessage);
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch (opcao) {
+                case "S": break;
+                default: errorMessage = "Opcao Invalida !"; break;
             }
-            while(!opcao.equals("S"));
+        }
+        while(!opcao.equals("S"));
     }
 
     //------------------------
@@ -478,44 +490,44 @@ private void flowGetBusySlots() {
     private void help() {
         Menu menu = viewScheduleTxt.getMenu(7);
         List<String> l = asList(
-                BLACK_BOLD + "Opcoes:" + RESET,
-                BLACK_BOLD + "/<vista>" + RESET +
-                        " Permite ter uma visao diaria, semanal ou mensal",
-                "         das reunioes. Se pretender uma visao diaria devera ",
-                "         introduzir" + RESET + BLACK_BOLD + " /diaria " + RESET + "onde lhe sera apresentado",
-                "         inicialmente as reunioes do dia corrente.",
-                "         Caso pretenda visualizar todas as reunioes",
-                "         agendadas devera introduzir apenas" + RESET + BLACK_BOLD + " /" + RESET + ".",
-                "         O principio e o mesmo para os restantes",
-                "         modos de visualizacao."+ RESET,
-                " ",
-                BLACK_BOLD + "<" + RESET +
-                        "        Recuar a pagina que esta ser apresentada.",
-                BLACK_BOLD + ">" + RESET +
-                        "        Avancar a pagina que esta ser apresentada.",
-                " ",
-                BLACK_BOLD + ">>" + RESET +
-                        "       Caso prentenda avancar no dia/semana/mes referente",
-                "         ao modo de visualizacao. Por exemplo, foi selecionada",
-                "         a vista diaria em que inicialmente mostra as reunioes",
-                "         do dia corrente. Caso pretenda ver do dia seguinte,",
-                "         devera usar esta opcao, e assim sucessivamente.",
-                "         Para a vista semanal, ira apresentar da proxima semana",
-                "         e o mesmo principio para a vista mensal.",
-                BLACK_BOLD + "<<" + RESET +
-                        "       Da mesma forma que a anterior, esta opcao permite recuar um",
-                "         dia, semana ou mes de acordo com o modo de visualizacao.",
-                "         Estas duas ultimas opcoes permitem navegar sempre com a",
-                "         apresentacao no mesmo intervalo.",
-                " ",
-                BLACK_BOLD + "=<id>" + RESET +
-                        "   Cada reuniao contem antes da sua descricao",
-                "         um identificador.",
-                "         Pretendendo selecionar, por exemplo, a reuniao",
-                "         com o identifcador 0, o utilizador devera introduzir",
-                "         a opcao "+ RESET + BLACK_BOLD + "=0" + RESET +".",
-                "         No novo menu apresentado podera alterar qualquer ",
-                "         dado da reuniao, remover ou ver detalhes da mesma."
+            BLACK_BOLD + "Opcoes:" + RESET,
+            BLACK_BOLD + "/<vista>" + RESET +
+                    " Permite ter uma visao diaria, semanal ou mensal",
+            "         das reunioes. Se pretender uma visao diaria devera ",
+            "         introduzir" + RESET + BLACK_BOLD + " /diaria " + RESET + "onde lhe sera apresentado",
+            "         inicialmente as reunioes do dia corrente.",
+            "         Caso pretenda visualizar todas as reunioes",
+            "         agendadas devera introduzir apenas" + RESET + BLACK_BOLD + " /" + RESET + ".",
+            "         O principio e o mesmo para os restantes",
+            "         modos de visualizacao."+ RESET,
+            " ",
+            BLACK_BOLD + "<" + RESET +
+                    "        Recuar a pagina que esta ser apresentada.",
+            BLACK_BOLD + ">" + RESET +
+                    "        Avancar a pagina que esta ser apresentada.",
+            " ",
+            BLACK_BOLD + ">>" + RESET +
+                    "       Caso prentenda avancar no dia/semana/mes referente",
+            "         ao modo de visualizacao. Por exemplo, foi selecionada",
+            "         a vista diaria em que inicialmente mostra as reunioes",
+            "         do dia corrente. Caso pretenda ver do dia seguinte,",
+            "         devera usar esta opcao, e assim sucessivamente.",
+            "         Para a vista semanal, ira apresentar da proxima semana",
+            "         e o mesmo principio para a vista mensal.",
+            BLACK_BOLD + "<<" + RESET +
+                    "       Da mesma forma que a anterior, esta opcao permite recuar um",
+            "         dia, semana ou mes de acordo com o modo de visualizacao.",
+            "         Estas duas ultimas opcoes permitem navegar sempre com a",
+            "         apresentacao no mesmo intervalo.",
+            " ",
+            BLACK_BOLD + "=<id>" + RESET +
+                    "   Cada reuniao contem antes da sua descricao",
+            "         um identificador.",
+            "         Pretendendo selecionar, por exemplo, a reuniao",
+            "         com o identifcador 0, o utilizador devera introduzir",
+            "         a opcao "+ RESET + BLACK_BOLD + "=0" + RESET +".",
+            "         No novo menu apresentado podera alterar qualquer ",
+            "         dado da reuniao, remover ou ver detalhes da mesma."
         );
 
         String opcao;
