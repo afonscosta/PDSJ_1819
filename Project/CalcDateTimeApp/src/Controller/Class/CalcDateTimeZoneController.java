@@ -22,12 +22,6 @@ import static java.lang.System.out;
 import static java.time.temporal.ChronoUnit.*;
 import static java.util.Arrays.asList;
 
-/*TODO:
-Edgar
-    2. Diferenca entre dois fusos -> adicionar uma mensagem qd o utilziador introduzir o primeiro. Se não parece que foi inválido
-    3. Diferenca entre datas -> inserir data fim -> tb escolho o zoned e dps não acontece nada
-    */
-
 public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneController {
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeZoneView viewZoneTxt;

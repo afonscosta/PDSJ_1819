@@ -43,7 +43,7 @@ public final class CalcDateTimeApp {
         //--------------------------------
         InterfCalcDateTimeLocalModel modelLocal = CalcDateTimeLocalModel.of();
         InterfCalcDateTimeZoneModel modelZone = CalcDateTimeZoneModel.of();
-        InterfCalcDateTimeScheduleModel modelSchedule = InterfCalcDateTimeScheduleModel.pushState("AgendaReunioes");
+        InterfCalcDateTimeScheduleModel modelSchedule = CalcDateTimeScheduleModel.of("AgendaReunioes");
         InterfCalcDateTimeModel model = new CalcDateTimeModel(modelLocal, modelZone, modelSchedule);
 
         //--------------------------------
