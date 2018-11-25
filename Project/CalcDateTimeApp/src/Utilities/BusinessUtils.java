@@ -89,6 +89,8 @@ public class BusinessUtils {
     public static Temporal shiftWorkDays(Temporal temp, int n) {
         int conta = 0;  // conta dias úteis
         DayOfWeek dia;
+        if ((dia = getDayOfWeek(temp)) == null) return null;
+        if (dia.equals(SATURDAY) || dia.equals(SUNDAY)) conta = 1;
         while (conta < abs(n)) {
             if ((dia = getDayOfWeek(temp)) == null) return null;
             if (!(dia.equals(SATURDAY) || dia.equals(SUNDAY))) conta++;
@@ -158,8 +160,17 @@ public class BusinessUtils {
         // Code taken from Answer by Roland.
         // https://stackoverflow.com/a/44942039/642706
         long count = 0;
+        long extra = 0;
         // Faz-se +1 dia para não incluir o dia atual.
-        final DayOfWeek startW = start.plusDays(1).getDayOfWeek();
+        if (start.getDayOfWeek().equals(SATURDAY) || start.getDayOfWeek().equals(SUNDAY)) {
+            start = (ZonedDateTime) nextMondayN(start, 1);
+            extra += 1;
+        }
+        if (stop.getDayOfWeek().equals(SATURDAY) || stop.getDayOfWeek().equals(SUNDAY)) {
+            stop = (ZonedDateTime) nextMondayN(stop, 1);
+            extra -= 1;
+        }
+        final DayOfWeek startW = start.getDayOfWeek();
         final DayOfWeek stopW = stop.getDayOfWeek();
 
         final long days = ChronoUnit.DAYS.between( start , stop );
@@ -168,7 +179,8 @@ public class BusinessUtils {
         //adjust for starting and ending on a Sunday:
         count = daysWithoutWeekends + ( startW == DayOfWeek.SUNDAY ? 1 : 0 ) + ( stopW == DayOfWeek.SUNDAY ? 1 : 0 );
 
-        return abs(count);
+        //if (start.getDayOfWeek().equals(SATURDAY) || start.getDayOfWeek().equals(SUNDAY)) return abs(count)+1;
+        return abs(count)+extra;
     }
 
     /*
@@ -441,14 +453,6 @@ public class BusinessUtils {
         return ret;
     }
 
-    /**
-     * TODO: VERIFICAR SE É CORRETO USAR CLEARCONSOLE COMO UM MÉTODO ESTÁTICO
-     */
-    public static void clearConsole() {
-        //Só deve funcionar para linux
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-    }
 
     /*
      * StringBuilder, int -> StringBuilder
@@ -553,5 +557,9 @@ public class BusinessUtils {
         catch (IllegalArgumentException e) {
             return null;
         }
+    }
+
+    public static ZonedDateTime getNowOfZone(ZoneId zid) {
+        return ZonedDateTime.now(zid);
     }
 }

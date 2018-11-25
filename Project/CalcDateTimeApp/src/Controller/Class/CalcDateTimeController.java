@@ -15,6 +15,7 @@ import java.util.List;
 import static Utilities.ConsoleColors.BLACK_BOLD;
 import static Utilities.ConsoleColors.RESET;
 import static Utilities.ControllerUtils.*;
+import static java.lang.System.err;
 import static java.lang.System.out;
 import static java.util.Arrays.asList;
 
@@ -59,7 +60,10 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         // Início do fluxo de execução
         Menu menu = viewMainTxt.getMenu(0);
         String opcao;
+        String errorMessage = "n/a";
         do {
+            menu.addErrorMessage(errorMessage);
+            errorMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -70,7 +74,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 case "C" : flowConfig(); break;
                 case "?" : helpMain(); break;
                 case "S": controlSchedule.saveState(); break; //É aqui que se guarda os DateTimeFormatter's e o localZone
-                default: System.out.println("Opcao Invalida!"); break;
+                default: errorMessage = "Opcao Invalida!"; break;
             }
         }
         while(!opcao.equals("S"));
@@ -82,33 +86,36 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     private void flowConfig() {
         Menu menu = viewMainTxt.getMenu(1);
         String opcao;
-        Boolean configChanged = false;
-        String statusMessage = "n/a" ;
+        boolean configChanged = false;
+        String statusMessage = "n/a";
+        String errorMessage = "n/a";
         do {
             menu.addStatusMessage(statusMessage);
+            menu.addErrorMessage(errorMessage);
+            errorMessage = "n/a";
+            statusMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "FL": flowSetDateFormatLocal(); configChanged = true; statusMessage = "Formato de apresentacao local modificado"; break;
-                case "FF": flowSetDateFormatZoned(); configChanged = true; statusMessage = "Formato de apresentacao de datas com zonas modificado"; break;
+                case "FL": flowSetDateFormatLocal(); configChanged = true; break;
+                case "FF": flowSetDateFormatZoned(); configChanged = true; break;
                 case "F": flowSetZone(); configChanged = true; statusMessage = "Fuso local modificado"; break;
                 case "H": setSchedule(); configChanged = true; statusMessage = "Limitacoes de horario adicionadas"; break;
-                case "?": helpConfig(); statusMessage = "n/a"; break;
+                case "?": helpConfig(); break;
                 case "S": break;
-                default: System.out.println("Opcao Invalida!"); break;
+                default: errorMessage = "Opcao Invalida!"; break;
             }
         }
         while(!opcao.equals("S"));
 
         if (configChanged) {
             model.saveConfigs();
-
         }
     }
 
     private void flowSetZone() {
-        String zone = flowShowAllAvailableTimezonesAndGetNZoneIds(1,viewMainTxt.getMenu(2), ZoneId.systemDefault().toString()).get(0);
+        String zone = flowGetNZoneIds(1,viewMainTxt.getMenu(2), ZoneId.systemDefault().toString()).get(0);
         model.withZoneLocal(zone);
         model.withZoneZone(zone);
     }
@@ -116,40 +123,30 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     private void flowSetDateFormatLocal(){
         Menu menu = viewMainTxt.getMenu(4);
         String opcao;
-        boolean flowDone=false;
+        String statusMessage = "n/a";
+        String errorMessage = "n/a";
         do {
+            menu.addStatusMessage(statusMessage);
+            menu.addErrorMessage(errorMessage);
+            errorMessage = "n/a";
+            statusMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "P": flowPreDefinedDateFormatLocal(); flowDone=true; break;
-                case "M": model.setLocalDateTimeFormat(setDinamicDateFormatLocal()); flowDone=true; break;
+                case "P": flowPreDefinedDateFormatLocal(); break;
+                case "M":
+                    model.setLocalDateTimeFormat(setDinamicDateFormatLocal());
+                    statusMessage = "Formato de apresentacao local modificado";
+                    break;
                 case "?": helpFormatLocal(); break;
-                case "S": flowDone=true; break;
-                default: System.out.println("Opcao Invalida!"); break;
+                case "S": break;
+                default: errorMessage = "Opcao Invalida!"; break;
             }
         }
-        while(!flowDone);
+        while(!opcao.equals("S"));
     }
 
-    private void flowSetDateFormatZoned(){
-        Menu menu = viewMainTxt.getMenu(4);
-        String opcao;
-        boolean flowDone = false;
-        do {
-            menu.show();
-            opcao = Input.lerString();
-            opcao = opcao.toUpperCase();
-            switch(opcao) {
-                case "P": flowPreDefinedDateFormatZoned(); flowDone=true; break;
-                case "M": model.setLocalDateTimeFormat(setDinamicDateFormatZoned()); flowDone=true; break;
-                case "?": helpFormatZone(); break;
-                case "S": flowDone=true; break;
-                default: System.out.println("Opcao Invalida!"); break;
-            }
-        }
-        while(!flowDone);
-    }
 
     private String setDinamicDateFormatLocal(){
         out.println("Insira o formato pretendido para datas locais: ");
@@ -159,20 +156,60 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     private void flowPreDefinedDateFormatLocal(){
         Menu menu = viewMainTxt.getMenu(5);
         String opcao;
-        Boolean flowDone=false;
+        String statusMessage = "n/a" ;
+        String errorMessage = "n/a";
         do {
+            menu.addStatusMessage(statusMessage);
+            menu.addErrorMessage(errorMessage);
+            errorMessage = "n/a";
+            statusMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "1": model.setLocalDateTimeFormat("dd-MM-yyy HH:mm"); flowDone=true; break;
-                case "2": model.setLocalDateTimeFormat("dd-MM-yyy HH:mm:ss"); flowDone=true; break;
-                case "3": model.setLocalDateTimeFormat("dd-MM-yyy HH:mm:ss:nn"); flowDone=true; break;
-                case "S": flowDone=true; break;
-                default: System.out.println("Opcao Invalida!"); break;
+                case "1":
+                    model.setLocalDateTimeFormat("dd-MM-yyy HH:mm");
+                    statusMessage = "Formato de apresentacao local modificado";
+                    break;
+                case "2":
+                    model.setLocalDateTimeFormat("dd-MM-yyy HH:mm:ss");
+                    statusMessage = "Formato de apresentacao local modificado";
+                    break;
+                case "3":
+                    model.setLocalDateTimeFormat("dd-MM-yyy HH:mm:ss:nn");
+                    statusMessage = "Formato de apresentacao local modificado";
+                    break;
+                case "S": break;
+                default: errorMessage = "Opcao Invalida!"; break;
             }
         }
-        while(!flowDone);
+        while(!opcao.equals("S"));
+    }
+
+    private void flowSetDateFormatZoned(){
+        Menu menu = viewMainTxt.getMenu(4);
+        String opcao;
+        String statusMessage = "n/a" ;
+        String errorMessage = "n/a";
+        do {
+            menu.addStatusMessage(statusMessage);
+            menu.addErrorMessage(errorMessage);
+            errorMessage = "n/a";
+            statusMessage = "n/a";
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "P": flowPreDefinedDateFormatZoned(); break;
+                case "M":
+                    model.setZoneDateTimeFormat(setDinamicDateFormatZoned());
+                    statusMessage = "Formato de apresentacao de datas com zonas modificado";
+                    break;
+                case "S": break;
+                default: errorMessage = "Opcao Invalida!"; break;
+            }
+        }
+        while(!opcao.equals("S"));
     }
 
     private String setDinamicDateFormatZoned(){
@@ -183,25 +220,42 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     private void flowPreDefinedDateFormatZoned(){
         Menu menu = viewMainTxt.getMenu(6);
         String opcao;
-        Boolean flowDone = false;
+        String statusMessage = "n/a";
+        String errorMessage = "n/a";
         do {
+            menu.addStatusMessage(statusMessage);
+            menu.addErrorMessage(errorMessage);
+            errorMessage = "n/a";
+            statusMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "1": model.setZoneDateTimeFormat("dd-MM-yyy HH:mm VV"); flowDone=true; break;
-                case "2": model.setZoneDateTimeFormat("dd-MM-yyy HH:mm:ss VV"); flowDone=true; break;
-                case "3": model.setZoneDateTimeFormat("dd-MM-yyy HH:mm:ss O"); flowDone=true; break;
-                case "4": model.setZoneDateTimeFormat("dd-MM-yyy HH:mm VV O"); flowDone=true; break;
-                case "S": flowDone=true; break;
-                default: System.out.println("Opcao Invalida!"); break;
+                case "1":
+                    model.setZoneDateTimeFormat("dd-MM-yyy HH:mm VV");
+                    statusMessage = "Formato de apresentacao de datas com zonas modificado";
+                    break;
+                case "2":
+                    model.setZoneDateTimeFormat("dd-MM-yyy HH:mm:ss VV");
+                    statusMessage = "Formato de apresentacao de datas com zonas modificado";
+                    break;
+                case "3":
+                    model.setZoneDateTimeFormat("dd-MM-yyy HH:mm:ss O");
+                    statusMessage = "Formato de apresentacao de datas com zonas modificado";
+                    break;
+                case "4":
+                    model.setZoneDateTimeFormat("dd-MM-yyy HH:mm VV O");
+                    statusMessage = "Formato de apresentacao de datas com zonas modificado";
+                    break;
+                case "S": break;
+                default: errorMessage = "Opcao Invalida!"; break;
             }
         }
-        while(!flowDone);
+        while(!opcao.equals("S"));
     }
 
     private void setLocal() {
-        String zone = flowShowAllAvailableTimezonesAndGetNZoneIds(1,viewMainTxt.getMenu(2), ZoneId.systemDefault().toString()).get(0);
+        String zone = flowGetNZoneIds(1,viewMainTxt.getMenu(2), ZoneId.systemDefault().toString()).get(0);
         controlLocal.withZone(zone);
     }
 

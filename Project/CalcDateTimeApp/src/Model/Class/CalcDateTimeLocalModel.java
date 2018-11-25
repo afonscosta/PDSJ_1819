@@ -48,7 +48,9 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 
     @Override
     public void shiftWorkDaysDateTime(int n) {
-        ldt = (ZonedDateTime) shiftWorkDays(ldt, n);
+        ZonedDateTime newLDT = (ZonedDateTime) shiftWorkDays(ldt, n);
+        if (newLDT != null)
+            ldt = newLDT;
     }
 
     @Override
@@ -119,7 +121,7 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 
             // Caso de erro, adicionar o default
         } catch (Exception e) {
-            this.setLocalDateTimeFormat("yyyy/MM/dd k:m:s:n");
+            this.setLocalDateTimeFormat("yyyy/MM/dd H:m:s:n");
             this.setZoneId(ZoneId.systemDefault());
         }
     }
