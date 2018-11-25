@@ -17,21 +17,22 @@ public class CalcDateTimeZoneView implements InterfCalcDateTimeZoneView {
 
     private Menus initView() {
         Menus menusZoneTxt = new Menus();
-        Opcao op1, op2, op3, op4, op5, op6, op7, op8, op9;
+        Opcao op1, op2, op3, op4, op5, op6, op7, op8, op9, op10;
 
         //------------------------
         // CaldDateTimeZone
         //------------------------
-        op1 = new Opcao("Definir data", "A");
-        op2 = new Opcao("Aritmetica de datas", "M");
-        op3 = new Opcao("Aritmetica de dias uteis", "MU");
+        op1 = new Opcao("Definir data", "C");
+        op2 = new Opcao("Aritmetica de datas", "A");
+        op3 = new Opcao("Aritmetica de dias uteis", "AU");
         op4 = new Opcao("Diferenca entre datas", "D");
         op5 = new Opcao("Diferenca entre datas (dias uteis)", "DU");
         op6 = new Opcao("Tempo atual numa região", "T");
-        op7 = new Opcao("Converter para fuso", "C");
-        op8 = new Opcao("Diferenca entre dois fusos", "F");
-        op9 = new Opcao("Sair da aplicacao", "S");
-        List<Opcao> linhas = Arrays.asList(op1,op2,op3,op4,op5,op6,op7,op8,op9);
+        op7 = new Opcao("Converter para fuso", "F");
+        op8 = new Opcao("Diferenca entre dois fusos", "DF");
+        op9 = new Opcao("Ajuda", "?");
+        op10 = new Opcao("Sair da aplicacao", "S");
+        List<Opcao> linhas = Arrays.asList(op1,op2,op3,op4,op5,op6,op7,op8,op9,op10);
         Menu menuCalcDateTimeZone = new Menu(linhas,"Menu Calculadora de Zonas");
         menusZoneTxt.addMenu(0,menuCalcDateTimeZone);
 
@@ -82,6 +83,12 @@ public class CalcDateTimeZoneView implements InterfCalcDateTimeZoneView {
         linhas = Arrays.asList(op1, op2, op3, op4, op5, op6);
         Menu menuZoneIdNavigator = new Menu(linhas, "Navegador de ZoneIds");
         menusZoneTxt.addMenu(4, menuZoneIdNavigator);
+
+        op1 = new Opcao("Sair", "S");
+        linhas = Arrays.asList(op1);
+        Menu menuAjuda = new Menu(linhas, "Menu ajuda");
+        menusZoneTxt.addMenu(5, menuAjuda);
+
         return menusZoneTxt;
     }
 

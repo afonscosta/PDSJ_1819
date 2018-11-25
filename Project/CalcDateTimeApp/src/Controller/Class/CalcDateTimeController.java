@@ -10,7 +10,6 @@ import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeView;
 
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static Utilities.ConsoleColors.BLACK_BOLD;
@@ -18,7 +17,6 @@ import static Utilities.ConsoleColors.RESET;
 import static Utilities.ControllerUtils.*;
 import static java.lang.System.out;
 import static java.util.Arrays.asList;
-import static java.util.Arrays.binarySearch;
 
 public class CalcDateTimeController implements InterfCalcDateTimeController {
 
@@ -35,8 +33,8 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
     private CalcDateTimeController(InterfCalcDateTimeLocalController controlLocal,
-                                  InterfCalcDateTimeZoneController controlZone,
-                                  InterfCalcDateTimeScheduleController controlSchedule) {
+                                   InterfCalcDateTimeZoneController controlZone,
+                                   InterfCalcDateTimeScheduleController controlSchedule) {
         this.controlLocal = controlLocal;
         this.controlZone = controlZone;
         this.controlSchedule = controlSchedule;
@@ -53,7 +51,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
 
-        //------------------------
+    //------------------------
     // Fluxo inicial do programa
     //------------------------
     @Override
@@ -85,16 +83,18 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         Menu menu = viewMainTxt.getMenu(1);
         String opcao;
         Boolean configChanged = false;
+        String statusMessage = "n/a" ;
         do {
+            menu.addStatusMessage(statusMessage);
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "FL": flowSetDateFormatLocal(); configChanged = true; break;
-                case "FF": flowSetDateFormatZoned(); configChanged = true; break;
-                case "L": setLocal(); configChanged = true; break;
-                case "H": setSchedule(); configChanged = true; break;
-                case "?": helpConfig(); break;
+                case "FL": flowSetDateFormatLocal(); configChanged = true; statusMessage = "Formato de apresentacao local modificado"; break;
+                case "FF": flowSetDateFormatZoned(); configChanged = true; statusMessage = "Formato de apresentacao de datas com zonas modificado"; break;
+                case "F": flowSetZone(); configChanged = true; statusMessage = "Fuso local modificado"; break;
+                case "H": setSchedule(); configChanged = true; statusMessage = "Limitacoes de horario adicionadas"; break;
+                case "?": helpConfig(); statusMessage = "n/a"; break;
                 case "S": break;
                 default: System.out.println("Opcao Invalida!"); break;
             }
@@ -103,7 +103,14 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
 
         if (configChanged) {
             model.saveConfigs();
+
         }
+    }
+
+    private void flowSetZone() {
+        String zone = flowShowAllAvailableTimezonesAndGetNZoneIds(1,viewMainTxt.getMenu(2), ZoneId.systemDefault().toString()).get(0);
+        model.withZoneLocal(zone);
+        model.withZoneZone(zone);
     }
 
     private void flowSetDateFormatLocal(){
@@ -189,12 +196,6 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             }
         }
         while(!flowDone);
-    }
-
-    private void setLocal() {
-        String zone = flowShowAllAvailableTimezonesAndGetNZoneIds(1,viewMainTxt.getMenu(2), ZoneId.systemDefault().toString()).get(0);
-        controlLocal.withZone(zone);
-        controlSchedule.withZone(zone);
     }
 
     private void setSchedule() {

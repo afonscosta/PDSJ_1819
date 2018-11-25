@@ -399,6 +399,41 @@ public class BusinessUtils {
         return ret;
     }
 
+    public static List<String> getSortedAvailableZoneIdsAndOffset() {
+        List<String> zoneIds = new ArrayList<>(ZoneId.getAvailableZoneIds());
+        List<String> ret = new ArrayList<>();
+
+        LocalDateTime today = LocalDateTime.now();
+        for (String zone : zoneIds) {
+            ZonedDateTime zdt = today.atZone(ZoneId.of(zone));
+            String offset = zdt.getOffset().getId().replaceAll("Z","+00:00");
+            ret.add(String.format("(%s) %s", offset, zone));
+        }
+
+        // Comparar p.e. "(-01:00) Europe/Lisbon" e "(+05:00) Asia/Tokyo"
+        Comparator<String> zoneIdComparator =
+                ((String z1, String z2) -> {
+                    if (z1.charAt(1) == '+' && z2.charAt(1) == '-') {
+                        return 1;
+                    } else if (z1.charAt(1) == '-' && z2.charAt(1) == '+') {
+                        return -1;
+                    } else {
+                        // Couldn't compare by signal, compare by number
+                        String num1str = z1.substring(1,7).replace(":","");
+                        String num2str = z2.substring(1,7).replace(":","");;
+
+                        int num1 = Integer.parseInt(num1str);
+                        int num2 = Integer.parseInt(num2str);
+
+                        return num1-num2;
+                    }
+                });
+
+        ret.sort(zoneIdComparator);
+
+        return ret;
+    }
+
     public static List<String> getSortedAvailableZoneIds() {
         List<String> ret = new ArrayList<>(ZoneId.getAvailableZoneIds());
         ret.sort(Comparator.naturalOrder());

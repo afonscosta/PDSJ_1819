@@ -41,7 +41,7 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         //------------------------
         op1 = new Opcao("Definir o formato das datas locais", "FL");
         op2 = new Opcao("Definir o formato das datas com fusos", "FF");
-        op3 = new Opcao("Definir o fuso local", "L");
+        op3 = new Opcao("Definir o fuso", "F");
         op4 = new Opcao("Definir horario da agenda","H");
         op5 = new Opcao("Ajuda", "?");
         op6 = new Opcao("Voltar ao Menu Principal", "S");

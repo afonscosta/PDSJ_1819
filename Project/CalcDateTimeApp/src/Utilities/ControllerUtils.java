@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static Utilities.BusinessUtils.*;
+import static Utilities.ConsoleColors.CYAN_BOLD;
+import static Utilities.ConsoleColors.RESET;
 import static java.lang.System.out;
 import static java.time.ZoneId.systemDefault;
 
@@ -182,7 +184,7 @@ public class ControllerUtils {
     public static List<String> flowShowAllAvailableTimezonesAndGetNZoneIds(int zoneIdsWanted, Menu menu, String defaultZoneid) {
         List<String> zoneIdList = new ArrayList<>();
         Boolean flowDone = false;
-        List<List<String>> chosenZoneIdsByPage = partitionIntoPages(getSortedAvailableZoneIds(),25); // If someone looks for "europe", place matches it here
+        List<List<String>> chosenZoneIdsByPage = partitionIntoPages(getSortedAvailableZoneIdsAndOffset(),25); // If someone looks for "europe", place matches it here
 
         int pageIndex = 0;
         int totalPages = chosenZoneIdsByPage.size();
@@ -201,7 +203,7 @@ public class ControllerUtils {
             description.add(""); // Linha branca na descrição
             int pageIndexToDisplay = (totalPages == 0) ? 0 : pageIndex + 1;
             description.add(String.format("Pagina (%s/%s)", pageIndexToDisplay, totalPages));
-            description.add(String.format("ZoneIds adicionados: (%d/%d)", zoneIdList.size(), zoneIdsWanted));
+            description.add(String.format(CYAN_BOLD + "ZoneIds adicionados: (%d/%d)" + RESET, zoneIdList.size(), zoneIdsWanted));
 
             menu.addDescToTitle(description);
 
@@ -214,9 +216,9 @@ public class ControllerUtils {
                     if (opcao.matches("\\/.*")) { // Procurando por zoneId com "/<palavra>"
                         List<String> matches = new ArrayList<>();
                         pageIndex = 0;
-                        String searchedWordNormalized = opcao.substring(1).toLowerCase(); // Remover o "?" e lowercase
+                        String searchedWordNormalized = opcao.substring(1).toLowerCase(); // Remover o "/" e lowercase
 
-                        for (String zoneId : getSortedAvailableZoneIds()) {
+                        for (String zoneId : getSortedAvailableZoneIdsAndOffset()) {
                             if (zoneId.toLowerCase().contains(searchedWordNormalized)) {
                                 matches.add(zoneId);
                             }
@@ -226,6 +228,7 @@ public class ControllerUtils {
                         totalPages = chosenZoneIdsByPage.size();
                     } else if (opcao.matches("=.+")) { // Selecionando zoneId com "=<palavra>"
                         opcao = opcao.substring(1); // Remover o "="
+                        // Procuramos na lista SEM zoneid porque o user coloca "Europe/Lisbon" e nao "(+00:00) Europe/Lisbon"
                         if (getSortedAvailableZoneIds().contains(opcao)) {
                             zoneIdList.add(opcao);
                             if (zoneIdList.size() == zoneIdsWanted) {

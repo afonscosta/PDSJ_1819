@@ -1,14 +1,12 @@
 package Controller.Class;
 
 import Controller.Interface.InterfCalcDateTimeLocalController;
-import Model.Class.CalcDateTimeScheduleModel;
 import Model.Interface.InterfCalcDateTimeModel;
 import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeLocalView;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -17,14 +15,12 @@ import static Utilities.BusinessUtils.*;
 import static Utilities.ConsoleColors.*;
 import static Utilities.ControllerUtils.*;
 import static java.lang.System.out;
-import static java.time.ZoneId.systemDefault;
 import static java.time.temporal.ChronoUnit.*;
 import static java.util.Arrays.asList;
 
 public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalController {
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeLocalView viewLocalTxt;
-    private ZoneId localZone;
 
     public static CalcDateTimeLocalController of() {
         return new CalcDateTimeLocalController();
@@ -59,20 +55,24 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         Menu menu = viewLocalTxt.getMenu(0);
         String ld;
         String opcao;
+
+        String statusMessage = "n/a";
+
         do {
             ld = localDateTimeToString(model.getDateTimeLocal(), DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
             menu.addDescToTitle(asList("Data: " + ld));
+            menu.addStatusMessage(statusMessage);
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "C" : setDateTimeLocal(); break;
-                case "A" : flowShiftDateTime(); break;
-                case "AU" : flowShiftWorkDaysDateTime(); break;
-                case "D" : flowDiffDateTime(); break;
-                case "DU" : flowDiffWorkDaysDateTime(); break;
-                case "O" : getDateTimeLocal(); break;
-                case "?" : help(); break;
+                case "C" : setDateTimeLocal(); statusMessage = "Data modificada com sucesso"; break;
+                case "A" : flowShiftDateTime(); statusMessage = "n/a"; break;
+                case "AU" : flowShiftWorkDaysDateTime(); statusMessage = "n/a"; break;
+                case "D" : flowDiffDateTime(); statusMessage = "n/a"; break;
+                case "DU" : flowDiffWorkDaysDateTime(); statusMessage = "n/a"; break;
+                case "O" : getDateTimeLocal(); statusMessage = "n/a"; break;
+                case "?" : help(); statusMessage = "n/a"; break;
                 case "S": break;
                 default: out.println("Opcao Invalida!"); break;
             }
@@ -189,9 +189,12 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String ld;
         Menu menu = viewLocalTxt.getMenu(3);
         String opcao;
+
+        String statusMessage = "n/a";
         do {
             ld = localDateTimeToString(model.getDateTimeLocal(), DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
             menu.addDescToTitle(asList("Data: " + ld));
+            menu.addStatusMessage(statusMessage);
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -207,6 +210,8 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                 case "S": break;
                 default: out.println("Opcao Invalida!"); break;
             }
+
+            statusMessage = "Data modificada com sucesso";
         }
         while(!opcao.equals("S"));
     }
@@ -218,9 +223,12 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String ld;
         Menu menu = viewLocalTxt.getMenu(4);
         String opcao;
+
+        String statusMessage = "n/a";
         do {
             ld = localDateTimeToString(model.getDateTimeLocal(), DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
             menu.addDescToTitle(asList("Data: " + ld));
+            menu.addStatusMessage(statusMessage);
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -229,6 +237,8 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                 case "S": break;
                 default: out.println("Opcao Invalida!"); break;
             }
+
+            statusMessage = "Data modificada com sucesso";
         }
         while(!opcao.equals("S"));
     }
@@ -275,7 +285,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         }
         String resDiff = model.diffDateTimeLocal(toDateTime);
 
-        out.println("\nResultado: " + resDiff);
+        out.println(GREEN_BOLD + "\nResultado: " + resDiff + RESET);
         out.print("Prima Enter para continuar.");
         Input.lerString();
     }
@@ -310,7 +320,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         }
         String resDiff = model.diffWorkDaysDateTimeLocal(toDateTime);
 
-        out.println("\nResultado: " + resDiff);
+        out.println(GREEN_BOLD + "\nResultado: " + resDiff + RESET);
         out.print("Prima Enter para continuar.");
         Input.lerString();
     }
@@ -343,7 +353,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         if (year != null) {
             zdt = zdt.withYear(year);
             while (month == null) {
-                out.print("Mes: ");
+                out.print("Mes do ano[1,2,..]: ");
                 str = Input.lerString();
                 month = validateMonth(str, null);
                 if (month == null)
@@ -352,7 +362,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             if (month != null) {
                 zdt = zdt.withMonth(month);
                 while (nweeks == null) {
-                    out.print("Semana: ");
+                    out.print("Semana do mes[1,2,..]: ");
                     str = Input.lerString();
                     nweeks = validateNumWeek(str, -1, year, month);
                     if (nweeks == null)
@@ -361,7 +371,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                 if (nweeks != -1) {
                     zdt = (ZonedDateTime) nextMondayN(zdt, nweeks-1);
                     while (ndays == null) {
-                        out.print("Dia: ");
+                        out.print("Dia da semana[1,2..]: ");
                         str = Input.lerString();
                         ndays = validateNumDay(str, -1, year, month, nweeks);
                         if (ndays == null)

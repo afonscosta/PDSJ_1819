@@ -2,17 +2,20 @@ package Utilities;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import static Utilities.BusinessUtils.repeatStringN;
+import static Utilities.ConsoleColors.GREEN_BOLD;
+import static Utilities.ConsoleColors.RESET;
 
 public class Menu {
 
     private List<Opcao> linhas;
     private String titulo;
     private List<String> desc;
+    private String statusMessage;
 
     public Menu(List<Opcao> linhas, String titulo) {
+        statusMessage = "n/a";
         this.linhas = linhas;
         this.titulo = titulo;
         this.desc = new ArrayList<>();
@@ -47,6 +50,13 @@ public class Menu {
                                " " + tag + " |");
         }
         System.out.println("+" + repeatStringN("=", max+2) + "+");
+        // Print da mensagem de sucesso
+        if (!statusMessage.equals("n/a")) {
+            System.out.println(GREEN_BOLD + statusMessage + RESET);
+
+            // Alerta só é mostrado uma vez
+            statusMessage = "n/a";
+        }
         System.out.print("Insira a sua opcao: ");
     }
 
@@ -95,5 +105,9 @@ public class Menu {
         String pattern = ("\033\\[0m|\033\\[0;30m|\033\\[0;31m|\033\\[0;32m|\033\\[0;33m|\033\\[0;34m|\033\\[0;35m|\033\\[0;36m|\033\\[0;37m|\033\\[1;30m|\033\\[1;31m|\033\\[1;32m|\033\\[1;33m|\033\\[1;34m|\033\\[1;35m|\033\\[1;36m|\033\\[1;37m|\033\\[4;30m|\033\\[4;31m|\033\\[4;32m|\033\\[4;33m|\033\\[4;34m|\033\\[4;35m|\033\\[4;36m|\033\\[4;37m|\033\\[40m|\033\\[41m|\033\\[42m|\033\\[43m|\033\\[44m|\033\\[45m|\033\\[46m|\033\\[47m|\033\\[0;90m|\033\\[0;91m|\033\\[0;92m|\033\\[0;93m|\033\\[0;94m|\033\\[0;95m|\033\\[0;96m|\033\\[0;97m|\033\\[1;90m|\033\\[1;91m|\033\\[1;92m|\033\\[1;93m|\033\\[1;94m|\033\\[1;95m|\033\\[1;96m|\033\\[1;97m|\033\\[0;100m|\033\\[0;101m|\033\\[0;102m|\033\\[0;103m|\033\\[0;104m|\033\\[0;105m|\033\\[0;106m|\033\\[0;107m");
         withoutColors = str.replaceAll(pattern, "");
         return withoutColors;
+    }
+
+    public void addStatusMessage(String statusMessage) {
+       this.statusMessage = statusMessage;
     }
 }
