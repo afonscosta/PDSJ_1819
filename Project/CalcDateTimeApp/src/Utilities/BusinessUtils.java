@@ -562,4 +562,16 @@ public class BusinessUtils {
     public static ZonedDateTime getNowOfZone(ZoneId zid) {
         return ZonedDateTime.now(zid);
     }
+
+    public static long gmtDifference(String zoneId1, String zoneId2) {
+        LocalDateTime today = LocalDateTime.now();
+        ZonedDateTime z1 = today.atZone(ZoneId.of(zoneId1));
+        ZonedDateTime z2 = today.atZone(ZoneId.of(zoneId2));
+
+        long diffAbs =  ChronoUnit.HOURS.between(z1,z2);
+
+        // Queremos representar ao contrario, de A -> B é preciso adicionar X horas
+        return (diffAbs * (-1));
+
+    }
 }
