@@ -83,13 +83,14 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         // Menu alter data
         //------------------------
 
-        op1 = new Opcao("Aritmetrica de dias", "D");
-        op2 = new Opcao("Aritmetrica de semanas", "Sem");
-        op3 = new Opcao("Aritmetrica de meses", "M");
-        op4 = new Opcao("Aritmetrica de anos", "A");
-        op5 = new Opcao("Alterar horas","T");
-        op6 = new Opcao("Voltar ao Menu reuniao", "S");
-        linhas = Arrays.asList(op1, op2, op3, op4, op5,op6);
+        op1 = new Opcao("Alterar manualmente", "MA");
+        op2 = new Opcao("Aritmetrica de dias", "D");
+        op3 = new Opcao("Aritmetrica de semanas", "Sem");
+        op4 = new Opcao("Aritmetrica de meses", "M");
+        op5 = new Opcao("Aritmetrica de anos", "A");
+        op6 = new Opcao("Alterar tempo","T");
+        op7 = new Opcao("Voltar ao Menu reuniao", "S");
+        linhas = Arrays.asList(op1, op2, op3, op4, op5, op6, op7);
         Menu menuShiftDateTime = new Menu(linhas, "Alterar Data");
         menusScheduleTxt.addMenu(5, menuShiftDateTime);
 

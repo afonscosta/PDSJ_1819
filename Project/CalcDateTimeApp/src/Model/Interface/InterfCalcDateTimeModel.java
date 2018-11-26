@@ -10,14 +10,11 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.util.Collection;
 import java.util.List;
 
 public interface InterfCalcDateTimeModel {
         //extends InterfCalcDateTimeLocalModel, InterfCalcDateTimeZoneModel, InterfCalcDateTimeScheduleModel {
-
-    ZoneId getZoneZone();
-
-    String getZoneDateTimeZone();
 
     Temporal getDateTimeLocal();
 
@@ -49,29 +46,11 @@ public interface InterfCalcDateTimeModel {
 
     void changeToCurrentDateInZone(String zoneId);
 
-    boolean addSlot(Slot newSlot);
-
-    void saveState(String nomeFicheiro) throws IOException;
-
-    List<String> getMainInfoSlots(ZoneId referenceZoneId, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
-
-    boolean removeSlot(Slot slot);
-
-    void editSlot(Slot s, EnumEditSlotInfo e, String edit);
-
-    Slot editDurationSlot(Slot s, Duration d);
-
-    Slot editDateSLot(Slot s, Temporal data);
-
-    Slot getSlot(String infoSlot);
-
-    List<String> getRestrictSlots(String modeNormalized, int want, ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
-
     String getLocalDateTimeFormat();
 
     String getZoneDateTimeFormat();
 
-    void setZoneId(ZoneId zoneId);
+    String getZoneZone();
 
     void setZoneDateTimeFormat(String zoneDateTimeFormat);
 
@@ -80,4 +59,29 @@ public interface InterfCalcDateTimeModel {
     void saveConfigs();
 
     ZoneId getLocalZone();
+
+/*
+    Métodos de acesso ao Model Schedule
+ */
+    boolean addSlot(Slot newSlot,Collection c);
+
+    List<String> getMainInfoSlots(ZoneId referenceZoneId, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
+
+    List<String> getModeSlots(String modeNormalized, int want, ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
+
+    List<String> getRestrictSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
+
+    boolean removeSlot(Slot slot,Collection c);
+
+    void editSlot(Slot s, EnumEditSlotInfo e, String edit);
+
+    Slot editDurationSlot(Slot s, Duration d);
+
+    Slot editDateSLot(Slot s, Temporal data);
+
+    Slot getSlot(String infoSlot, Collection c);
+
+    Collection getSchedule();
+
+    Collection getScheduleRestrictions();
 }

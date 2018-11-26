@@ -4,18 +4,28 @@ import Controller.Interface.InterfCalcDateTimeController;
 import Controller.Interface.InterfCalcDateTimeLocalController;
 import Controller.Interface.InterfCalcDateTimeScheduleController;
 import Controller.Interface.InterfCalcDateTimeZoneController;
+import Model.Class.RestrictSlot;
+import Model.Class.Slot;
 import Model.Interface.InterfCalcDateTimeModel;
+import Utilities.BusinessUtils;
 import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeView;
 
+import java.time.Duration;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static Utilities.ConsoleColors.BLACK_BOLD;
-import static Utilities.ConsoleColors.RESET;
+import static Utilities.BusinessUtils.getIdSlot;
+import static Utilities.BusinessUtils.partitionIntoPages;
+import static Utilities.ConsoleColors.*;
 import static Utilities.ControllerUtils.*;
-import static java.lang.System.err;
 import static java.lang.System.out;
 import static java.util.Arrays.asList;
 
@@ -73,7 +83,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 case "A" : controlSchedule.flowSchedule(); break;
                 case "C" : flowConfig(); break;
                 case "?" : helpMain(); break;
-                case "S": controlSchedule.saveState(); break; //É aqui que se guarda os DateTimeFormatter's e o localZone
+                case "S": model.saveConfigs(); break;
                 default: errorMessage = "Opcao Invalida!"; break;
             }
         }
@@ -101,8 +111,8 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 case "FL": flowSetDateFormatLocal(); configChanged = true; break;
                 case "FF": flowSetDateFormatZoned(); configChanged = true; break;
                 case "F": flowSetZone(); configChanged = true; statusMessage = "Fuso local modificado"; break;
-                case "H": setSchedule(); configChanged = true; statusMessage = "Limitacoes de horario adicionadas"; break;
-                case "?": helpConfig(); break;
+                case "R": flowRestrictSchedule(); configChanged = true; break;
+                case "?": helpConfig(); statusMessage = "n/a"; break;
                 case "S": break;
                 default: errorMessage = "Opcao Invalida!"; break;
             }
@@ -112,6 +122,176 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         if (configChanged) {
             model.saveConfigs();
         }
+    }
+
+    private void flowRestrictSchedule(){
+        Menu menu = viewMainTxt.getMenu(7);
+        String opcao;
+        Boolean configChanged=false;
+        String statusMessage = "n/a" ;
+        String erroMessage = "Ira definir uma periodo de tempo para o qual nao sera permitido agendar reunioes" ;
+        do{
+            menu.addStatusMessage(statusMessage);
+            menu.addErrorMessage(erroMessage);
+            statusMessage = "n/a" ;
+            erroMessage = "n/a" ;
+            menu.show();
+            opcao= Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch (opcao){
+                case "E":  configChanged = addRestrictSchedule("pontual"); break;
+                case "G": flowGlobalRestrictSchedule(); break;
+                case "V": flowShowRestrictSchedule(); break;
+                case "S": break;
+            }
+            if(opcao.equals("E")){
+                if(configChanged)
+                    statusMessage = "Restricao adicionada com sucesso!";
+                else
+                    erroMessage = "Restricao em conflito com reunioes ja agendadas!";
+
+            }
+        }
+        while(!opcao.equals("S"));
+    }
+
+    private void flowShowRestrictSchedule(){
+        Menu menu = viewMainTxt.getMenu(9);
+        String opcao;
+        List<String> description;
+        ZoneId referenceZone = ZonedDateTime.from(model.getDateTimeLocal()).getZone();
+        DateTimeFormatter dtfLocal= DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat());
+        DateTimeFormatter dtfZone = DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat());
+        int pageIndex = 0;
+        do{
+            List<List<String>> restrictSlots = partitionIntoPages(model.getRestrictSlots(referenceZone,dtfLocal,dtfZone),25);
+            int totalPages = restrictSlots.size();
+            try {
+                description = new ArrayList(restrictSlots.get(pageIndex));
+            } catch (IndexOutOfBoundsException e) {
+                description = new ArrayList<>();
+            }
+
+            description.add(""); // Linha branca na descrição
+            int pageIndexToDisplay = (totalPages == 0) ? 0 : pageIndex + 1;
+            description.add(String.format("Pagina (%s/%s)", pageIndexToDisplay, totalPages));
+
+            menu.addDescToTitle(description);
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch (opcao){
+                case "<":
+                case ">":
+                case"S":
+                default:
+                    if (opcao.matches("=.*")) {
+                        opcao = opcao.substring(1); // Remover o "="
+
+                        for (String infoSlot : model.getRestrictSlots(referenceZone,dtfLocal,dtfZone)) {
+                            String idSlot = getIdSlot(infoSlot);
+                            if(idSlot!=null & idSlot.equals(opcao)){
+                                Slot s= model.getSlot(idSlot,model.getScheduleRestrictions());
+                                if(s!=null) {
+                                    flowSelectRestrictSchedule(s);
+                                    break;
+                                }
+                            }
+                        }
+
+                    }
+                    break;
+            }
+        }
+        while(!opcao.equals("S"));
+    }
+
+    private void flowSelectRestrictSchedule(Slot s){
+        Menu menu = viewMainTxt.getMenu(10);
+        String opcao;
+        boolean res=false;
+        String statusMessage = "n/a" ;
+        String erroMessage = "n/a" ;
+        ZoneId referenceZone = ZonedDateTime.from(model.getDateTimeLocal()).getZone();
+        DateTimeFormatter dtfLocal= DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat());
+        DateTimeFormatter dtfZone = DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat());
+        do{
+            String dataToShow = BusinessUtils.DateSlotToString(s,referenceZone,dtfLocal,dtfZone);
+            menu.addDescToTitle(Arrays.asList(dataToShow,
+                                            s.getDuration().toString(),
+                                            s.getDescription())
+            );
+            menu.addStatusMessage(statusMessage);
+            menu.addErrorMessage(erroMessage);
+            statusMessage = "n/a" ;
+            erroMessage = "n/a" ;
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch (opcao){
+                case "R": res = model.removeSlot(s,model.getScheduleRestrictions());break;
+                case "S": break;
+
+            }
+            if(opcao.equals("R")){
+                if(res)
+                    statusMessage="Restricao removida com sucesso!";
+                else
+                    erroMessage="Nao e possivel remover a restricao...";
+            }
+        }
+        while(!opcao.equals("S"));
+    }
+
+    private boolean flowGlobalRestrictSchedule(){
+        Menu menu = viewMainTxt.getMenu(8);
+        boolean configChanged= false;
+        String opcao;
+        String statusMessage = "n/a" ;
+        String erroMessage = "n/a" ;
+        do{
+            menu.addStatusMessage(statusMessage);
+            menu.addErrorMessage(erroMessage);
+            statusMessage = "n/a" ;
+            erroMessage = "n/a" ;
+            menu.show();
+            opcao= Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch (opcao){
+                case "DIA": configChanged = addRestrictSchedule("diaria"); break;
+                case "SEM": configChanged = addRestrictSchedule("semanal"); break;
+                case "S": break;
+            }
+            if(opcao.equals("DIA") | opcao.equals("SEM")){
+                if(configChanged)
+                    statusMessage = "Restricao adicionada com sucesso!";
+                else
+                    erroMessage="Restricao em conflito com reunioes ja agendadas!";
+            }
+        }
+        while(!(opcao.equals("S")));
+        return false;
+    }
+
+    private boolean addRestrictSchedule(String mode){
+        ZonedDateTime zdt = ZonedDateTime.from(model.getDateTimeLocal());
+        ZoneId referenceZoneID = zdt.getZone();
+        out.println("Data da restricao:");
+        Temporal date = getDateTimeFromInput((ZonedDateTime) model.getDateTimeLocal(), referenceZoneID);
+        out.println("Duracao");
+        out.print("Horas ira demorar: ");
+        int horas = Input.lerInt();
+        out.print("Minutos ira demorar: ");
+        int minutos = Input.lerInt();
+        Duration duration = Duration.of(horas, ChronoUnit.HOURS);
+        duration = duration.plus(minutos, ChronoUnit.MINUTES);
+
+        out.print("Introduza uma descricao da restricao: ");
+        String desc = Input.lerString();
+
+        RestrictSlot newSlot = RestrictSlot.of(date, duration, null, desc, mode);
+        return model.addSlot(newSlot,model.getScheduleRestrictions());
+
     }
 
     private void flowSetZone() {
@@ -257,25 +437,6 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     private void setLocal() {
         String zone = flowGetNZoneIds(1,viewMainTxt.getMenu(2), ZoneId.systemDefault().toString()).get(0);
         controlLocal.withZone(zone);
-    }
-
-    private void setSchedule() {
-        Menu menu = viewMainTxt.getMenu(7);
-        String opcao;
-        do {
-            menu.show();
-            opcao = Input.lerString();
-            opcao = opcao.toUpperCase();
-            switch(opcao) {
-                case "S": break;
-                default: addRestrictSchedule();
-            }
-        }
-        while(!opcao.equals("S"));
-    }
-
-    private void addRestrictSchedule(){
-
     }
 
     private void helpConfig() {

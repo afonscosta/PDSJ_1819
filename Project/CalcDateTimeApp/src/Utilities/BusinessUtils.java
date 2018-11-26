@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.lang.Math.abs;
 import static java.time.DayOfWeek.*;
@@ -520,10 +522,10 @@ public class BusinessUtils {
     // Se a zoned for a de referencia, não quero imprimir a zoned
     // A zoned de referencia é a dada no ficheiro de configuração
     //------------------------
-    public static String DateSlotToString(Slot s,ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
+    public static String DateSlotToString(Slot s, ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
         ZonedDateTime date = ZonedDateTime.from(s.getData());
         boolean temp = isSlotfromReferenceZone(s,referenceZone);
-        if(temp==true) {
+        if(temp) {
             return date.format(dtfLocal);
         }
         else{
@@ -539,11 +541,22 @@ public class BusinessUtils {
             return false;
     }
     public static ZonedDateTime convertZoneDateTimeToSpecificZone (Temporal data,ZoneId referenceZone) {
-        System.out.println(data);
         ZonedDateTime zoneData= ZonedDateTime.from(data);
         zoneData = zoneData.withZoneSameInstant(referenceZone);
-        System.out.println(zoneData);
         return zoneData;
+    }
+
+    //------------------------
+    // Dado a caracterização da reunião(id, data, local) devolve apenas o seu identificador gerado ao nivel da interface
+    // null caso de erro
+    //------------------------
+    public static String getIdSlot(String infoSlot){
+        Pattern p = Pattern.compile("^[0-9]+");
+        Matcher m = p.matcher(infoSlot);
+        if(m.find()){
+            return m.group(0);
+        }
+        else return null;
     }
 
     /*
@@ -561,5 +574,17 @@ public class BusinessUtils {
 
     public static ZonedDateTime getNowOfZone(ZoneId zid) {
         return ZonedDateTime.now(zid);
+    }
+
+    public static long gmtDifference(String zoneId1, String zoneId2) {
+        LocalDateTime today = LocalDateTime.now();
+        ZonedDateTime z1 = today.atZone(ZoneId.of(zoneId1));
+        ZonedDateTime z2 = today.atZone(ZoneId.of(zoneId2));
+
+        long diffAbs =  ChronoUnit.HOURS.between(z1,z2);
+
+        // Queremos representar ao contrario, de A -> B é preciso adicionar X horas
+        return (diffAbs * (-1));
+
     }
 }

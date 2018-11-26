@@ -6,16 +6,13 @@ import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeZoneView;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
-import static Utilities.BusinessUtils.getNowOfZone;
-import static Utilities.BusinessUtils.zoneDateTimeToString;
+import static Utilities.BusinessUtils.*;
 import static Utilities.ConsoleColors.*;
 import static Utilities.ControllerUtils.*;
 import static java.lang.System.out;
@@ -75,7 +72,6 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
                 case "AU": flowShiftWorkDaysDateTimeZone(); break;
                 case "D": flowDiffDateTimeZone(); break;
                 case "DU": flowDiffWorkDaysDateTimeZone(); break;
-                case "T": flowShowCurrentTimeInZone(); statusMessage = "Data convertida para tempo atual no fuso escolhido"; break;
                 case "F": flowConvertZone(); statusMessage = "Data convertida para o fuso escolhido"; break;
                 case "DF": flowDiffInTimeZones(); break;
                 case "?" : help(); break;
@@ -86,7 +82,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     }
 
     private void resetDateTimeZone() {
-        model.fromDateTimeZone(getNowOfZone(model.getZoneZone()));
+        model.fromDateTimeZone(getNowOfZone(ZoneId.of(model.getZoneZone())));
     }
 
     private void help() {
@@ -148,16 +144,19 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     }
 
     private void flowDiffInTimeZones() {
-        List<String> zoneIdsTxt = flowGetNZoneIds(2, viewZoneTxt.getMenu(4), model.getZoneDateTimeZone());
+        List<String> zoneIdsTxt = flowGetNZoneIds(2, viewZoneTxt.getMenu(4), model.getZoneZone());
 
-        ZoneId zoneId1 = ZoneId.of(zoneIdsTxt.get(0));
-        ZoneId zoneId2 = ZoneId.of(zoneIdsTxt.get(1));
+        String zoneId1 = zoneIdsTxt.get(0);
+        String zoneId2 = zoneIdsTxt.get(1);
 
-        LocalDateTime today = LocalDateTime.now();
+        long zoneIdDifferenceHours = gmtDifference(zoneId1,zoneId2);
+        String zoneIdDifferenceHoursTxt = String.valueOf(zoneIdDifferenceHours);
 
-        long zoneIdDifferenceHours = ChronoUnit.HOURS.between(today.atZone(zoneId1),today.atZone(zoneId2));
+        if (zoneIdDifferenceHours > 0) {
+            zoneIdDifferenceHoursTxt = "+" + zoneIdDifferenceHours;
+        }
 
-        out.println(zoneId1.toString() + " -> " + zoneId2.toString() + String.format(" (%d)", zoneIdDifferenceHours));
+        out.println(GREEN_BOLD + zoneId1 + " --(" + zoneIdDifferenceHoursTxt + " horas)--> " + zoneId2 + RESET);
         out.print("Prima Enter para continuar.");
         Input.lerString();
     }
@@ -276,7 +275,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     }
 
     private ZonedDateTime getZoneDateTimeFromInput() {
-        String zoneIdString = flowGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneDateTimeZone()).get(0);
+        String zoneIdString = flowGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneZone()).get(0);
         ZoneId zoneId = ZoneId.of(zoneIdString);
 
         return getDateTimeFromInput((ZonedDateTime) model.getDateTimeZone(), zoneId);
@@ -287,7 +286,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     //------------------------
     // Saber que data atual é numa certa região
     private void flowShowCurrentTimeInZone() {
-        String answerZone = flowGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneDateTimeZone()).get(0);
+        String answerZone = flowGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneZone()).get(0);
         model.changeToCurrentDateInZone(answerZone);
     }
 
@@ -352,7 +351,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     // Pedir para que zona queremos mudar a data
     private void flowConvertZone() {
         try {
-            String answerZone = flowGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneDateTimeZone()).get(0);
+            String answerZone = flowGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneZone()).get(0);
             model.withZoneZone(answerZone);
         }
         catch (IndexOutOfBoundsException e){}
