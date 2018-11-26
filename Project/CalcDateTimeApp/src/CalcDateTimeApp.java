@@ -39,6 +39,7 @@ public final class CalcDateTimeApp {
      */
 
     public static void main(String[] args) {
+        
 
         //--------------------------------
         InterfCalcDateTimeLocalModel modelLocal = CalcDateTimeLocalModel.of();
