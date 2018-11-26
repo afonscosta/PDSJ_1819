@@ -119,10 +119,8 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     }
 
     @Override
-    public String getZoneDateTimeZone() {
-        ZonedDateTime zdt = (ZonedDateTime) modelZone.getDateTime();
-
-        return zdt.getZone().toString();
+    public String getZoneZone() {
+        return modelZone.getZone().toString();
     }
 
     @Override

@@ -1,6 +1,5 @@
 package Model.Interface;
 
-import Model.Class.RestrictSlot;
 import Model.Class.Slot;
 import Utilities.EnumEditSlotInfo;
 
@@ -16,8 +15,6 @@ import java.util.List;
 
 public interface InterfCalcDateTimeModel {
         //extends InterfCalcDateTimeLocalModel, InterfCalcDateTimeZoneModel, InterfCalcDateTimeScheduleModel {
-
-    String getZoneDateTimeZone();
 
     Temporal getDateTimeLocal();
 
@@ -54,6 +51,8 @@ public interface InterfCalcDateTimeModel {
     String getZoneDateTimeFormat();
 
     void setZoneId(ZoneId zoneId);
+
+    String getZoneZone();
 
     void setZoneDateTimeFormat(String zoneDateTimeFormat);
 

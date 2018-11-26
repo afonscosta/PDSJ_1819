@@ -518,10 +518,10 @@ public class BusinessUtils {
     // Se a zoned for a de referencia, não quero imprimir a zoned
     // A zoned de referencia é a dada no ficheiro de configuração
     //------------------------
-    public static String DateSlotToString(Slot s,ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
+    public static String DateSlotToString(Slot s, ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
         ZonedDateTime date = ZonedDateTime.from(s.getData());
         boolean temp = isSlotfromReferenceZone(s,referenceZone);
-        if(temp==true) {
+        if(temp) {
             return date.format(dtfLocal);
         }
         else{
