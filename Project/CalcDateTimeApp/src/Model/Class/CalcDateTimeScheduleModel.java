@@ -23,10 +23,12 @@ import java.util.TreeSet;
 public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleModel,Serializable {
     private Set<Slot> schedule;
     private List<RestrictSlot> scheduleRestrictions;
+
+    private Comparator<Slot> slotComparator;
     static final long serialVersionUID = 1L;
 
     private CalcDateTimeScheduleModel() {
-        Comparator<Slot> compDateSlots =
+        slotComparator =
                 (Comparator<Slot> & Serializable)(Slot s1, Slot s2) -> {
                     Temporal data1 = s1.getData();
                     Temporal data2 = s2.getData();
@@ -66,7 +68,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                         }
                     }
                 };
-        this.schedule= new TreeSet<>(compDateSlots);
+        this.schedule= new TreeSet<>(slotComparator);
         this.scheduleRestrictions= new ArrayList<>();
     }
 
@@ -77,8 +79,12 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
 
     @Override
     public void loadConfigs(Configs configs) {
-        this.schedule = configs.getSchedule();
-        this.scheduleRestrictions = configs.getScheduleRestrictions();
+        if (configs.getSchedule() != null) {
+            this.schedule.addAll(configs.getSchedule());
+        }
+        if (configs.getScheduleRestrictions() != null) {
+            this.scheduleRestrictions = configs.getScheduleRestrictions();
+        }
     }
 
     //------------------------
@@ -257,16 +263,5 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         index ++;
         }
         return  null;
-    }
-
-    //------------------------
-    // Guarda o estado do model pois este tem de ser persistente
-    //------------------------
-    public void saveState(String nomeFicheiro) throws IOException {
-        FileOutputStream fos = new FileOutputStream(nomeFicheiro);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(this);
-        oos.close();
-        fos.close();
     }
 }

@@ -14,10 +14,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 public class CalcDateTimeModel implements InterfCalcDateTimeModel {
 
@@ -64,7 +61,9 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
         configs.setLocalDateTimeFormat(this.getLocalDateTimeFormat());
         configs.setZoneDateTimeFormat(this.getZoneDateTimeFormat());
         configs.setZoneId(this.getLocalZone().toString());
-        configs.setAgenda(new TreeSet(this.getSchedule()));
+
+        configs.setSchedule(new ArrayList(this.getSchedule()));
+
         configs.setScheduleRestrictions(new ArrayList(this.getScheduleRestrictions()));
 
         // re-writes over old file
@@ -74,11 +73,6 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     @Override
     public ZoneId getLocalZone() {
         return modelLocal.getZone();
-    }
-
-    @Override
-    public void setZoneId(ZoneId zoneId) {
-        modelLocal.setZoneId(zoneId);
     }
 
     @Override
@@ -177,11 +171,6 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     @Override
     public boolean addSlot(Slot newSlot, Collection c){
         return modelSchedule.addSlot(newSlot,c);
-    }
-
-    @Override
-    public void saveState(String nomeFicheiro) throws IOException {
-        modelSchedule.saveState(nomeFicheiro);
     }
 
     @Override

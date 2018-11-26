@@ -5,14 +5,11 @@ import Model.Class.Slot;
 
 import java.io.*;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class Configs implements Serializable{
 
-    private Set<Slot> agenda;
+    private List<Slot> schedule;
     private List<RestrictSlot> scheduleRestrictions;
     private String zoneDateTimeFormat;
     private String localDateTimeFormat;
@@ -37,15 +34,15 @@ public class Configs implements Serializable{
     }
 
     public Configs() {
-        this.agenda = new TreeSet<>();
-        this.scheduleRestrictions = new ArrayList<>();
+        this.schedule = null;
+        this.scheduleRestrictions = null;
         this.zoneDateTimeFormat = "yyyy/MM/dd H:m:s:n - VV";
         this.localDateTimeFormat = "yyyy/MM/dd H:m:s:n";
         this.zoneId = ZoneId.systemDefault().toString();
     }
 
-    public Set<Slot> getSchedule() {
-        return agenda;
+    public List<Slot> getSchedule() {
+        return schedule;
     }
 
     public List<RestrictSlot> getScheduleRestrictions() {
@@ -76,8 +73,8 @@ public class Configs implements Serializable{
         }
     }
 
-    public void setAgenda(Set<Slot> agenda) {
-        this.agenda = agenda;
+    public void setSchedule(List<Slot> schedule) {
+        this.schedule = schedule;
     }
 
     public void setScheduleRestrictions(List<RestrictSlot> list) {

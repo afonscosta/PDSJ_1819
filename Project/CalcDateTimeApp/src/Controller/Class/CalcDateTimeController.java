@@ -111,7 +111,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 case "FL": flowSetDateFormatLocal(); configChanged = true; break;
                 case "FF": flowSetDateFormatZoned(); configChanged = true; break;
                 case "F": flowSetZone(); configChanged = true; statusMessage = "Fuso local modificado"; break;
-                case "H": flowRestrictSchedule();
+                case "H": flowRestrictSchedule(); break;
                 case "?": helpConfig(); statusMessage = "n/a"; break;
                 case "S": break;
                 default: errorMessage = "Opcao Invalida!"; break;

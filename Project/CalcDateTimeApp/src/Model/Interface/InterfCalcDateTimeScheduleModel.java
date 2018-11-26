@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 public interface InterfCalcDateTimeScheduleModel {
@@ -21,8 +22,6 @@ public interface InterfCalcDateTimeScheduleModel {
     Collection getScheduleRestrictions();
 
     boolean addSlot(Slot newSlot, Collection c);
-
-    void saveState(String nomeFicheiro) throws IOException;
 
     List<String> getMainInfoSlots(ZoneId referenceZoneId, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
 
