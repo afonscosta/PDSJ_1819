@@ -1,13 +1,22 @@
 package Utilities;
 
+import Model.Class.RestrictSlot;
 import Model.Class.Slot;
 
 import java.io.*;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class Configs implements Serializable{
+
+    private Set<Slot> agenda;
+    private List<RestrictSlot> scheduleRestrictions;
+    private String zoneDateTimeFormat;
+    private String localDateTimeFormat;
+    private String zoneId;
 
     public static Configs of (String pathToFile) {
         try {
@@ -29,18 +38,18 @@ public class Configs implements Serializable{
 
     public Configs() {
         this.agenda = new TreeSet<>();
+        this.scheduleRestrictions = new ArrayList<>();
         this.zoneDateTimeFormat = "yyyy/MM/dd H:m:s:n - VV";
         this.localDateTimeFormat = "yyyy/MM/dd H:m:s:n";
         this.zoneId = ZoneId.systemDefault().toString();
     }
 
-    private Set<Slot> agenda;
-    private String zoneDateTimeFormat;
-    private String localDateTimeFormat;
-    private String zoneId;
-
-    public Set<Slot> getAgenda() {
+    public Set<Slot> getSchedule() {
         return agenda;
+    }
+
+    public List<RestrictSlot> getScheduleRestrictions() {
+        return scheduleRestrictions;
     }
 
     public String getZoneDateTimeFormat() {
@@ -71,6 +80,10 @@ public class Configs implements Serializable{
         this.agenda = agenda;
     }
 
+    public void setScheduleRestrictions(List<RestrictSlot> list) {
+        this.scheduleRestrictions = list;
+    }
+
     public void setZoneDateTimeFormat(String zoneDateTimeFormat) {
         this.zoneDateTimeFormat = zoneDateTimeFormat;
     }
@@ -82,6 +95,5 @@ public class Configs implements Serializable{
     public void setZoneId(String zoneId) {
         this.zoneId = zoneId;
     }
-
 
 }

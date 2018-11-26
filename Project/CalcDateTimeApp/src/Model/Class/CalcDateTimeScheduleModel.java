@@ -21,7 +21,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleModel,Serializable {
-    private Set<Slot> agenda;
+    private Set<Slot> schedule;
+    private List<RestrictSlot> scheduleRestrictions;
     static final long serialVersionUID = 1L;
 
     private CalcDateTimeScheduleModel() {
@@ -41,13 +42,13 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                         if (data2.getClass().getSimpleName().equals("ZonedDateTime")) {
                             ldt2 = BusinessUtils.convertZoneDateTimeToSpecificZone(data2,referenceZone).toLocalDateTime();
                         }
-                        System.out.println("ldt1->" + ldt1.toString());
-                        System.out.println("ldt2->" + ldt2.toString());
+                        //System.out.println("ldt1->" + ldt1.toString());
+                        //System.out.println("ldt2->" + ldt2.toString());
 
                         if (ldt1.isBefore(ldt2)) {
                             Duration d1 = s1.getDuration();
                             LocalDateTime data1Final = ldt1.plus(d1);
-                            System.out.println("data1Final->" + data1Final);
+                            //System.out.println("data1Final->" + data1Final);
                             if (data1Final.isBefore(ldt2))
                                 return -1;
                             else {
@@ -56,7 +57,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                         } else {
                             Duration d2 = s2.getDuration();
                             LocalDateTime data2Final = ldt2.plus(d2);
-                            System.out.println("data2Final->" + data2Final);
+                            //System.out.println("data2Final->" + data2Final);
                             if (data2Final.isBefore(ldt1))
                                 return 1;
                             else {
@@ -65,7 +66,8 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                         }
                     }
                 };
-        this.agenda= new TreeSet<>(compDateSlots);
+        this.schedule= new TreeSet<>(compDateSlots);
+        this.scheduleRestrictions= new ArrayList<>();
     }
 
 
@@ -75,7 +77,8 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
 
     @Override
     public void loadConfigs(Configs configs) {
-        this.agenda = configs.getAgenda();
+        this.schedule = configs.getSchedule();
+        this.scheduleRestrictions = configs.getScheduleRestrictions();
     }
 
     //------------------------
@@ -91,7 +94,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
             // Json character escape nos ficheiros, portanto temos de os remover
             zoneIdTxt = zoneIdTxt.replaceAll("\\\\","");
             ZoneId zoneId = ZoneId.of(zoneIdTxt);
-            System.out.println(zoneId);
+            //System.out.println(zoneId);
             return zoneId;
 
         } catch (Exception e) {
@@ -100,14 +103,16 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         }
     }
 
-
-    @Override
-    public Set<Slot> getAgenda() {
-        return agenda;
+    public Set<Slot> getSchedule() {
+        return schedule;
     }
 
-    public void setAgenda(Set<Slot> agenda) {
-        this.agenda = agenda;
+    public List<RestrictSlot> getScheduleRestrictions() {
+        return scheduleRestrictions;
+    }
+
+    public void setschedule(Set<Slot> schedule) {
+        this.schedule = schedule;
     }
 
     //------------------------
@@ -118,8 +123,18 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     public List<String> getMainInfoSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
         List<String> res= new ArrayList();
         int index =0;
-        for(Slot s : agenda) {
+        for(Slot s : schedule) {
             res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone,dtfLocal,dtfZone) + " || " + s.getLocal());
+            index ++;
+        }
+        return res;
+    }
+
+    public List<String> getRestrictSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
+        List<String> res= new ArrayList();
+        int index =0;
+        for(RestrictSlot s: scheduleRestrictions){
+            res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone,dtfLocal,dtfZone) + " || " + s.getPeriod());
             index ++;
         }
         return res;
@@ -127,14 +142,14 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
 
     //------------------------
     // ModeNormalized: diaria, semanal, mensal
-    // want -> a igualdade a verficar na agenda
+    // want -> a igualdade a verficar na schedule
     // Por exemplo, utilizador escolhe diaria -> want diz-me o dia referente
     //------------------------
 
-    public List<String> getRestrictSlots(String modeNormalized, int want, ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
+    public List<String> getModeSlots(String modeNormalized, int want, ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
         List<String> res= new ArrayList();
         int index =0;
-        for(Slot s : agenda) {
+        for(Slot s : schedule) {
             ZonedDateTime date = ZonedDateTime.from(s.getData());
             switch (modeNormalized) {
                 case "diaria":
@@ -163,23 +178,21 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     }
 
     //------------------------
-    // Adicionar uma reunião à agenda
+    // Adicionar uma reunião à schedule
     //------------------------
-    public boolean addSlot(Slot newSlot){
-        boolean add = agenda.add(newSlot);
-
-        return add;
+    public boolean addSlot(Slot newSlot, Collection c){
+        return c.add(newSlot);
     }
 
     //------------------------
-    // Remover uma reunião da agenda
+    // Remover uma reunião da schedule
     //------------------------
-    public boolean removeSlot(Slot s){
-        return agenda.remove(s);
+    public boolean removeSlot(Slot s, Collection c){
+        return c.remove(s);
     }
 
     //------------------------
-    // Adicionar uma reunião à agenda
+    // Adicionar uma reunião à schedule
     //------------------------
     public void editSlot(Slot s, EnumEditSlotInfo e, String edit){
             switch (e){
@@ -199,11 +212,11 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     public Slot editDurationSlot(Slot s, Duration newDuration) {
         Slot temp = s.clone();
-        removeSlot(s);
-        Slot newSlot = new Slot(temp.getData(),newDuration,temp.getLocal(),temp.getDescription());
-        boolean add = addSlot(newSlot);
+        removeSlot(s,schedule);
+        Slot newSlot = Slot.of(temp.getData(),newDuration,temp.getLocal(),temp.getDescription());
+        boolean add = addSlot(newSlot,schedule);
         if(add==false) {
-            addSlot(temp);
+            addSlot(temp,schedule);
             return temp;
         }
         return newSlot;
@@ -215,27 +228,29 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     public Slot editDateSLot(Slot s, Temporal data){
         Slot temp = s.clone();
-        removeSlot(s);
-        Slot newSlot = new Slot(data, temp.getDuration(),temp.getLocal(),temp.getDescription());
-        boolean add = addSlot(newSlot);
+        removeSlot(s,schedule);
+        Slot newSlot = Slot.of(data, temp.getDuration(),temp.getLocal(),temp.getDescription());
+        boolean add = addSlot(newSlot,schedule);
         if(add==false){
-            addSlot(temp);
+            System.out.println("No model não adicionou direito.");
+            addSlot(temp,schedule);
             return temp;
         }
+        System.out.println("No model adicionou direito.");
         return newSlot;
     }
 
     //------------------------
-    // Dado o idenficador gerado ao nivel da interface ao percorrer a agenda
+    // Dado o idenficador gerado ao nivel da interface ao percorrer a collection(schedule ou sch
     // Este identificador pode ser visto como temporário
     // Devolver o objecto que o identifica
     //------------------------
-    public Slot getSlot(String infoSlot){
+    public Slot getSlot(String infoSlot, Collection c){
         int id = Integer.parseInt(infoSlot);
         int index =0;
-        for(Slot s : agenda){
+        for(Object s : c){
             if(index==id){
-                return s;
+                return (Slot)s;
             }
             if(index>id)
                 return null;
@@ -243,7 +258,6 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         }
         return  null;
     }
-
 
     //------------------------
     // Guarda o estado do model pois este tem de ser persistente

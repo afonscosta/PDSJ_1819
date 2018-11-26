@@ -42,7 +42,7 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         op1 = new Opcao("Definir o formato das datas locais", "FL");
         op2 = new Opcao("Definir o formato das datas com fusos", "FF");
         op3 = new Opcao("Definir o fuso", "F");
-        op4 = new Opcao("Definir restricoes sobre o agendamento de reunioes","H");
+        op4 = new Opcao("Restricoes no agendamento de reunioes","H");
         op5 = new Opcao("Ajuda", "?");
         op6 = new Opcao("Voltar ao Menu Principal", "S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5, op6);
@@ -104,13 +104,46 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         menuMainTxt.addMenu(6, menuZonedFormatter);
 
         //------------------------
-        // Menu Configurações
+        // Menu restricoes
         //------------------------
-        op1 = new Opcao("Voltar ao Menu Configuracoes", "S");
-        linhas = Arrays.asList(op1);
-        Menu menuRetrictSlots = new Menu(linhas, "Nao permitir que haja agendamento de reunioes");
+        op1 = new Opcao("Aplicar uma restricao especifica", "E");
+        op2 = new Opcao("Aplicar uma restricao global sobre a agenda", "G");
+        op3 = new Opcao("Visualizar restricoes definidas","V");
+        op4 = new Opcao("Voltar ao Menu Configuracoes", "S");
+        linhas = Arrays.asList(op1,op2,op3,op4);
+        Menu menuRetrictSlots = new Menu(linhas, "Restricao");
         menuMainTxt.addMenu(7, menuRetrictSlots);
 
+        //------------------------
+        // Menu adicionar uma restricao
+        //------------------------
+        op1 = new Opcao("Restricao diaria", "Dia");
+        op2 = new Opcao("Restricao semanal", "Sem");
+        op3 = new Opcao("Voltar ao Menu Restricoes", "S");
+        linhas = Arrays.asList(op1,op2,op3);
+        Menu menuGlobalRetrictSlots = new Menu(linhas, "Mascara da restricao");
+        menuMainTxt.addMenu(8, menuGlobalRetrictSlots);
+
+        //------------------------
+        // Menu visualizar uma restricao
+        //------------------------
+        op1 = new Opcao("Pagina anterior", "<");
+        op2 = new Opcao("Pagina seguinte", ">");
+        op3 = new Opcao("Selecionar", "=<palavra>");
+        op4 = new Opcao("Voltar ao Menu Restricoes", "S");
+        linhas = Arrays.asList(op1,op2,op3,op4);
+        Menu menuRestrictNavigator = new Menu(linhas, "Restricoes definidas");
+        menuMainTxt.addMenu(9, menuRestrictNavigator);
+
+
+        //------------------------
+        // Menu remover uma restricao
+        //------------------------
+        op1 = new Opcao("Remover", "R");
+        op2 = new Opcao("Voltar ao Menu Restricoes", "S");
+        linhas = Arrays.asList(op1,op2);
+        Menu menuDeleteRestrict = new Menu(linhas, "Remover restricao");
+        menuMainTxt.addMenu(10, menuDeleteRestrict);
 
         return menuMainTxt;
     }
