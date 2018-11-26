@@ -74,6 +74,12 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
         return modelLocal.getZone();
     }
 
+    /*
+    public ZoneId getZoneZone() {
+        return modelZone.getZone();
+    }
+    */
+
     @Override
     public void setZoneId(ZoneId zoneId) {
         modelLocal.setZoneId(zoneId);
@@ -166,7 +172,6 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     @Override
     public void changeToCurrentDateInZone(String zoneId) {
         modelZone.changeToCurrentDateInZone(zoneId);
-
     }
 
     //------------------------

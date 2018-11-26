@@ -25,6 +25,22 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     private List<RestrictSlot> scheduleRestrictions;
     static final long serialVersionUID = 1L;
 
+    public static CalcDateTimeScheduleModel of(String nomeFicheiro) {
+        try {
+            FileInputStream fis = new FileInputStream(nomeFicheiro);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            CalcDateTimeScheduleModel scheduleModel = (CalcDateTimeScheduleModel) ois.readObject();
+            ois.close();
+            fis.close();
+            return scheduleModel;
+        }
+        catch(IOException | ClassNotFoundException e){
+            System.out.println("Problemas a trazer o tree set");
+            return CalcDateTimeScheduleModel.of();
+
+        }
+    }
+
     public static CalcDateTimeScheduleModel of() {
         return new CalcDateTimeScheduleModel();
     }

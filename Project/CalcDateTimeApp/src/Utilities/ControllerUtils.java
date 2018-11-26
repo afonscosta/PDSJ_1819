@@ -14,6 +14,15 @@ import static java.time.ZoneId.systemDefault;
 
 public class ControllerUtils {
 
+    /**
+     * TODO: VERIFICAR SE É CORRETO USAR CLEARCONSOLE COMO UM MÉTODO ESTÁTICO
+     */
+    public static void clearConsole() {
+        //Só deve funcionar para linux
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
     // Pede ao utilizador uma data.
     // Se não disser nada fica a que se encontra no modelLocal.
     // Devolve null caso dê uma exceção.
@@ -83,14 +92,11 @@ public class ControllerUtils {
                 out.println("[!] Nanosegundos invalidos.");
         }
 
-        if (zid != null)
-            return ZonedDateTime.of(year, month, day, hour, minute, second, nano, zid);
-        // Colocar o que está no ficheiro de configuração
-        return ZonedDateTime.of(year, month, day, hour, minute, second, nano, systemDefault());
+        return ZonedDateTime.of(year, month, day, hour, minute, second, nano, zid);
     }
 
     public static ZonedDateTime getZoneDateTimeFromInput(Menu menu, String zid, ZonedDateTime zdt) {
-        String zoneIdString = flowShowAllAvailableTimezonesAndGetNZoneIds(1, menu, zid).get(0);
+        String zoneIdString = flowGetNZoneIds(1, menu, zid).get(0);
         ZoneId zoneId = ZoneId.of(zoneIdString);
 
         return getDateTimeFromInput(zdt, zoneId);
@@ -160,14 +166,17 @@ public class ControllerUtils {
      */
     public static void flowHelp(Menu menu, List<String> l)  {
         String opcao;
+        String errorMessage = "n/a";
         do {
             menu.addDescToTitle(l);
+            menu.addErrorMessage(errorMessage);
+            errorMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
                 case "S": break;
-                default: out.println("Opcao Invalida!"); break;
+                default: errorMessage = "Opcao Invalida!"; break;
             }
         }
         while(!opcao.equals("S"));
@@ -188,7 +197,7 @@ public class ControllerUtils {
         return format;
     }
 
-    public static List<String> flowShowAllAvailableTimezonesAndGetNZoneIds(int zoneIdsWanted, Menu menu, String defaultZoneid) {
+    public static List<String> flowGetNZoneIds(int zoneIdsWanted, Menu menu, String defaultZoneid) {
         List<String> zoneIdList = new ArrayList<>();
         Boolean flowDone = false;
         List<List<String>> chosenZoneIdsByPage = partitionIntoPages(getSortedAvailableZoneIdsAndOffset(),25); // If someone looks for "europe", place matches it here

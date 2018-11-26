@@ -17,22 +17,23 @@ public class CalcDateTimeZoneView implements InterfCalcDateTimeZoneView {
 
     private Menus initView() {
         Menus menusZoneTxt = new Menus();
-        Opcao op1, op2, op3, op4, op5, op6, op7, op8, op9, op10;
+        Opcao op1, op2, op3, op4, op5, op6, op7, op8, op9, op10, op11;
 
         //------------------------
         // CaldDateTimeZone
         //------------------------
         op1 = new Opcao("Definir data", "C");
-        op2 = new Opcao("Aritmetica de datas", "A");
-        op3 = new Opcao("Aritmetica de dias uteis", "AU");
-        op4 = new Opcao("Diferenca entre datas", "D");
-        op5 = new Opcao("Diferenca entre datas (dias uteis)", "DU");
-        op6 = new Opcao("Tempo atual numa região", "T");
-        op7 = new Opcao("Converter para fuso", "F");
-        op8 = new Opcao("Diferenca entre dois fusos", "DF");
-        op9 = new Opcao("Ajuda", "?");
-        op10 = new Opcao("Sair da aplicacao", "S");
-        List<Opcao> linhas = Arrays.asList(op1,op2,op3,op4,op5,op6,op7,op8,op9,op10);
+        op2 = new Opcao("Reset para data atual", "R");
+        op3 = new Opcao("Aritmetica de datas", "A");
+        op4 = new Opcao("Aritmetica de dias uteis", "AU");
+        op5 = new Opcao("Diferenca entre datas", "D");
+        op6 = new Opcao("Diferenca entre datas (dias uteis)", "DU");
+        op7 = new Opcao("Tempo atual numa região", "T");
+        op8 = new Opcao("Converter para fuso", "F");
+        op9 = new Opcao("Diferenca entre dois fusos", "DF");
+        op10 = new Opcao("Ajuda", "?");
+        op11 = new Opcao("Sair da aplicacao", "S");
+        List<Opcao> linhas = Arrays.asList(op1,op2,op3,op4,op5,op6,op7,op8,op9,op10,op11);
         Menu menuCalcDateTimeZone = new Menu(linhas,"Menu Calculadora de Zonas");
         menusZoneTxt.addMenu(0,menuCalcDateTimeZone);
 

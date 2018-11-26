@@ -21,23 +21,8 @@ public interface InterfCalcDateTimeScheduleModel {
 
     boolean addSlot(Slot newSlot, Collection c);
 
-    void saveState(String nomeFicheiro)throws IOException;
+    void saveState(String nomeFicheiro) throws IOException;
 
-    static InterfCalcDateTimeScheduleModel pushState(String nomeFicheiro) {
-        try {
-            FileInputStream fis = new FileInputStream(nomeFicheiro);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            InterfCalcDateTimeScheduleModel scheduleModel = (InterfCalcDateTimeScheduleModel) ois.readObject();
-            ois.close();
-            fis.close();
-            return scheduleModel;
-        }
-        catch(IOException | ClassNotFoundException e){
-            System.out.println("Problemas a trazer o tree set");
-            return CalcDateTimeScheduleModel.of();
-
-        }
-    }
     List<String> getMainInfoSlots(ZoneId referenceZoneId, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
 
     List<String> getModeSlots(String modeNormalized, int want,ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
