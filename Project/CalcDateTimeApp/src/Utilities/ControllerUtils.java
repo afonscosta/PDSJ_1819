@@ -89,6 +89,13 @@ public class ControllerUtils {
         return ZonedDateTime.of(year, month, day, hour, minute, second, nano, systemDefault());
     }
 
+    public static ZonedDateTime getZoneDateTimeFromInput(Menu menu, String zid, ZonedDateTime zdt) {
+        String zoneIdString = flowShowAllAvailableTimezonesAndGetNZoneIds(1, menu, zid).get(0);
+        ZoneId zoneId = ZoneId.of(zoneIdString);
+
+        return getDateTimeFromInput(zdt, zoneId);
+    }
+
     //------------------------
     // Alterar Apenas o Time de uma ZonedDateTime
     //------------------------

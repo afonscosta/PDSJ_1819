@@ -146,7 +146,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     }
 
     private void flowDiffInTimeZones() {
-        List<String> zoneIdsTxt = flowShowAllAvailableTimezonesAndGetNZoneIds(2, viewZoneTxt.getMenu(4), model.getZoneDateTimeZone());
+        List<String> zoneIdsTxt = flowShowAllAvailableTimezonesAndGetNZoneIds(2, viewZoneTxt.getMenu(4), model.getZoneZone());
 
         ZoneId zoneId1 = ZoneId.of(zoneIdsTxt.get(0));
         ZoneId zoneId2 = ZoneId.of(zoneIdsTxt.get(1));
@@ -186,7 +186,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     private void diffWorkDaysDateTimeZone() {
         ZonedDateTime toDateTime = null;
         while(toDateTime == null) {
-            toDateTime = getZoneDateTimeFromInput();
+            toDateTime = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), model.getZoneZone(), (ZonedDateTime) model.getDateTimeZone());
         }
         String resDiff = model.diffWorkDaysDateTimeZone(toDateTime);
 
@@ -220,7 +220,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     private void fromDateTimeLocal() {
         ZonedDateTime newLDT = null;
         while(newLDT == null) {
-            newLDT = getZoneDateTimeFromInput();
+            newLDT = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), model.getZoneZone(), (ZonedDateTime) model.getDateTimeZone());
         }
         model.fromDateTimeZone(newLDT);
     }
@@ -228,7 +228,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     private void diffDateTimeLocal() {
         ZonedDateTime toDateTime = null;
         while(toDateTime == null) {
-            toDateTime = getZoneDateTimeFromInput();
+            toDateTime = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), model.getZoneZone(), (ZonedDateTime) model.getDateTimeZone());
         }
         String resDiff = model.diffDateTimeZone(toDateTime);
 
@@ -257,23 +257,17 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     }
 
     private void setDateTimeZone() {
-        ZonedDateTime zdt = getZoneDateTimeFromInput();
+        ZonedDateTime zdt = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), model.getZoneZone(), (ZonedDateTime) model.getDateTimeZone());
         model.fromDateTimeZone(zdt);
     }
 
-    private ZonedDateTime getZoneDateTimeFromInput() {
-        String zoneIdString = flowShowAllAvailableTimezonesAndGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneDateTimeZone()).get(0);
-        ZoneId zoneId = ZoneId.of(zoneIdString);
-
-        return getDateTimeFromInput((ZonedDateTime) model.getDateTimeZone(), zoneId);
-    }
 
     //------------------------
     // FlowShowCurrentTimeInZone
     //------------------------
     // Saber que data atual é numa certa região
     private void flowShowCurrentTimeInZone() {
-        String answerZone = flowShowAllAvailableTimezonesAndGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneDateTimeZone()).get(0);
+        String answerZone = flowShowAllAvailableTimezonesAndGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneZone()).get(0);
 
             model.changeToCurrentDateInZone(answerZone);
     }
@@ -313,7 +307,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     // Pedir para que zona queremos mudar a data
     private void flowConvertZone() {
         try {
-            String answerZone = flowShowAllAvailableTimezonesAndGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneDateTimeZone()).get(0);
+            String answerZone = flowShowAllAvailableTimezonesAndGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneZone()).get(0);
 
             model.withZoneZone(answerZone);
         }

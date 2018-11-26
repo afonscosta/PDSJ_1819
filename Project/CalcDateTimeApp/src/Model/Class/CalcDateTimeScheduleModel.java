@@ -408,9 +408,11 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         Slot newSlot = Slot.of(data, temp.getDuration(),temp.getLocal(),temp.getDescription());
         boolean add = addSlot(newSlot,schedule);
         if(add==false){
+            System.out.println("No model não adicionou direito.");
             addSlot(temp,schedule);
             return temp;
         }
+        System.out.println("No model adicionou direito.");
         return newSlot;
     }
 
