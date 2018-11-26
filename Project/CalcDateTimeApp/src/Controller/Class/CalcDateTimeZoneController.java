@@ -72,7 +72,6 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
                 case "AU": flowShiftWorkDaysDateTimeZone(); break;
                 case "D": flowDiffDateTimeZone(); break;
                 case "DU": flowDiffWorkDaysDateTimeZone(); break;
-                case "T": flowShowCurrentTimeInZone(); statusMessage = "Data convertida para tempo atual no fuso escolhido"; break;
                 case "F": flowConvertZone(); statusMessage = "Data convertida para o fuso escolhido"; break;
                 case "DF": flowDiffInTimeZones(); break;
                 case "?" : help(); break;
@@ -273,15 +272,6 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     private void setDateTimeZone() {
         ZonedDateTime zdt = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), model.getZoneZone(), (ZonedDateTime) model.getDateTimeZone());
         model.fromDateTimeZone(zdt);
-    }
-
-    //------------------------
-    // FlowShowCurrentTimeInZone
-    //------------------------
-    // Saber que data atual é numa certa região
-    private void flowShowCurrentTimeInZone() {
-        String answerZone = flowGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneZone()).get(0);
-        model.changeToCurrentDateInZone(answerZone);
     }
 
     private void flowShiftZoneDateTime() {
