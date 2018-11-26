@@ -1,27 +1,27 @@
 package Model.Interface;
 
-import Model.Class.CalcDateTimeScheduleModel;
-import Model.Class.RestrictSlot;
 import Model.Class.Slot;
+import Utilities.Configs;
 import Utilities.EnumEditSlotInfo;
 
-import java.io.*;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 public interface InterfCalcDateTimeScheduleModel {
+
+    void loadConfigs(Configs configs);
 
     Collection getSchedule();
 
     Collection getScheduleRestrictions();
 
     boolean addSlot(Slot newSlot, Collection c);
-
-    void saveState(String nomeFicheiro) throws IOException;
 
     List<String> getMainInfoSlots(ZoneId referenceZoneId, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
 

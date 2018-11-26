@@ -103,7 +103,6 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     private void flowAddSlot(){
         Menu menu = viewScheduleTxt.getMenu(3);
         String opcao;
-        String errorMessage = "n/a";
         do {
             Temporal tempLocal = model.getDateTimeLocal();
             Temporal tempZone = model.getDateTimeZone();
@@ -111,8 +110,6 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             String zdt = zoneDateTimeToString((ZonedDateTime)tempZone, getDateTimeFormatterZoned());
             menu.addDescToTitle(Arrays.asList("Data calc. local: " + ldt,
                     "Data calc. com fusos: " + zdt));
-            menu.addErrorMessage(errorMessage);
-            errorMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -122,7 +119,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                 case "ML": Temporal date = getDateFromInput("ML");addSlot(date); break;
                 case "MF":  date = getDateFromInput("MF");addSlot(date); break;
                 case "S": break;
-                default: errorMessage = "Opcao Invalida !"; break;
+                default: System.out.println("Opcao Invalida !"); break;
             }
         }
         //Come back to init menu of Agenda
@@ -298,8 +295,6 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         do {
             String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
             menu.addDescToTitle(Arrays.asList("Data: " + dataToShow));
-            menu.addErrorMessage(errorMessage);
-            errorMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -344,8 +339,6 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             menu.addDescToTitle(Arrays.asList(dataToShow,
                     s.getLocal(), s.getDuration().toString(),
                     s.getDescription()));
-            menu.addErrorMessage(errorMessage);
-            errorMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -357,6 +350,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                 case "S": break;
                 default: errorMessage = "Opcao Invalida !"; break;
             }
+
         }
         while (!opcao.equals("S"));
         return s;
@@ -410,6 +404,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             out.print("Prima Enter para continuar.");
             Input.lerString();
             return s;
+
         }
 
     //------------------------
@@ -420,12 +415,12 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     private Slot flowEditDataSlot(Slot s) {
         Menu menu = viewScheduleTxt.getMenu(5);
         String opcao;
-        String statusMessage = "n/a";
         String errorMessage = "n/a";
         DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
         DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
         do {
             Temporal data = s.getData();
+
             String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
             menu.addDescToTitle(Arrays.asList(dataToShow));
             menu.addErrorMessage(errorMessage);
@@ -446,7 +441,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     }
                     if (s.getData().equals(data)) {
                         System.out.println("Entrou no if no controller.");
-                        statusMessage = "Alteracao efetuada com sucesso!";
+                        errorMessage = "Alteracao efetuada com sucesso!";
                     } else {
                         System.out.println("Entrou no else no controller.");
                         //errorMessage = "Sobreposicao de reunioes!";
@@ -456,7 +451,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     data = shiftDateTime(data,ControllerUtils.shift("dias"), DAYS);
                     s = model.editDateSLot(s, data);
                     if (s.getData().equals(data)) {
-                        statusMessage = "Alteracao efetuada com sucesso!";
+                        errorMessage = "Alteracao efetuada com sucesso!";
                     } else {
                         //errorMessage = "Sobreposicao de reunioes!";
                     }
@@ -465,7 +460,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     data = shiftDateTime(data,ControllerUtils.shift("semanas"), WEEKS);
                     s = model.editDateSLot(s, data);
                     if (s.getData().equals(data)) {
-                        statusMessage = "Alteracao efetuada com sucesso!";
+                        errorMessage = "Alteracao efetuada com sucesso!";
                     } else {
                         //errorMessage = "Sobreposicao de reunioes!";
                     }
@@ -474,7 +469,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     data = shiftDateTime(data,ControllerUtils.shift("meses"), MONTHS);
                     s = model.editDateSLot(s, data);
                     if (s.getData().equals(data)) {
-                        statusMessage = "Alteracao efetuada com sucesso!";
+                        errorMessage = "Alteracao efetuada com sucesso!";
                     } else {
                         //errorMessage = "Sobreposicao de reunioes!";
                     }
@@ -483,7 +478,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     data = shiftDateTime(data,ControllerUtils.shift("anos"), YEARS);
                     s = model.editDateSLot(s, data);
                     if (s.getData().equals(data)) {
-                        statusMessage = "Alteracao efetuada com sucesso!";
+                        errorMessage = "Alteracao efetuada com sucesso!";
                     } else {
                         //errorMessage = "Sobreposicao de reunioes!";
                     }
@@ -492,7 +487,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     data = shitTime(ZonedDateTime.from(data));
                     s = model.editDateSLot(s,data);
                     if (s.getData().equals(data)) {
-                        statusMessage = "Alteracao efetuada com sucesso!";
+                        errorMessage = "Alteracao efetuada com sucesso!";
                     } else {
                         //errorMessage = "Sobreposicao de reunioes!";
                     }
@@ -504,7 +499,6 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         while (!opcao.equals("S")) ;
         return s;
     }
-
     //------------------------
     // Detalhes do slot selecionado
     //------------------------
@@ -538,59 +532,45 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     //------------------------
     private void help() {
         List<String> l = asList(
-            BLACK_BOLD + "Opcoes:" + RESET,
-            BLACK_BOLD + "/<vista>" + RESET +
-                    " Permite ter uma visao diaria, semanal ou mensal",
-            "         das reunioes. Se pretender uma visao diaria devera ",
-            "         introduzir" + RESET + BLACK_BOLD + " /diaria " + RESET + "onde lhe sera apresentado",
-            "         inicialmente as reunioes do dia corrente.",
-            "         Caso pretenda visualizar todas as reunioes",
-            "         agendadas devera introduzir apenas" + RESET + BLACK_BOLD + " /" + RESET + ".",
-            "         O principio e o mesmo para os restantes",
-            "         modos de visualizacao."+ RESET,
-            " ",
-            BLACK_BOLD + "<" + RESET +
-                    "        Recuar a pagina que esta ser apresentada.",
-            BLACK_BOLD + ">" + RESET +
-                    "        Avancar a pagina que esta ser apresentada.",
-            " ",
-            BLACK_BOLD + ">>" + RESET +
-                    "       Caso prentenda avancar no dia/semana/mes referente",
-            "         ao modo de visualizacao. Por exemplo, foi selecionada",
-            "         a vista diaria em que inicialmente mostra as reunioes",
-            "         do dia corrente. Caso pretenda ver do dia seguinte,",
-            "         devera usar esta opcao, e assim sucessivamente.",
-            "         Para a vista semanal, ira apresentar da proxima semana",
-            "         e o mesmo principio para a vista mensal.",
-            BLACK_BOLD + "<<" + RESET +
-                    "       Da mesma forma que a anterior, esta opcao permite recuar um",
-            "         dia, semana ou mes de acordo com o modo de visualizacao.",
-            "         Estas duas ultimas opcoes permitem navegar sempre com a",
-            "         apresentacao no mesmo intervalo.",
-            " ",
-            BLACK_BOLD + "=<id>" + RESET +
-                    "   Cada reuniao contem antes da sua descricao",
-            "         um identificador.",
-            "         Pretendendo selecionar, por exemplo, a reuniao",
-            "         com o identifcador 0, o utilizador devera introduzir",
-            "         a opcao "+ RESET + BLACK_BOLD + "=0" + RESET +".",
-            "         No novo menu apresentado podera alterar qualquer ",
-            "         dado da reuniao, remover ou ver detalhes da mesma."
+                BLACK_BOLD + "Opcoes:" + RESET,
+                BLACK_BOLD + "/<vista>" + RESET +
+                        " Permite ter uma visao diaria, semanal ou mensal",
+                "         das reunioes. Se pretender uma visao diaria devera ",
+                "         introduzir" + RESET + BLACK_BOLD + " /diaria " + RESET + "onde lhe sera apresentado",
+                "         inicialmente as reunioes do dia corrente.",
+                "         Caso pretenda visualizar todas as reunioes",
+                "         agendadas devera introduzir apenas" + RESET + BLACK_BOLD + " /" + RESET + ".",
+                "         O principio e o mesmo para os restantes",
+                "         modos de visualizacao."+ RESET,
+                " ",
+                BLACK_BOLD + "<" + RESET +
+                        "        Recuar a pagina que esta ser apresentada.",
+                BLACK_BOLD + ">" + RESET +
+                        "        Avancar a pagina que esta ser apresentada.",
+                " ",
+                BLACK_BOLD + ">>" + RESET +
+                        "       Caso prentenda avancar no dia/semana/mes referente",
+                "         ao modo de visualizacao. Por exemplo, foi selecionada",
+                "         a vista diaria em que inicialmente mostra as reunioes",
+                "         do dia corrente. Caso pretenda ver do dia seguinte,",
+                "         devera usar esta opcao, e assim sucessivamente.",
+                "         Para a vista semanal, ira apresentar da proxima semana",
+                "         e o mesmo principio para a vista mensal.",
+                BLACK_BOLD + "<<" + RESET +
+                        "       Da mesma forma que a anterior, esta opcao permite recuar um",
+                "         dia, semana ou mes de acordo com o modo de visualizacao.",
+                "         Estas duas ultimas opcoes permitem navegar sempre com a",
+                "         apresentacao no mesmo intervalo.",
+                " ",
+                BLACK_BOLD + "=<id>" + RESET +
+                        "   Cada reuniao contem antes da sua descricao",
+                "         um identificador.",
+                "         Pretendendo selecionar, por exemplo, a reuniao",
+                "         com o identifcador 0, o utilizador devera introduzir",
+                "         a opcao "+ RESET + BLACK_BOLD + "=0" + RESET +".",
+                "         No novo menu apresentado podera alterar qualquer ",
+                "         dado da reuniao, remover ou ver detalhes da mesma."
         );
         flowHelp(viewScheduleTxt.getMenu(7),l);
-    }
-
-    //------------------------
-    // Persistência ao nivel do model das reuniões
-    //------------------------
-    public void saveState(){
-        try{
-            model.saveState("AgendaReunioes");
-        } catch (IOException e) {
-            e.printStackTrace();
-            out.println(RED_BOLD + "Não foi possivel guardar o estado da aplicação");
-            out.print("Prima Enter para continuar.");
-            Input.lerString();
-        }
     }
 }

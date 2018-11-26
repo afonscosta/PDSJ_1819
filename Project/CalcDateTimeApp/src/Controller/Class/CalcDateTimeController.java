@@ -18,8 +18,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
-import java.time.temporal.TemporalField;
-import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +26,6 @@ import static Utilities.BusinessUtils.getIdSlot;
 import static Utilities.BusinessUtils.partitionIntoPages;
 import static Utilities.ConsoleColors.*;
 import static Utilities.ControllerUtils.*;
-import static java.lang.System.err;
 import static java.lang.System.out;
 import static java.util.Arrays.asList;
 
@@ -86,7 +83,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 case "A" : controlSchedule.flowSchedule(); break;
                 case "C" : flowConfig(); break;
                 case "?" : helpMain(); break;
-                case "S": controlSchedule.saveState(); break; //É aqui que se guarda os DateTimeFormatter's e o localZone
+                case "S": model.saveConfigs(); break;
                 default: errorMessage = "Opcao Invalida!"; break;
             }
         }
@@ -115,7 +112,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 case "FF": flowSetDateFormatZoned(); configChanged = true; break;
                 case "F": flowSetZone(); configChanged = true; statusMessage = "Fuso local modificado"; break;
                 case "H": flowRestrictSchedule(); break;
-                case "?": helpConfig(); break;
+                case "?": helpConfig(); statusMessage = "n/a"; break;
                 case "S": break;
                 default: errorMessage = "Opcao Invalida!"; break;
             }

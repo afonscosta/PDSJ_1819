@@ -2,10 +2,8 @@ package Model.Class;
 
 import Model.Interface.InterfCalcDateTimeLocalModel;
 import Utilities.BusinessUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import Utilities.Configs;
 
-import java.io.FileReader;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -19,15 +17,21 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
     private ZonedDateTime ldt;
     private String localDateTimeFormat;
 
+    protected CalcDateTimeLocalModel() {
+        this.ldt = ZonedDateTime.now();
+        this.localDateTimeFormat = "yyyy/MM/dd H:m:s:n";
+    }
+
     public static CalcDateTimeLocalModel of () {
         return new CalcDateTimeLocalModel();
     }
 
-    protected CalcDateTimeLocalModel() {
-        // Iniciar variável
-        this.ldt = ZonedDateTime.now();
-        readConfFileAndLoadLocalRelated();
-        // Colocar como default o "now" mas nesta nova zona
+    @Override
+    public void loadConfigs(Configs configs) {
+        this.setLocalDateTimeFormat(configs.getLocalDateTimeFormat());
+        this.setZoneId(ZoneId.of(configs.getZoneId()));
+
+        // Reset do buffer para data atual
         this.ldt = ZonedDateTime.now(this.ldt.getZone());
     }
 
@@ -91,38 +95,5 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
     @Override
     public ZoneId getZone() {
        return ldt.getZone();
-    }
-
-    private void readConfFileAndLoadLocalRelated() {
-
-        String pathToConfFile = "./date_dict_conf.json";
-
-        JSONParser parser = new JSONParser();
-
-        try {
-            Object obj = parser.parse(new FileReader(pathToConfFile));
-
-            JSONObject jsonObj = (JSONObject) obj;
-
-            String localDateTimeFormat = (String) jsonObj.get("localDateTimeFormat");
-
-            String zoneIdTxt = ((String) jsonObj.get("zoneId"));
-
-            // Json character escape nos ficheiros, portanto temos de os remover
-            zoneIdTxt = zoneIdTxt.replaceAll("\\\\","");
-
-            // Variavel vem no formato "palavra", temos de remover pelicas
-            zoneIdTxt = zoneIdTxt.replaceAll("\"","");
-
-            ZoneId zoneId = ZoneId.of(zoneIdTxt);
-
-            this.setLocalDateTimeFormat(localDateTimeFormat);
-            this.setZoneId(zoneId);
-
-            // Caso de erro, adicionar o default
-        } catch (Exception e) {
-            this.setLocalDateTimeFormat("yyyy/MM/dd H:m:s:n");
-            this.setZoneId(ZoneId.systemDefault());
-        }
     }
 }

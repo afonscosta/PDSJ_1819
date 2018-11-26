@@ -50,8 +50,6 @@ public interface InterfCalcDateTimeModel {
 
     String getZoneDateTimeFormat();
 
-    void setZoneId(ZoneId zoneId);
-
     String getZoneZone();
 
     void setZoneDateTimeFormat(String zoneDateTimeFormat);
@@ -66,8 +64,6 @@ public interface InterfCalcDateTimeModel {
     Métodos de acesso ao Model Schedule
  */
     boolean addSlot(Slot newSlot,Collection c);
-
-    void saveState(String nomeFicheiro) throws IOException;
 
     List<String> getMainInfoSlots(ZoneId referenceZoneId, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
 

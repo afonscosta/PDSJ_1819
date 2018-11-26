@@ -2,6 +2,7 @@ package Model.Class;
 
 import Model.Interface.InterfCalcDateTimeScheduleModel;
 import Utilities.BusinessUtils;
+import Utilities.Configs;
 import Utilities.EnumEditSlotInfo;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -23,88 +24,80 @@ import static java.time.temporal.ChronoUnit.HOURS;
 public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleModel,Serializable {
     private Set<Slot> schedule;
     private List<RestrictSlot> scheduleRestrictions;
+
+    private Comparator<Slot> slotComparator;
     static final long serialVersionUID = 1L;
 
-    public static CalcDateTimeScheduleModel of(String nomeFicheiro) {
-        try {
-            FileInputStream fis = new FileInputStream(nomeFicheiro);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            CalcDateTimeScheduleModel scheduleModel = (CalcDateTimeScheduleModel) ois.readObject();
-            ois.close();
-            fis.close();
-            return scheduleModel;
-        }
-        catch(IOException | ClassNotFoundException e){
-            System.out.println("Problemas a trazer o tree set");
-            return CalcDateTimeScheduleModel.of();
+    private CalcDateTimeScheduleModel() {
+        slotComparator =
+                (Comparator<Slot> & Serializable)(Slot s1, Slot s2) -> {
+                    Temporal data1 = s1.getData();
+                    Temporal data2 = s2.getData();
+                    LocalDateTime ldt1 = LocalDateTime.from(data1);
+                    LocalDateTime ldt2 = LocalDateTime.from(data2);
+                    ZoneId referenceZone = getReferenceZone();
 
-        }
+                    if (data1.equals(data2)) return 0;
+                    else {
+                        if (data1.getClass().getSimpleName().equals("ZonedDateTime")) {
+                            ldt1 = BusinessUtils.convertZoneDateTimeToSpecificZone(data1, referenceZone).toLocalDateTime();
+                        }
+                        if (data2.getClass().getSimpleName().equals("ZonedDateTime")) {
+                            ldt2 = BusinessUtils.convertZoneDateTimeToSpecificZone(data2,referenceZone).toLocalDateTime();
+                        }
+                        //System.out.println("ldt1->" + ldt1.toString());
+                        //System.out.println("ldt2->" + ldt2.toString());
+
+                        if (ldt1.isBefore(ldt2)) {
+                            Duration d1 = s1.getDuration();
+                            LocalDateTime data1Final = ldt1.plus(d1);
+                            //System.out.println("data1Final->" + data1Final);
+                            if (data1Final.isBefore(ldt2))
+                                return -1;
+                            else {
+                                return 0;
+                            }
+                        } else {
+                            Duration d2 = s2.getDuration();
+                            LocalDateTime data2Final = ldt2.plus(d2);
+                            //System.out.println("data2Final->" + data2Final);
+                            if (data2Final.isBefore(ldt1))
+                                return 1;
+                            else {
+                                return 0;
+                            }
+                        }
+                    }
+                };
+        this.schedule= new TreeSet<>(slotComparator);
+        this.scheduleRestrictions= new ArrayList<>();
     }
 
     public static CalcDateTimeScheduleModel of() {
         return new CalcDateTimeScheduleModel();
     }
-
-    private CalcDateTimeScheduleModel() {
-        Comparator<Slot> compDateSlots =
-                (Comparator<Slot> & Serializable)(Slot s1, Slot s2) -> {
-                                Temporal data1 = s1.getData();
-                                Temporal data2 = s2.getData();
-                                LocalDateTime ldt1 = LocalDateTime.from(data1);
-                                LocalDateTime ldt2 = LocalDateTime.from(data2);
-                                ZoneId referenceZone = getReferenceZone();
-
-                                if (data1.equals(data2)) return 0;
-                                else {
-                                    if (data1.getClass().getSimpleName().equals("ZonedDateTime")) {
-                                        ldt1 = BusinessUtils.convertZoneDateTimeToSpecificZone(data1, referenceZone).toLocalDateTime();
-                                    }
-                                    if (data2.getClass().getSimpleName().equals("ZonedDateTime")) {
-                                        ldt2 = BusinessUtils.convertZoneDateTimeToSpecificZone(data2,referenceZone).toLocalDateTime();
-                                    }
-                                    System.out.println("ldt1->" + ldt1.toString());
-                                    System.out.println("ldt2->" + ldt2.toString());
-
-                                    if (ldt1.isBefore(ldt2)) {
-                                        Duration d1 = s1.getDuration();
-                                        LocalDateTime data1Final = ldt1.plus(d1);
-                                        //System.out.println("data1Final->" + data1Final);
-                                        if (data1Final.isBefore(ldt2))
-                                            return -1;
-                                        else {
-                                            return 0;
-                                        }
-                                    } else {
-                                        Duration d2 = s2.getDuration();
-                                        LocalDateTime data2Final = ldt2.plus(d2);
-                                        //System.out.println("data2Final->" + data2Final);
-                                        if (data2Final.isBefore(ldt1))
-                                            return 1;
-                                        else {
-                                            return 0;
-                                        }
-                                    }
-                                }
-                };
-                this.schedule= new TreeSet<>(compDateSlots);
-                this.scheduleRestrictions= new ArrayList<>();
+    @Override
+    public void loadConfigs(Configs configs) {
+        if (configs.getSchedule() != null) {
+            this.schedule.addAll(configs.getSchedule());
+        }
+        if (configs.getScheduleRestrictions() != null) {
+            this.scheduleRestrictions = configs.getScheduleRestrictions();
+        }
     }
 
     //------------------------
     // Retorna o ZonedId de definido no ficheiro de configurações
     //------------------------
     private ZoneId getReferenceZone(){
-        String pathToConfFile = "./date_dict_conf.json";
-        JSONParser parser = new JSONParser();
         try {
-            Object obj = parser.parse(new FileReader(pathToConfFile));
-            JSONObject jsonObj = (JSONObject) obj;
-            String zoneIdTxt = ((String) jsonObj.get("zoneId"));
-            // Json character escape nos ficheiros, portanto temos de os remover
-            zoneIdTxt = zoneIdTxt.replaceAll("\\\\","");
-            ZoneId zoneId = ZoneId.of(zoneIdTxt);
-            //System.out.println(zoneId);
-            return zoneId;
+            FileInputStream fis = new FileInputStream("./Configs");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            Configs configs = (Configs) ois.readObject();
+            ois.close();
+            fis.close();
+            System.out.println(configs.getZoneId());
+            return ZoneId.of(configs.getZoneId());
 
         } catch (Exception e) {
             return ZoneId.systemDefault();
@@ -449,16 +442,5 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         index ++;
         }
         return  null;
-    }
-
-    //------------------------
-    // Guarda o estado do model pois este tem de ser persistente
-    //------------------------
-    public void saveState(String nomeFicheiro) throws IOException {
-        FileOutputStream fos = new FileOutputStream(nomeFicheiro);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(this);
-        oos.close();
-        fos.close();
     }
 }
