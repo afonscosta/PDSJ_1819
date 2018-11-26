@@ -537,10 +537,8 @@ public class BusinessUtils {
             return false;
     }
     public static ZonedDateTime convertZoneDateTimeToSpecificZone (Temporal data,ZoneId referenceZone) {
-        System.out.println(data);
         ZonedDateTime zoneData= ZonedDateTime.from(data);
         zoneData = zoneData.withZoneSameInstant(referenceZone);
-        System.out.println(zoneData);
         return zoneData;
     }
 

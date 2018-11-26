@@ -7,17 +7,18 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.*;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static java.time.temporal.ChronoUnit.DAYS;
+import static java.time.temporal.ChronoUnit.HOURS;
 
 public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleModel,Serializable {
     private Set<Slot> schedule;
@@ -45,8 +46,8 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                                     if (data2.getClass().getSimpleName().equals("ZonedDateTime")) {
                                         ldt2 = BusinessUtils.convertZoneDateTimeToSpecificZone(data2,referenceZone).toLocalDateTime();
                                     }
-                                    //System.out.println("ldt1->" + ldt1.toString());
-                                    //System.out.println("ldt2->" + ldt2.toString());
+                                    System.out.println("ldt1->" + ldt1.toString());
+                                    System.out.println("ldt2->" + ldt2.toString());
 
                                     if (ldt1.isBefore(ldt2)) {
                                         Duration d1 = s1.getDuration();
@@ -122,6 +123,11 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         return res;
     }
 
+    //------------------------
+    // Devolve todas as restrições existentes
+    // É apresentada cada restrição de forma aglutinada, pela sua data e tipo de restrição definida(diaria, semanal ou pontual).
+    //------------------------
+
     public List<String> getRestrictSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
         List<String> res= new ArrayList();
         int index =0;
@@ -170,10 +176,188 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     }
 
     //------------------------
-    // Adicionar uma reunião à schedule
+    //Restrições que sejam definidas em que abrangem mais que uma, teram de ser separadas, para cada dia ser tratado individulamente
     //------------------------
-    public boolean addSlot(Slot newSlot, Collection c){
-        return c.add(newSlot);
+    public List<Slot> partitionSlot(Slot newSlot) {
+        List<Slot> slotsToAdd = new ArrayList<>();
+
+        Duration durationNewSlot = newSlot.getDuration();
+        LocalDateTime ldtNewSlot = BusinessUtils.convertZoneDateTimeToSpecificZone(newSlot.getData(), getReferenceZone()).toLocalDateTime();
+        System.out.println("ldt1->" + ldtNewSlot);
+        Temporal finalDate = ldtNewSlot.plus(durationNewSlot);
+        System.out.println("finalDate->" + finalDate);
+        //A duracao definida faz com passe da meia noite
+        if (!LocalDate.from(ldtNewSlot).equals(LocalDate.from(finalDate))) {
+            Duration durationFromMidnight;
+            do {
+                LocalDateTime ldt2 = LocalDateTime.from(ldtNewSlot);
+                //defino o limite superior do dia
+                ldt2 = ldt2.withHour(23);
+                ldt2 = ldt2.withMinute(59);
+                //duracao até ao limite deste dia
+                Duration durationUntilMidnight = Duration.between(ldtNewSlot, ldt2);
+                Slot slotUntilMidnight = newSlot.clone();
+                slotUntilMidnight.setDuration(durationUntilMidnight);
+                slotsToAdd.add(slotUntilMidnight);
+
+                //duracao que ainda falta considerar
+                durationFromMidnight = durationNewSlot.minus(durationUntilMidnight);
+                Slot slotFromMidnight = newSlot.clone();
+                //avanço no dia e defino no limite inferior do dia
+                Temporal dateFromMidnight = slotFromMidnight.getData();
+                dateFromMidnight= dateFromMidnight.plus(1,DAYS);
+                dateFromMidnight = dateFromMidnight.with(ChronoField.HOUR_OF_DAY,0);
+                dateFromMidnight = dateFromMidnight.with(ChronoField.MINUTE_OF_DAY,0);
+                slotFromMidnight.setData(dateFromMidnight);
+                slotFromMidnight.setDuration(durationFromMidnight);
+                if(durationFromMidnight.toHours() < 24) {
+                    //posso adicionar porque a sua duracao já foi restrita a menos de 24 horas
+                    slotsToAdd.add(slotFromMidnight);
+                }
+                else {
+                    newSlot = slotFromMidnight.clone();
+                    ldtNewSlot = BusinessUtils.convertZoneDateTimeToSpecificZone(newSlot.getData(), getReferenceZone()).toLocalDateTime();
+                    durationNewSlot = newSlot.getDuration();
+                }
+            }
+            while (durationFromMidnight.toHours() > 24);
+        }
+        else {
+            System.out.println("Não há problemas no slot");
+            slotsToAdd.add(newSlot);
+        }
+        System.out.println("-------SLOTS TO ADD:");
+        for (Slot s : slotsToAdd) {
+            System.out.println(s.getData() + "," + s.getDuration());
+        }
+        return slotsToAdd;
+    }
+
+    //------------------------
+    // compara em termos de LocalTime dois slots
+    //------------------------
+    public boolean compareTime(LocalTime ldt1, LocalTime ldt2, Slot newSlot, Slot s){
+        if (ldt1.isBefore(ldt2)) {
+            Duration d1 = newSlot.getDuration();
+            LocalTime data1Final = ldt1.plus(d1);
+            if (data1Final.isBefore(ldt2))
+                return true;
+            else {
+                return false;
+            }
+        } else {
+            Duration d2 = s.getDuration();
+            LocalTime data2Final = ldt2.plus(d2);
+            if (data2Final.isBefore(ldt1))
+                return true;
+            else {
+                return false;
+            }
+        }
+    }
+
+    //------------------------
+    // compara em termos de LocalDateTime dois slots
+    //------------------------
+    public boolean compareLocalDateTime(LocalDateTime ldt1, LocalDateTime ldt2, Slot newSlot, Slot s){
+        if (ldt1.isBefore(ldt2)) {
+            Duration d1 = newSlot.getDuration();
+            LocalDateTime data1Final = ldt1.plus(d1);
+            if (data1Final.isBefore(ldt2))
+                return true;
+            else {
+                return false;
+            }
+        } else {
+            Duration d2 = s.getDuration();
+            LocalDateTime data2Final = ldt2.plus(d2);
+            if (data2Final.isBefore(ldt1))
+                return true;
+            else {
+                return false;
+            }
+        }
+    }
+
+    //------------------------
+    // Só posso agendar uma reunião se não houver nenhuma restrição definida que sobreponha
+    //------------------------
+    public boolean doesNotBreakAnyRestrict(Slot newSlot){
+        boolean res;
+        LocalDateTime ldtNewSlot = BusinessUtils.convertZoneDateTimeToSpecificZone(newSlot.getData(), getReferenceZone()).toLocalDateTime();
+        for(RestrictSlot s : scheduleRestrictions){
+            LocalDateTime ldtRestrictSlot= LocalDateTime.from(s.getData());
+            if(s.getPeriod().equals("semanal")){
+               if(ldtNewSlot.getDayOfWeek().equals(ldtRestrictSlot.getDayOfWeek())){
+                   res = compareTime(LocalTime.from(ldtNewSlot),LocalTime.from(ldtRestrictSlot),newSlot,s);
+                   if(res==false) {
+                        System.out.println("SOBREPOSICAO COM A RESTRICAO: " + ldtRestrictSlot);
+                       return false;
+                   }
+               }
+            }
+            else if(s.getPeriod().equals("pontual")){
+                res = compareLocalDateTime(ldtNewSlot,ldtRestrictSlot,newSlot,s);
+                if(res==false) {
+                    System.out.println("SOBREPOSICAO COM A RESTRICAO: " + ldtRestrictSlot);
+                    return false;
+                }
+            }
+            else if(s.getPeriod().equals("diaria")){
+                res = compareTime(LocalTime.from(ldtNewSlot),LocalTime.from(ldtRestrictSlot),newSlot,s);
+                if(res==false) {
+                    System.out.println("SOBREPOSICAO COM A RESTRICAO: " + ldtRestrictSlot);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    //------------------------
+    // Só posso adicionar uma restrição se não houver nenhuma reunião já agendada que quebra a restrição que se pretenda adicionar
+    //------------------------
+
+    public boolean doesNotOverlapAnySchedule(List<Slot> slotsToAdd,Collection c){
+        boolean state=true;
+        for(Slot sToAdd : slotsToAdd) {
+            c.add(sToAdd);
+            for (Slot s : schedule) {
+                if (!doesNotBreakAnyRestrict(s)) {
+                    System.out.println("SOBREPOSICAO COM A REUNIAO AGENDADA->" + s.getData());
+                    c.remove(sToAdd);
+                    state = false;
+                    break;
+                }
+            }
+            if(!state)
+                break;
+
+        }
+        if(!state) {
+            for (Slot sToRemove : slotsToAdd) {
+                c.remove(sToRemove);
+            }
+        }
+            return state;
+    }
+
+    //------------------------
+    // Adicionar uma reunião ao schedule ou adicionar uma restrição ao scheduleRestrictions
+    // Só posso agendar uma reunião se não houver nenhuma restrição definida que sobreponha
+    // Só posso adicionar uma restrição se não houver nenhuma reunião já agendada que quebra a restrição que se pretenda adicionar
+    //------------------------
+    public boolean addSlot(Slot newSlot, Collection c) {
+        if(newSlot.getClass().getSimpleName().equals("Slot")){
+            if(doesNotBreakAnyRestrict(newSlot)){
+                return  c.add(newSlot);
+            }
+        }
+        else {
+            List<Slot> slotstoAdd = partitionSlot(newSlot);
+            return doesNotOverlapAnySchedule(slotstoAdd, c);
+        }
+        return false;
     }
 
     //------------------------

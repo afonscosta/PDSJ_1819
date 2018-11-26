@@ -106,8 +106,8 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         //------------------------
         // Menu restricoes
         //------------------------
-        op1 = new Opcao("Aplicar uma restricao especifica", "E");
-        op2 = new Opcao("Aplicar uma restricao global sobre a agenda", "G");
+        op1 = new Opcao("Adicionar restricao especifica", "E");
+        op2 = new Opcao("Adicionar restricao global sobre a agenda", "G");
         op3 = new Opcao("Visualizar restricoes definidas","V");
         op4 = new Opcao("Voltar ao Menu Configuracoes", "S");
         linhas = Arrays.asList(op1,op2,op3,op4);
@@ -119,7 +119,7 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         //------------------------
         op1 = new Opcao("Restricao diaria", "Dia");
         op2 = new Opcao("Restricao semanal", "Sem");
-        op3 = new Opcao("Voltar ao Menu Restricoes", "S");
+        op3 = new Opcao("Voltar ao Menu Configuracoes", "S");
         linhas = Arrays.asList(op1,op2,op3);
         Menu menuGlobalRetrictSlots = new Menu(linhas, "Mascara da restricao");
         menuMainTxt.addMenu(8, menuGlobalRetrictSlots);

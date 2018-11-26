@@ -14,12 +14,22 @@ public class Slot implements Serializable {
     public static Slot of (Temporal data, Duration duration, String local, String description) {
         return new Slot(data,duration,local,description);
     }
+    public static Slot of (Slot s) {
+        return new Slot(s);
+    }
 
     protected Slot(Temporal data, Duration duration, String local, String description) {
         this.data = data;
         this.duration = duration;
         this.local = local;
         this.description = description;
+    }
+
+    protected Slot(Slot s) {
+        this.data = s.getData();
+        this.duration = s.getDuration();
+        this.local = s.getLocal();
+        this.description = s.getDescription();
     }
 
     public Temporal getData() {
@@ -55,7 +65,7 @@ public class Slot implements Serializable {
     }
 
     public Slot clone(){
-        Slot res = of(data,duration,local,description);
+        Slot res = of(this);
         return res;
     }
 }
