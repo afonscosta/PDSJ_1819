@@ -111,7 +111,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 case "FL": flowSetDateFormatLocal(); configChanged = true; break;
                 case "FF": flowSetDateFormatZoned(); configChanged = true; break;
                 case "F": flowSetZone(); configChanged = true; statusMessage = "Fuso local modificado"; break;
-                case "H": flowRestrictSchedule(); break;
+                case "R": flowRestrictSchedule(); configChanged = true; break;
                 case "?": helpConfig(); statusMessage = "n/a"; break;
                 case "S": break;
                 default: errorMessage = "Opcao Invalida!"; break;
@@ -127,35 +127,32 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     private void flowRestrictSchedule(){
         Menu menu = viewMainTxt.getMenu(7);
         String opcao;
-        Boolean configChanged;
+        Boolean configChanged=false;
         String statusMessage = "n/a" ;
-        Boolean flowDone= false;
+        String erroMessage = "Ira definir uma periodo de tempo para o qual nao sera permitido agendar reunioes" ;
         do{
-            menu.addDescToTitle(Arrays.asList(RED_BOLD + "Ira definir uma periodo de tempo para o qual nao sera permitido agendar reunioes" + RESET));
             menu.addStatusMessage(statusMessage);
+            menu.addErrorMessage(erroMessage);
+            statusMessage = "n/a" ;
+            erroMessage = "n/a" ;
             menu.show();
             opcao= Input.lerString();
             opcao = opcao.toUpperCase();
             switch (opcao){
-                case "E":  configChanged=addRestrictSchedule("pontual");
-                            //flowDone=true;
-                            if(configChanged==true)
-                                statusMessage = "Limitacao de horario adicionada!";
-                            else
-                                statusMessage=(RED_BOLD +"Restricao em conflito com reunioes ja definidas!"+ RESET);
-                            break;
-                case "G": configChanged = flowGlobalRestrictSchedule();
-                           // flowDone = true;
-                            if(configChanged==true)
-                                statusMessage = "Limitacao de horario adicionada!";
-                            else
-                                statusMessage=(RED_BOLD +"Restricao em conflito com reunioes ja definidas!"+ RESET);
-                            break;
-                case "V": flowShowRestrictSchedule(); /*flowDone= true; */break;
-                case "S": flowDone = true; break;
+                case "E":  configChanged = addRestrictSchedule("pontual"); break;
+                case "G": flowGlobalRestrictSchedule(); break;
+                case "V": flowShowRestrictSchedule(); break;
+                case "S": break;
+            }
+            if(opcao.equals("E")){
+                if(configChanged)
+                    statusMessage = "Restricao adicionada com sucesso!";
+                else
+                    erroMessage = "Restricao em conflito com reunioes ja agendadas!";
+
             }
         }
-        while(!flowDone);
+        while(!opcao.equals("S"));
     }
 
     private void flowShowRestrictSchedule(){
@@ -212,7 +209,9 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     private void flowSelectRestrictSchedule(Slot s){
         Menu menu = viewMainTxt.getMenu(10);
         String opcao;
-        boolean flowDone=false;
+        boolean res=false;
+        String statusMessage = "n/a" ;
+        String erroMessage = "n/a" ;
         ZoneId referenceZone = ZonedDateTime.from(model.getDateTimeLocal()).getZone();
         DateTimeFormatter dtfLocal= DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat());
         DateTimeFormatter dtfZone = DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat());
@@ -222,30 +221,52 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                                             s.getDuration().toString(),
                                             s.getDescription())
             );
+            menu.addStatusMessage(statusMessage);
+            menu.addErrorMessage(erroMessage);
+            statusMessage = "n/a" ;
+            erroMessage = "n/a" ;
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch (opcao){
-                case "R": model.removeSlot(s,model.getScheduleRestrictions()); flowDone = true; break;
-                case "S": flowDone = true; break;
+                case "R": res = model.removeSlot(s,model.getScheduleRestrictions());break;
+                case "S": break;
 
             }
+            if(opcao.equals("R")){
+                if(res)
+                    statusMessage="Restricao removida com sucesso!";
+                else
+                    erroMessage="Nao e possivel remover a restricao...";
+            }
         }
-        while(!flowDone);
+        while(!opcao.equals("S"));
     }
 
     private boolean flowGlobalRestrictSchedule(){
         Menu menu = viewMainTxt.getMenu(8);
+        boolean configChanged= false;
         String opcao;
-
+        String statusMessage = "n/a" ;
+        String erroMessage = "n/a" ;
         do{
+            menu.addStatusMessage(statusMessage);
+            menu.addErrorMessage(erroMessage);
+            statusMessage = "n/a" ;
+            erroMessage = "n/a" ;
             menu.show();
             opcao= Input.lerString();
             opcao = opcao.toUpperCase();
             switch (opcao){
-                case "DIA": return addRestrictSchedule("diaria");
-                case "SEM": return addRestrictSchedule("semanal");
+                case "DIA": configChanged = addRestrictSchedule("diaria"); break;
+                case "SEM": configChanged = addRestrictSchedule("semanal"); break;
                 case "S": break;
+            }
+            if(opcao.equals("DIA") | opcao.equals("SEM")){
+                if(configChanged)
+                    statusMessage = "Restricao adicionada com sucesso!";
+                else
+                    erroMessage="Restricao em conflito com reunioes ja agendadas!";
             }
         }
         while(!(opcao.equals("S")));

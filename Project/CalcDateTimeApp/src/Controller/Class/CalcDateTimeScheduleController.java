@@ -103,27 +103,41 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     private void flowAddSlot(){
         Menu menu = viewScheduleTxt.getMenu(3);
         String opcao;
+        String statusMessage = "n/a";
+        String errorMessage = "n/a";
+        boolean res=false;
         do {
             Temporal tempLocal = model.getDateTimeLocal();
             Temporal tempZone = model.getDateTimeZone();
             String ldt = localDateTimeToString(tempLocal, getDateTimeFormatterLocal());
             String zdt = zoneDateTimeToString((ZonedDateTime)tempZone, getDateTimeFormatterZoned());
+            menu.addStatusMessage(statusMessage);
+            menu.addErrorMessage(errorMessage);
+            errorMessage = "n/a";
+            statusMessage = "n/a";
             menu.addDescToTitle(Arrays.asList("Data calc. local: " + ldt,
                     "Data calc. com fusos: " + zdt));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "L" : addSlot(tempLocal); break;
-                case "Z" : addSlot(tempZone); break;
-                case "ML": Temporal date = getDateFromInput("ML");addSlot(date); break;
-                case "MF":  date = getDateFromInput("MF");addSlot(date); break;
+                case "L" : res = addSlot(tempLocal);break;
+                case "Z" : res = addSlot(tempZone); break;
+                case "ML": Temporal date = getDateFromInput("ML");res = addSlot(date); break;
+                case "MF":  date = getDateFromInput("MF"); res = addSlot(date); break;
                 case "S": break;
-                default: System.out.println("Opcao Invalida !"); break;
+                default: errorMessage = "Opcao Invalida !"; break;
+            }
+            if(opcao.equals("L")| opcao.equals("Z") | opcao.equals("ML") | opcao.equals("MF")){
+                if(res){
+                    statusMessage="Reuniao adicionada com sucesso!";
+                }
+                else{
+                    errorMessage="Sobreposicao com reunioes ou restricoes...";
+                }
             }
         }
-        //Come back to init menu of Agenda
-        while(!(opcao.equals("S")| opcao.equals("L") | opcao.equals("Z") | opcao.equals("M")));
+        while(!(opcao.equals("S")));
     }
 
     public Temporal getDateFromInput(String typeOfDate){
@@ -139,7 +153,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     //------------------------
     // Adicionar uma nova reunião
     //------------------------
-    private void addSlot(Temporal date){
+    private boolean addSlot(Temporal date){
         out.println("Duracao da nova reuniao");
         out.print("Horas ira demorar: ");
         int horas = Input.lerInt();
@@ -164,14 +178,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             desc = Input.lerString();
         }
         Slot newSlot = Slot.of(date,duration,local,desc);
-        boolean res =model.addSlot(newSlot,model.getSchedule());
-        if(res == true){
-            System.out.println(GREEN_BOLD +"Reuniao adicionada com sucesso!" + RESET);
-        }
-        else
-            System.out.println(RED_BOLD +"Ja existe uma reuniao agendada ou a decorrer nesse data..." + RESET);
-        out.print("Prima Enter para continuar.");
-        Input.lerString();
+        return model.addSlot(newSlot,model.getSchedule());
     }
 
     //------------------------
@@ -183,6 +190,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         Menu menu = viewScheduleTxt.getMenu(1);
         List<String> description;
         String opcao;
+        String statusMessage = "n/a";
         String errorMessage = "n/a";
         String modeNormalized="";//identifca o modo geral
         int pageIndex = 0;
@@ -224,8 +232,10 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             description.add(String.format("Pagina (%s/%s)", pageIndexToDisplay, totalPages));
 
             menu.addDescToTitle(description);
+            menu.addStatusMessage(statusMessage);
             menu.addErrorMessage(errorMessage);
             errorMessage = "n/a";
+            statusMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
             opcao.toUpperCase();
@@ -290,37 +300,45 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         Menu menu = viewScheduleTxt.getMenu(2);
         String opcao;
         String errorMessage = "n/a";
+        String statusMessage= "n/a";
         DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
         DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
+        boolean res= false;
         do {
             String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
+            menu.addErrorMessage(errorMessage);
+            menu.addStatusMessage(statusMessage);
+            errorMessage="n/a";
+            statusMessage="n/a";
             menu.addDescToTitle(Arrays.asList("Data: " + dataToShow));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch (opcao) {
                 case "A": s = flowEditSlot(s); break;
-                case "R": removeSlot(s); break;
+                case "R": res= removeSlot(s); break;
                 case "D": slotDetails(s); break;
                 case "S": break;
                 default: errorMessage = "Opcao Invalida !"; break;
             }
+            if(opcao.equals("R")){
+                    if(res){
+                        statusMessage="Removido com sucesso!";
+                        //aqui devia tentar por o s vazio para não voltar a imprimir os valores de algo que já removi
+                    }
+                    else{
+                        errorMessage= "De momento, não e possivel remover o slot!";
+                    }
+            }
         }
-        while (!(opcao.equals("S") | opcao.equals("R") | opcao.equals("A") | opcao.equals("D")));
+        while (!(opcao.equals("S")));
     }
 
     //------------------------
     // Remover uma reunião da agenda
     //------------------------
-    private void removeSlot(Slot s){
-        boolean res = model.removeSlot(s, model.getSchedule());
-        if(res== true){
-            out.println(GREEN_BOLD +"Removido com sucesso!" + RESET);
-        }
-        else
-            out.println(RED_BOLD + "De momento, não e possivel remover o slot!" + RESET);
-        out.print("Prima Enter para continuar.");
-        Input.lerString();
+    private boolean removeSlot(Slot s){
+       return model.removeSlot(s, model.getSchedule());
     }
 
     //------------------------
@@ -339,6 +357,8 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             menu.addDescToTitle(Arrays.asList(dataToShow,
                     s.getLocal(), s.getDuration().toString(),
                     s.getDescription()));
+            menu.addErrorMessage(errorMessage);
+            errorMessage="n/a";
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -416,6 +436,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         Menu menu = viewScheduleTxt.getMenu(5);
         String opcao;
         String errorMessage = "n/a";
+        String statusMessage = "n/a";
         DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
         DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
         do {
@@ -424,7 +445,9 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             String dataToShow = BusinessUtils.DateSlotToString(s,getRefereceZoneId(),dtfLocal,dtfZone);
             menu.addDescToTitle(Arrays.asList(dataToShow));
             menu.addErrorMessage(errorMessage);
+            menu.addStatusMessage(statusMessage);
             errorMessage = "n/a";
+            statusMessage= "n/a";
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -441,7 +464,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     }
                     if (s.getData().equals(data)) {
                         System.out.println("Entrou no if no controller.");
-                        errorMessage = "Alteracao efetuada com sucesso!";
+                        statusMessage = "Alteracao efetuada com sucesso!";
                     } else {
                         System.out.println("Entrou no else no controller.");
                         //errorMessage = "Sobreposicao de reunioes!";
@@ -451,7 +474,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     data = shiftDateTime(data,ControllerUtils.shift("dias"), DAYS);
                     s = model.editDateSLot(s, data);
                     if (s.getData().equals(data)) {
-                        errorMessage = "Alteracao efetuada com sucesso!";
+                        statusMessage = "Alteracao efetuada com sucesso!";
                     } else {
                         //errorMessage = "Sobreposicao de reunioes!";
                     }
@@ -460,7 +483,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     data = shiftDateTime(data,ControllerUtils.shift("semanas"), WEEKS);
                     s = model.editDateSLot(s, data);
                     if (s.getData().equals(data)) {
-                        errorMessage = "Alteracao efetuada com sucesso!";
+                        statusMessage = "Alteracao efetuada com sucesso!";
                     } else {
                         //errorMessage = "Sobreposicao de reunioes!";
                     }
@@ -469,7 +492,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     data = shiftDateTime(data,ControllerUtils.shift("meses"), MONTHS);
                     s = model.editDateSLot(s, data);
                     if (s.getData().equals(data)) {
-                        errorMessage = "Alteracao efetuada com sucesso!";
+                        statusMessage = "Alteracao efetuada com sucesso!";
                     } else {
                         //errorMessage = "Sobreposicao de reunioes!";
                     }
@@ -478,7 +501,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     data = shiftDateTime(data,ControllerUtils.shift("anos"), YEARS);
                     s = model.editDateSLot(s, data);
                     if (s.getData().equals(data)) {
-                        errorMessage = "Alteracao efetuada com sucesso!";
+                        statusMessage = "Alteracao efetuada com sucesso!";
                     } else {
                         //errorMessage = "Sobreposicao de reunioes!";
                     }
@@ -487,13 +510,13 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     data = shitTime(ZonedDateTime.from(data));
                     s = model.editDateSLot(s,data);
                     if (s.getData().equals(data)) {
-                        errorMessage = "Alteracao efetuada com sucesso!";
+                        statusMessage = "Alteracao efetuada com sucesso!";
                     } else {
                         //errorMessage = "Sobreposicao de reunioes!";
                     }
                     break;
                 case "S": break;
-                default: /*errorMessage = "Opcao Invalida!";*/ break;
+                default: errorMessage = "Opcao Invalida!"; break;
             }
         }
         while (!opcao.equals("S")) ;

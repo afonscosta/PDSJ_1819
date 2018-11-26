@@ -96,7 +96,6 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
             Configs configs = (Configs) ois.readObject();
             ois.close();
             fis.close();
-            System.out.println(configs.getZoneId());
             return ZoneId.of(configs.getZoneId());
 
         } catch (Exception e) {
