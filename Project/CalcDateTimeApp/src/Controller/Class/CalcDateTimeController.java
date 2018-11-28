@@ -22,8 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static Utilities.BusinessUtils.getIdSlot;
-import static Utilities.BusinessUtils.partitionIntoPages;
+import static Utilities.BusinessUtils.*;
 import static Utilities.ConsoleColors.*;
 import static Utilities.ControllerUtils.*;
 import static java.lang.System.out;
@@ -216,10 +215,10 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         DateTimeFormatter dtfLocal= DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat());
         DateTimeFormatter dtfZone = DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat());
         do{
-            String dataToShow = BusinessUtils.DateSlotToString(s,referenceZone,dtfLocal,dtfZone);
-            menu.addDescToTitle(Arrays.asList(dataToShow,
-                                            s.getDuration().toString(),
-                                            s.getDescription())
+            List<String> dataToShow = slotToString(s,referenceZone,dtfLocal,dtfZone, true);
+            menu.addDescToTitle(Arrays.asList(dataToShow.get(0),
+                                              dataToShow.get(2),
+                                              dataToShow.get(3))
             );
             menu.addStatusMessage(statusMessage);
             menu.addErrorMessage(erroMessage);

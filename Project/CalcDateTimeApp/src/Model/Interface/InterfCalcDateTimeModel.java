@@ -1,9 +1,7 @@
 package Model.Interface;
 
 import Model.Class.Slot;
-import Utilities.EnumEditSlotInfo;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -73,7 +71,9 @@ public interface InterfCalcDateTimeModel {
 
     boolean removeSlot(Slot slot,Collection c);
 
-    void editSlot(Slot s, EnumEditSlotInfo e, String edit);
+    Slot editLocalSlot(Slot s, String edit);
+
+    Slot editDescSlot(Slot s, String edit);
 
     Slot editDurationSlot(Slot s, Duration d);
 

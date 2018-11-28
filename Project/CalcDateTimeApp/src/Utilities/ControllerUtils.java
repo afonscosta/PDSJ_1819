@@ -1,16 +1,22 @@
 package Utilities;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static Utilities.BusinessUtils.*;
-import static Utilities.ConsoleColors.CYAN_BOLD;
-import static Utilities.ConsoleColors.RESET;
+import static Utilities.ConsoleColors.*;
+import static java.lang.Integer.parseInt;
 import static java.lang.System.out;
-import static java.time.ZoneId.systemDefault;
+import static java.time.temporal.ChronoField.HOUR_OF_DAY;
+import static java.time.temporal.ChronoUnit.HOURS;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 public class ControllerUtils {
 
@@ -100,58 +106,6 @@ public class ControllerUtils {
         ZoneId zoneId = ZoneId.of(zoneIdString);
 
         return getDateTimeFromInput(zdt, zoneId);
-    }
-
-    //------------------------
-    // Alterar Apenas o Time de uma ZonedDateTime
-    //------------------------
-    public static ZonedDateTime shitTime(ZonedDateTime zdt) {
-        String str;
-        Integer hour = null;
-        Integer minute = null;
-        Integer second = null;
-        Integer nano = null;
-        while (hour == null) {
-            out.print("Hora (inicial: " + zdt.getHour() + "): ");
-            str = Input.lerString();
-            hour = validateHour(str, zdt.getHour());
-            if (hour == null)
-                out.println("[!] Hora invalida.");
-
-        }
-
-        while (minute == null) {
-            out.print("Minutos (inicial: " + zdt.getMinute() + "): ");
-            str = Input.lerString();
-            minute = validateMinSec(str, zdt.getMinute());
-            if (minute == null)
-                out.println("[!] Minutos invalidos.");
-        }
-
-        while (second == null) {
-            out.print("Segundos (inicial: " + zdt.getSecond() + "): ");
-            str = Input.lerString();
-            second = validateMinSec(str, zdt.getSecond());
-            if (second == null)
-                out.println("[!] Segundos invalidos.");
-        }
-
-        while (nano == null) {
-            out.print("Nanosegundos (inicial: " + zdt.getNano() + "): ");
-            str = Input.lerString();
-            nano = validatePosNumber(str, zdt.getNano());
-            if (nano == null)
-                out.println("[!] Nanosegundos invalidos.");
-
-        }
-        return ZonedDateTime.of(zdt.getYear(),
-                zdt.getMonthValue(),
-                zdt.getDayOfMonth(),
-                hour,
-                minute,
-                second,
-                nano,
-                zdt.getZone());
     }
 
 
@@ -251,7 +205,7 @@ public class ControllerUtils {
                                 flowDone = true;
                             }
                         }
-                    } else if (opcao.matches("=")) { // Selecionando o zoneId por defeito com "="
+                    } else if (opcao.matches("[Ss]")) { // Selecionando o zoneId por defeito com "="
                         zoneIdList.add(defaultZoneid);
                         if (zoneIdList.size() == zoneIdsWanted) {
                             flowDone = true;
@@ -262,5 +216,87 @@ public class ControllerUtils {
         } while(!flowDone);
 
         return zoneIdList;
+    }
+
+    /*
+     * Faz print do header de um dado mês
+     *             outubro
+     *      se te qu qu se sá do
+     */
+    public static void printHeader(int month) {
+        out.println();
+        String prefix = repeatStringN(" ", (20 - getMonth(month).length())/2);
+        out.println(prefix + getMonth(month));
+        out.println("se te qu qu se sa do");
+    }
+
+    /*
+     * Faz print do mês no formato:
+     *             outubro
+     *      se te qu qu se sá do
+     *       1  2  3  4  5  6  7
+     *       8  9 10 11 12 13 14
+     *      15 16 17 18 19 20 21
+     *      22 23 24 25 26 27 28
+     *      29 30 31
+     */
+    public static String printMonth(TemporalAccessor tacs) {
+        LocalDate ld;
+        try {
+            ld = LocalDate.from(tacs);
+            printHeader(ld.getMonthValue());
+            while (ld.getMonthValue() == ld.getMonthValue()) {
+                out.println(ld.query(BusinessUtils::organizeDays));
+                ld = (LocalDate) nextMondayN(ld, 1);
+            }
+            out.println();
+            return null;
+        }
+        catch (DateTimeException ignored) { return null; }
+    }
+
+    /*
+     * Faz print da semana no formato:
+     *            outubro
+     *     se te qu qu se sá do
+     *      1  2  3  4  5  6  7
+     */
+    public static String printWeek(TemporalAccessor tacs) {
+        LocalDate ld;
+        try {
+            ld = LocalDate.from(tacs);
+            printHeader(ld.getMonthValue());
+            out.println(ld.query(BusinessUtils::organizeDays));
+            out.println();
+            return null;
+        }
+        catch (DateTimeException ignored) { return null; }
+    }
+
+    public static String prettyPrintDuration(Duration duration) {
+        return duration.toString()
+                .substring(2)
+                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
+                .toLowerCase();
+    }
+
+    public static Duration getDurationFromInput() {
+        Pattern pattern;
+        Matcher matcher;
+
+        out.print("Duracao (hh:mm): ");
+        String dur = Input.lerString();
+        pattern = Pattern.compile("^([0-9]|1[0-9]|2[0-3]):([0-9]|[1-5][0-9])$");
+        matcher = pattern.matcher(dur);
+        while (!matcher.find()) {
+            out.println(RED_BOLD + "[!] Sintaxe Invalida." + RESET);
+            out.print("Duracao (hh:mm): ");
+            dur = Input.lerString();
+            pattern = Pattern.compile("^([0-9]|1[0-9]|2[0-3]):([0-9]|[1-5][0-9])$");
+            matcher = pattern.matcher(dur);
+        }
+
+        Duration newDuration = Duration.of(parseInt(matcher.group(1)), HOURS);
+        return newDuration.plus(parseInt(matcher.group(2)), MINUTES);
     }
 }

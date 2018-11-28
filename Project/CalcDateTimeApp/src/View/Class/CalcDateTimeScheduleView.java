@@ -49,9 +49,8 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         //------------------------
         op1 = new Opcao("Alterar", "A");
         op2 = new Opcao("Remover", "R");
-        op3 = new Opcao("Detalhes", "D");
-        op4 = new Opcao("Voltar ao Menu reunioes agendadas", "S");
-        linhas = Arrays.asList(op1, op2,op3,op4);
+        op3 = new Opcao("Voltar ao Menu reunioes agendadas", "S");
+        linhas = Arrays.asList(op1, op2,op3);
         Menu menuSelectBusySlot = new Menu(linhas, "Reuniao");
         menusScheduleTxt.addMenu(2, menuSelectBusySlot);
 
@@ -83,14 +82,9 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         // Menu alter data
         //------------------------
 
-        op1 = new Opcao("Alterar manualmente", "MA");
-        op2 = new Opcao("Aritmetrica de dias", "D");
-        op3 = new Opcao("Aritmetrica de semanas", "Sem");
-        op4 = new Opcao("Aritmetrica de meses", "M");
-        op5 = new Opcao("Aritmetrica de anos", "A");
-        op6 = new Opcao("Alterar tempo","T");
-        op7 = new Opcao("Voltar ao Menu reuniao", "S");
-        linhas = Arrays.asList(op1, op2, op3, op4, op5, op6, op7);
+        op1 = new Opcao("Alterar manualmente", "M");
+        op2 = new Opcao("Voltar ao Menu reuniao", "S");
+        linhas = Arrays.asList(op1,op2);
         Menu menuShiftDateTime = new Menu(linhas, "Alterar Data");
         menusScheduleTxt.addMenu(5, menuShiftDateTime);
 
@@ -118,7 +112,7 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         op2 = new Opcao("Procurar", "/<palavra>");
         op3 = new Opcao("Pagina seguinte", ">");
         op4 = new Opcao("Selecionar", "=<palavra>");
-        op5 = new Opcao("Voltar para Calc. de Zonas", "S");
+        op5 = new Opcao("Manter ZoneID atual", "S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5);
         Menu menuZoneIdNavigator = new Menu(linhas, "Navegador de ZoneIds");
         menusScheduleTxt.addMenu(8, menuZoneIdNavigator);

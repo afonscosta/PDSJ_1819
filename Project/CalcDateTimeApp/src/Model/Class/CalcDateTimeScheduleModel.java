@@ -1,13 +1,11 @@
 package Model.Class;
 
 import Model.Interface.InterfCalcDateTimeScheduleModel;
-import Utilities.BusinessUtils;
 import Utilities.Configs;
-import Utilities.EnumEditSlotInfo;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
@@ -15,11 +13,10 @@ import java.time.temporal.Temporal;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
-import java.util.Set;
-import java.util.TreeSet;
 
+import static Utilities.BusinessUtils.convertToZone;
+import static Utilities.BusinessUtils.slotToString;
 import static java.time.temporal.ChronoUnit.DAYS;
-import static java.time.temporal.ChronoUnit.HOURS;
 
 public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleModel,Serializable {
     private Set<Slot> schedule;
@@ -40,10 +37,10 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                     if (data1.equals(data2)) return 0;
                     else {
                         if (data1.getClass().getSimpleName().equals("ZonedDateTime")) {
-                            ldt1 = BusinessUtils.convertZoneDateTimeToSpecificZone(data1, referenceZone).toLocalDateTime();
+                            ldt1 = convertToZone(data1, referenceZone).toLocalDateTime();
                         }
                         if (data2.getClass().getSimpleName().equals("ZonedDateTime")) {
-                            ldt2 = BusinessUtils.convertZoneDateTimeToSpecificZone(data2,referenceZone).toLocalDateTime();
+                            ldt2 = convertToZone(data2,referenceZone).toLocalDateTime();
                         }
                         //System.out.println("ldt1->" + ldt1.toString());
                         //System.out.println("ldt2->" + ldt2.toString());
@@ -125,7 +122,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         List<String> res= new ArrayList();
         int index =0;
         for(Slot s : schedule) {
-            res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone,dtfLocal,dtfZone) + " || " + s.getLocal());
+            res.add(index + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getLocal());
             index ++;
         }
         return res;
@@ -140,7 +137,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         List<String> res= new ArrayList();
         int index =0;
         for(RestrictSlot s: scheduleRestrictions){
-            res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone,dtfLocal,dtfZone) + " || " + s.getPeriod());
+            res.add(index + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getPeriod());
             index ++;
         }
         return res;
@@ -160,7 +157,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
             switch (modeNormalized) {
                 case "diaria":
                     if(date.getDayOfMonth()==want){
-                        res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone,dtfLocal,dtfZone) + " || " + s.getLocal());
+                        res.add(index + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getLocal());
                         index ++;
                     }
                     break;
@@ -168,16 +165,17 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                     TemporalField woy = WeekFields.ISO.weekOfYear();
                     int weekNumber = date.get(woy);
                     if(weekNumber==want){
-                        res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone,dtfLocal, dtfZone) + " || " + s.getLocal());
+                        res.add(index + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getLocal());
                         index ++;
                     }
                     break;
                 case "mensal":
                     if(date.getMonthValue()==want){
-                        res.add(index + ": " + BusinessUtils.DateSlotToString(s,referenceZone,dtfLocal,dtfZone) + " || " + s.getLocal());
+                        res.add(index + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getLocal());
                         index ++;
                     }
                     break;
+                default: break;
             }
         }
         return res;
@@ -190,7 +188,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         List<Slot> slotsToAdd = new ArrayList<>();
 
         Duration durationNewSlot = newSlot.getDuration();
-        LocalDateTime ldtNewSlot = BusinessUtils.convertZoneDateTimeToSpecificZone(newSlot.getData(), getReferenceZone()).toLocalDateTime();
+        LocalDateTime ldtNewSlot = convertToZone(newSlot.getData(), getReferenceZone()).toLocalDateTime();
         System.out.println("ldt1->" + ldtNewSlot);
         Temporal finalDate = ldtNewSlot.plus(durationNewSlot);
         System.out.println("finalDate->" + finalDate);
@@ -224,7 +222,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                 }
                 else {
                     newSlot = slotFromMidnight.clone();
-                    ldtNewSlot = BusinessUtils.convertZoneDateTimeToSpecificZone(newSlot.getData(), getReferenceZone()).toLocalDateTime();
+                    ldtNewSlot = convertToZone(newSlot.getData(), getReferenceZone()).toLocalDateTime();
                     durationNewSlot = newSlot.getDuration();
                 }
             }
@@ -292,7 +290,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     public boolean doesNotBreakAnyRestrict(Slot newSlot){
         boolean res;
-        LocalDateTime ldtNewSlot = BusinessUtils.convertZoneDateTimeToSpecificZone(newSlot.getData(), getReferenceZone()).toLocalDateTime();
+        LocalDateTime ldtNewSlot = convertToZone(newSlot.getData(), getReferenceZone()).toLocalDateTime();
         for(RestrictSlot s : scheduleRestrictions){
             LocalDateTime ldtRestrictSlot= LocalDateTime.from(s.getData());
             if(s.getPeriod().equals("semanal")){
@@ -376,17 +374,19 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     }
 
     //------------------------
-    // Adicionar uma reunião à schedule
+    // Altera o local de um slot
     //------------------------
-    public void editSlot(Slot s, EnumEditSlotInfo e, String edit){
-            switch (e){
-                case LOCAL:
-                    s.setLocal(edit);
-                    break;
-                case DESC:
-                    s.setDescription(edit);
-                    break;
-            }
+    public Slot editLocalSlot(Slot s, String newLocal) {
+        s.setLocal(newLocal);
+        return s;
+    }
+
+    //------------------------
+    // Altera a descrição de um slot
+    //------------------------
+    public Slot editDescSlot(Slot s, String newDesc) {
+        s.setDescription(newDesc);
+        return s;
     }
 
     //------------------------
