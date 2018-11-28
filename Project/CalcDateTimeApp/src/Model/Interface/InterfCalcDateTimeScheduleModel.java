@@ -2,15 +2,12 @@ package Model.Interface;
 
 import Model.Class.Slot;
 import Utilities.Configs;
-import Utilities.EnumEditSlotInfo;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 
 public interface InterfCalcDateTimeScheduleModel {
@@ -31,13 +28,14 @@ public interface InterfCalcDateTimeScheduleModel {
 
     boolean removeSlot(Slot slot,Collection c);
 
-    void editSlot(Slot s, EnumEditSlotInfo e,String edit);
-
     Slot editDurationSlot(Slot s, Duration d);
 
     Slot editDateSLot(Slot s, Temporal data);
 
     Slot getSlot(String infoSlot,Collection c);
 
+    Slot editLocalSlot(Slot s, String edit);
+
+    Slot editDescSlot(Slot s, String edit);
 }
 

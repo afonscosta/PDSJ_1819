@@ -5,16 +5,14 @@ import Model.Class.Slot;
 import java.text.DateFormatSymbols;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAdjuster;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.time.temporal.*;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static Utilities.ConsoleColors.BLACK_BOLD;
+import static Utilities.ConsoleColors.RESET;
+import static Utilities.ControllerUtils.prettyPrintDuration;
 import static java.lang.Math.abs;
 import static java.time.DayOfWeek.*;
 import static java.time.format.DateTimeFormatter.ofPattern;
@@ -30,17 +28,13 @@ public class BusinessUtils {
      * Temporal -> String
      * Formato de saída: dd/mm/aaaa
      */
-    public static String localDateToString(Temporal temp) {
-        LocalDateTime ldt;
-        if (temp.getClass().getSimpleName().equals("ZonedDateTime")) {
-            ldt = ((ZonedDateTime) temp).toLocalDateTime();
-        }
-        else
-            ldt = (LocalDateTime) temp;
-        String dt = ldt.getDayOfMonth() + "/" +
-            ldt.getMonth().getValue() + "/" +
-            ldt.getYear();
-        return dt;
+    public static String tempToLocalDateStr(TemporalAccessor tacs) {
+        LocalDate ld;
+        try { ld = LocalDate.from(tacs); }
+        catch (DateTimeException e) { return null; }
+        return ld.getDayOfMonth() + "/" +
+               ld.getMonth().getValue() + "/" +
+               ld.getYear();
     }
 
     /*
@@ -50,11 +44,8 @@ public class BusinessUtils {
      */
     public static String localDateTimeToString(Temporal temp, DateTimeFormatter localDateTimeFormatter) {
         LocalDateTime ldt;
-        if (temp.getClass().getSimpleName().equals("ZonedDateTime")) {
-            ldt = ((ZonedDateTime) temp).toLocalDateTime();
-        }
-        else
-            ldt = (LocalDateTime) temp;
+        try { ldt = LocalDateTime.from(temp); }
+        catch (DateTimeException e) { return null; }
         return ldt.format(localDateTimeFormatter);
     }
 
@@ -63,16 +54,6 @@ public class BusinessUtils {
      * Formato de saída: dd/mm/aaaa  hh:mm:ss [zona]
      */
     public static String zoneDateTimeToString(ZonedDateTime zdt, DateTimeFormatter zonedDateTimeFormatter) {
-/*        LocalDateTime ldt = zdt.toLocalDateTime();
-
-        String dt = ldt.getDayOfMonth() + "/" +
-                    ldt.getMonth().getValue() + "/" +
-                    ldt.getYear() + " " +
-                    ldt.getHour() + ":" +
-                    ldt.getMinute() + ":" +
-                    ldt.getSecond() + ":" +
-                    ldt.getNano() +
-                    " [" + zdt.getZone() + "]";*/
         return zdt.format(zonedDateTimeFormatter);
     }
 
@@ -81,36 +62,35 @@ public class BusinessUtils {
         return temp.plus(n, cu);
     }
 
+    public static boolean isWeekend(TemporalAccessor tacs) {
+        LocalDate ld;
+        ld = LocalDate.from(tacs);
+        return ld.getDayOfWeek().equals(SATURDAY) || ld.getDayOfWeek().equals(SUNDAY);
+    }
 
     /*
      * Temporal, int, EnumDateTimeShiftMode -> LocalDateTime
      * Soma ou subtrai, dependendo do valor do mode, n dias úteis ao ldt.
-     * Retorna null se o argumento temp for de uma classe diferente de
-     * LocalDateTime e ZonedDateTime.
+     * Retorna null se o argumento temp não tiver uma componente Date.
      */
     public static Temporal shiftWorkDays(Temporal temp, int n) {
         int conta = 0;  // conta dias úteis
-        DayOfWeek dia;
-        if ((dia = getDayOfWeek(temp)) == null) return null;
-        if (dia.equals(SATURDAY) || dia.equals(SUNDAY)) conta = 1;
-        while (conta < abs(n)) {
-            if ((dia = getDayOfWeek(temp)) == null) return null;
-            if (!(dia.equals(SATURDAY) || dia.equals(SUNDAY))) conta++;
-            temp = temp.plus(n/abs(n), DAYS);
-        }
-        // Ajustar o dia final para não ficar num fim de semana.
-        if ((dia = getDayOfWeek(temp)) == null) return null;
-        if (n > 0) {
-            if (dia.equals(SATURDAY) || dia.equals(SUNDAY)) {
-                temp = nextMondayN(temp, 1);
+        try {
+            if (temp.query(BusinessUtils::isWeekend)) conta = 1;
+            while (conta < abs(n)) {
+                if (!temp.query(BusinessUtils::isWeekend)) conta++;
+                temp = temp.plus(n / abs(n), DAYS);
             }
-        }
-        else if (n < 0) {
-            if (dia.equals(SATURDAY) || dia.equals(SUNDAY)) {
-                temp = prevFridayN(temp, 1);
+            // Ajustar o dia final para não ficar num fim de semana.
+            if (temp.query(BusinessUtils::isWeekend)) {
+                if (n > 0) {
+                    temp = nextMondayN(temp, 1);
+                } else if (n < 0) {
+                    temp = prevFridayN(temp, 1);
+                }
             }
-        }
-        return temp;
+            return temp;
+        } catch (DateTimeException e) { return null; }
     }
 
     /*
@@ -155,44 +135,40 @@ public class BusinessUtils {
     }
 
     /*
-     * LocalDateTime, LocalDateTime -> long
-     * Calcula o número de dias úteis entre duas LocalDateTime's.
+     * Temporal, Temporal -> long
+     * Calcula o número de dias úteis entre dois Temporal's.
      */
-    public static long countWorkDays(ZonedDateTime start, ZonedDateTime stop) {
-        // Code taken from Answer by Roland.
-        // https://stackoverflow.com/a/44942039/642706
-        long count = 0;
+    public static long countWorkDays(Temporal start, Temporal stop) {
+        long count;
         long extra = 0;
-        // Faz-se +1 dia para não incluir o dia atual.
-        if (start.getDayOfWeek().equals(SATURDAY) || start.getDayOfWeek().equals(SUNDAY)) {
-            start = (ZonedDateTime) nextMondayN(start, 1);
+        if (start.query(BusinessUtils::isWeekend)) {
+            start = nextMondayN(start, 1);
             extra += 1;
         }
-        if (stop.getDayOfWeek().equals(SATURDAY) || stop.getDayOfWeek().equals(SUNDAY)) {
-            stop = (ZonedDateTime) nextMondayN(stop, 1);
+        if (stop.query(BusinessUtils::isWeekend)) {
+            stop = nextMondayN(stop, 1);
             extra -= 1;
         }
-        final DayOfWeek startW = start.getDayOfWeek();
-        final DayOfWeek stopW = stop.getDayOfWeek();
+        final DayOfWeek startW = start.query(BusinessUtils::getDayOfWeek);
+        final DayOfWeek stopW = stop.query(BusinessUtils::getDayOfWeek);
 
         final long days = ChronoUnit.DAYS.between( start , stop );
         final long daysWithoutWeekends = days - 2 * ( ( days + startW.getValue() ) / 7 );
 
         //adjust for starting and ending on a Sunday:
-        count = daysWithoutWeekends + ( startW == DayOfWeek.SUNDAY ? 1 : 0 ) + ( stopW == DayOfWeek.SUNDAY ? 1 : 0 );
+        count = daysWithoutWeekends + ( startW == SUNDAY ? 1 : 0 ) + ( stopW == SUNDAY ? 1 : 0 );
 
-        //if (start.getDayOfWeek().equals(SATURDAY) || start.getDayOfWeek().equals(SUNDAY)) return abs(count)+1;
         return abs(count)+extra;
     }
 
     /*
-     * Lê um inteiro positivo (0 inclusive)
+     * Lê um inteiro positivo (0 inclusive) com um número de digitos entre [1, 9]
      * Devolve def caso seja lida a string vazia
      * Devolve null caso não seja validado
      */
     public static Integer validatePosNumber(String str, Integer def) {
         Integer num = null;
-        if (str.matches("^\\d+$")) {
+        if (str.matches("^\\d{1,9}$")) {
             num = Integer.parseInt(str);
         }
         if (str.isEmpty())
@@ -266,7 +242,7 @@ public class BusinessUtils {
     public static Integer validateNumDay(String str, Integer def, int year, int month, int nweek) {
         Integer num = null;
         int ndays = getNumDaysInWeek(year, month, nweek);
-        if (str.matches("^(1|2|3|4|5|6|7)$")) {
+        if (str.matches("^([1234567])$")) {
             num = Integer.parseInt(str);
             if (num <= 0 || num > ndays)
                 return null;
@@ -345,18 +321,29 @@ public class BusinessUtils {
         return ld.getDayOfWeek().getValue() - start + 1;
     }
 
+
     /*
      * Temporal -> DayOfWeek
      * Dado um temporal dá o dia da semana.
      * Caso não seja um ZonedDateTime ou LocalDateTime devolve null.
      */
-    public static DayOfWeek getDayOfWeek(Temporal temp) {
-        DayOfWeek dow = null;
-        if (temp.getClass().getSimpleName().equals("ZonedDateTime"))
-            dow = ((ZonedDateTime) temp).getDayOfWeek();
-        else if (temp.getClass().getSimpleName().equals("LocalDateTime"))
-            dow = ((LocalDateTime) temp).getDayOfWeek();
-        return dow;
+    public static DayOfWeek getDayOfWeek(TemporalAccessor tacs) {
+        LocalDate ld;
+        try { ld = LocalDate.from(tacs); }
+        catch (DateTimeException e) { return null; }
+        return ld.getDayOfWeek();
+    }
+
+    /*
+     * Temporal -> DayOfWeek
+     * Dado um temporal dá o dia da semana.
+     * Caso não seja um ZonedDateTime ou LocalDateTime devolve null.
+     */
+    public static Integer getDayOfMonth(TemporalAccessor tacs) {
+        LocalDate ld;
+        try { ld = LocalDate.from(tacs); }
+        catch (DateTimeException e) { return null; }
+        return ld.getDayOfMonth();
     }
 
     /*
@@ -406,10 +393,8 @@ public class BusinessUtils {
                 currentPage.add(list.get(totalListIndex++));
                 pageListIndex++;
             }
-
             ret.add(currentPage);
         }
-
         return ret;
     }
 
@@ -478,20 +463,23 @@ public class BusinessUtils {
      * ldt: 2018/10/1 -> ' 1  2  3  4  5  6  7'
      * ldt: 2018/11/5 -> ' 5  6  7  8  9 10 11'
      */
-    public static String organizeDays(ZonedDateTime zdt) {
+    public static String organizeDays(TemporalAccessor tacs) {
         StringBuilder res = new StringBuilder();
-        int dow = zdt.getDayOfWeek().getValue();
-        int dom = zdt.getDayOfMonth();
+        LocalDate ld;
+        try { ld = LocalDate.from(tacs); }
+        catch (DateTimeException e) { return null; }
+        int dow = ld.getDayOfWeek().getValue();
+        int dom = ld.getDayOfMonth();
         res.append(repeatStringN(" ", 3*(dow-1)));
         res = normDay(res, dom);
         res.append(" ");
         dow++; dom++;
-        while(zdt.getMonthValue() == zdt.plusDays(dow-1).getMonthValue() && dow < 7) {
+        while(ld.getMonthValue() == ld.plus(dow-1, DAYS).getMonthValue() && dow < 7) {
             res = normDay(res, dom);
             res.append(" ");
             dow++; dom++;
         }
-        if(zdt.getMonthValue() == zdt.plusDays(dow-1).getMonthValue()) {
+        if(ld.getMonthValue() == ld.plusDays(dow-1).getMonthValue()) {
             res = normDay(res, dom);
         }
         return res.toString();
@@ -513,37 +501,41 @@ public class BusinessUtils {
         return new DateFormatSymbols().getMonths()[month-1];
     }
 
-    //pode ir para o utils
-
-
+    private static List<String> putSubtitles(Slot s, ZonedDateTime date, DateTimeFormatter dtf) {
+        return Arrays.asList(BLACK_BOLD + "Data: " + RESET + date.format(dtf),
+                             BLACK_BOLD + "Local: " + RESET + s.getLocal(),
+                             BLACK_BOLD + "Duracao: " + RESET + prettyPrintDuration(s.getDuration()),
+                             BLACK_BOLD + "Descricao: " + RESET + s.getDescription());
+    }
 
     //------------------------
     // Business utils referentes ao slot
     // Se a zoned for a de referencia, não quero imprimir a zoned
     // A zoned de referencia é a dada no ficheiro de configuração
     //------------------------
-    public static String DateSlotToString(Slot s, ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
+    public static List<String> slotToString(Slot s, ZoneId referenceZone, DateTimeFormatter dtfLocal,
+                                            DateTimeFormatter dtfZone, boolean subtitles){
         ZonedDateTime date = ZonedDateTime.from(s.getData());
-        boolean temp = isSlotfromReferenceZone(s,referenceZone);
-        if(temp) {
-            return date.format(dtfLocal);
+        boolean isLocal = isSlotfromReferenceZone(s,referenceZone);
+        if(isLocal) {
+            if (subtitles)
+                return putSubtitles(s, date, dtfLocal);
+            return Arrays.asList(date.format(dtfLocal), s.getLocal(), prettyPrintDuration(s.getDuration()), s.getDescription());
         }
         else{
-            return date.format(dtfZone);
+            if (subtitles)
+                return putSubtitles(s, date, dtfZone);
+            return Arrays.asList(date.format(dtfZone), s.getLocal(), prettyPrintDuration(s.getDuration()), s.getDescription());
         }
     }
 
     public static boolean isSlotfromReferenceZone(Slot s, ZoneId referenceZone){
         ZonedDateTime date = ZonedDateTime.from(s.getData());
-        if(date.getZone().equals(referenceZone))
-            return true;
-        else
-            return false;
+        return date.getZone().equals(referenceZone);
     }
-    public static ZonedDateTime convertZoneDateTimeToSpecificZone (Temporal data,ZoneId referenceZone) {
+    public static ZonedDateTime convertToZone (Temporal data,ZoneId referenceZone) {
         ZonedDateTime zoneData= ZonedDateTime.from(data);
-        zoneData = zoneData.withZoneSameInstant(referenceZone);
-        return zoneData;
+        return zoneData.withZoneSameInstant(referenceZone);
     }
 
     //------------------------

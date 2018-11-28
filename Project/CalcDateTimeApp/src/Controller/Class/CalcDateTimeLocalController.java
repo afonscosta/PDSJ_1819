@@ -2,6 +2,8 @@ package Controller.Class;
 
 import Controller.Interface.InterfCalcDateTimeLocalController;
 import Model.Interface.InterfCalcDateTimeModel;
+import Utilities.BusinessUtils;
+import Utilities.ControllerUtils;
 import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeLocalView;
@@ -410,7 +412,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         if (year != null) {
             zdt = zdt.withYear(year);
             while (month == null) {
-                out.print("Mes do ano [1,2,..]: ");
+                out.print("Mes do ano (1, 2, ...): ");
                 str = Input.lerString();
                 month = validateMonth(str, null);
                 if (month == null)
@@ -419,7 +421,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             if (month != null) {
                 zdt = zdt.withMonth(month);
                 while (nweeks == null) {
-                    out.print("Semana do mes [1,2,..]: ");
+                    out.print("Semana do mes (1ª, 2ª, ...): ");
                     str = Input.lerString();
                     nweeks = validateNumWeek(str, -1, year, month);
                     if (nweeks == null)
@@ -427,72 +429,29 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                     else if (nweeks == -1) {
                         // Imprime o mês inteiro
                         nweeks = null;
-                        printMonth(zdt);
+                        zdt.query(ControllerUtils::printMonth);
                     }
                 }
                 zdt = (ZonedDateTime) nextMondayN(zdt, nweeks-1);
                 while (ndays == null) {
-                    out.print("Dia da semana [1,2..]: ");
+                    out.print("Dia da semana (1º, 2º, ...): ");
                     str = Input.lerString();
                     ndays = validateNumDay(str, -1, year, month, nweeks);
                     if (ndays == null)
                         out.println(RED_BOLD + "[!] Numero do dia invalido." + RESET);
                     else if (ndays == -1) {
                         ndays = null;
-                        printWeek(zdt);
+                        zdt.query(ControllerUtils::printWeek);
                     }
                 }
                 //Imprime a data do dia em questão
                 zdt = (ZonedDateTime) nextDayN(zdt, ndays-1); // -1 porque o atual conta
                 model.fromDateTimeLocal(zdt);
-                out.println("\n" + GREEN_BOLD + "Resultado: " + localDateToString(zdt) + RESET);
+                out.println("\n" + GREEN_BOLD + "Resultado: " + zdt.query(BusinessUtils::tempToLocalDateStr) + RESET);
             }
         }
         out.print("Prima Enter para continuar.");
         Input.lerString();
     }
 
-    /*
-     * Faz print do header de um dado mês
-     *             outubro
-     *      se te qu qu se sá do
-     */
-    private void printHeader(int month) {
-        out.println();
-        String prefix = repeatStringN(" ", (20 - getMonth(month).length())/2);
-        out.println(prefix + getMonth(month));
-        out.println("se te qu qu se sa do");
-    }
-
-    /*
-     * Faz print do mês no formato:
-     *             outubro
-     *      se te qu qu se sá do
-     *       1  2  3  4  5  6  7
-     *       8  9 10 11 12 13 14
-     *      15 16 17 18 19 20 21
-     *      22 23 24 25 26 27 28
-     *      29 30 31
-     */
-    private void printMonth(ZonedDateTime zdt) {
-        printHeader(zdt.getMonthValue());
-        LocalDateTime start = LocalDateTime.from(zdt);
-        while(start.getMonthValue() == zdt.getMonthValue()) {
-            out.println(organizeDays(zdt));
-            zdt = (ZonedDateTime) nextMondayN(zdt, 1);
-        }
-        out.println();
-    }
-
-    /*
-     * Faz print da semana no formato:
-     *            outubro
-     *     se te qu qu se sá do
-     *      1  2  3  4  5  6  7
-     */
-    private void printWeek(ZonedDateTime zdt) {
-        printHeader(zdt.getMonthValue());
-        out.println(organizeDays(zdt));
-        out.println();
-    }
 }

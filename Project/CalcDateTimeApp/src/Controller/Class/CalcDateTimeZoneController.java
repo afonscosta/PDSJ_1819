@@ -156,7 +156,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
             zoneIdDifferenceHoursTxt = "+" + zoneIdDifferenceHours;
         }
 
-        out.println(GREEN_BOLD + zoneId1 + " --(" + zoneIdDifferenceHoursTxt + " horas)--> " + zoneId2 + RESET);
+        out.println(GREEN_BOLD + zoneId1 + " -- (" + zoneIdDifferenceHoursTxt + " horas) --> " + zoneId2 + RESET);
         out.print("Prima Enter para continuar.");
         Input.lerString();
     }

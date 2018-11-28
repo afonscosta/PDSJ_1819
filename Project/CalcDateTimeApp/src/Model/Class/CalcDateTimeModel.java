@@ -5,9 +5,7 @@ import Model.Interface.InterfCalcDateTimeModel;
 import Model.Interface.InterfCalcDateTimeScheduleModel;
 import Model.Interface.InterfCalcDateTimeZoneModel;
 import Utilities.Configs;
-import Utilities.EnumEditSlotInfo;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -213,8 +211,13 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     }
 
     @Override
-    public void editSlot(Slot s, EnumEditSlotInfo e, String edit) {
-        modelSchedule.editSlot(s,e,edit);
+    public Slot editLocalSlot(Slot s, String edit) {
+        return modelSchedule.editLocalSlot(s, edit);
+    }
+
+    @Override
+    public Slot editDescSlot(Slot s, String edit) {
+        return modelSchedule.editDescSlot(s, edit);
     }
 
     @Override
