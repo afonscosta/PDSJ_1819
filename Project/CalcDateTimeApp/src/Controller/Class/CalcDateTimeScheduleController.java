@@ -249,11 +249,11 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     else if (opcao.matches("=.*")) {
                         opcao = opcao.substring(1); // Remover o "="
                         for (String infoSlot : model.getMainInfoSlots(referenceZonedId,dtfLocal,dtfZoned)) {
-                            String idSlot = getIdSlot(infoSlot);
-                            if(idSlot!=null & idSlot.equals(opcao)){
-                                Slot s= model.getSlot(idSlot,model.getSchedule());
+                            long idSlot = getIdSlot(infoSlot);
+                            if(idSlot>=0 & idSlot==Long.valueOf(opcao)){
+                                Slot s= model.getSlot(idSlot);
                                 if(s!=null) {
-                                    flowSelectBusySlot(s);
+                                    flowSelectBusySlot(idSlot);
                                     break;
                                 }
                             }
@@ -289,16 +289,23 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     // Fluxo ao selecionar uma reunião
     // Pode-se optar por alterar, remover, ver detalhes dessa reunião
     //------------------------
-    public void flowSelectBusySlot(Slot s) {
+    public void flowSelectBusySlot(Long idSelectSlot) {
         Menu menu = viewScheduleTxt.getMenu(2);
-        String opcao;
+        String opcao="";
         String errorMessage = "n/a";
         String statusMessage= "n/a";
         DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
         DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
+        Slot s;
         boolean res= false;
         do {
-            menu.addDescToTitle(slotToString(s, getRefereceZoneId(), dtfLocal, dtfZone, true));
+            s = model.getSlot(idSelectSlot);
+            if(opcao.equals("R")){
+                menu.addDescToTitle(Arrays.asList(""));
+            }
+            else{
+                menu.addDescToTitle(slotToString(s, getRefereceZoneId(), dtfLocal, dtfZone, true));
+            }
             menu.addErrorMessage(errorMessage);
             menu.addStatusMessage(statusMessage);
             errorMessage="n/a";
@@ -307,7 +314,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch (opcao) {
-                case "A": s = flowEditSlot(s); break;
+                case "A": flowEditSlot(idSelectSlot); break;
                 case "R": res= removeSlot(s); break;
                 case "S": break;
                 default: errorMessage = "Opcao Invalida !"; break;
@@ -315,7 +322,6 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             if(opcao.equals("R")){
                     if(res){
                         statusMessage="Removido com sucesso!";
-                        //aqui devia tentar por o s vazio para não voltar a imprimir os valores de algo que já removi
                     }
                     else{
                         errorMessage= "De momento, não e possivel remover o slot!";
@@ -337,38 +343,50 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     // Pode-se optar por alterar a data, duracao, local e a descrição
     // Devolve o slot alterado ou o slot original
     //------------------------
-    private Slot flowEditSlot(Slot s){
+    private void flowEditSlot(Long idSelectSlot){
         Menu menu = viewScheduleTxt.getMenu(4);
         String opcao;
         String errorMessage = "n/a";
+        String statusMessage = "n/a";
         DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
         DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
+        Slot s;
+        boolean res=false;
         do {
+            s = model.getSlot(idSelectSlot);
             menu.addDescToTitle(slotToString(s,getRefereceZoneId(),dtfLocal,dtfZone, true));
             menu.addErrorMessage(errorMessage);
+            menu.addStatusMessage(statusMessage);
             errorMessage="n/a";
+            statusMessage="n/a";
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch (opcao) {
-                case "DATA": s = flowEditDataSlot(s); break;
-                case "D": s = editDuration(s); break;
-                case "L": s = editLocal(s); break;
-                case "DESC": s = editDesc(s); break;
+                case "DATA": flowEditDataSlot(idSelectSlot); break;
+                case "D": res = editDuration(s); break;
+                case "L": editLocal(s); statusMessage="Local alterado com sucesso!"; break;
+                case "DESC": editDesc(s); statusMessage="Descricao alterada com sucesso!"; break;
                 case "S": break;
                 default: errorMessage = "Opcao Invalida !"; break;
+            }
+            if(opcao.equals("D")){
+                if (res) {
+                    statusMessage = "Alteracao efetuada com sucesso!";
+                } else {
+                    errorMessage = "Sobreposicao de reunioes!";
+                }
             }
 
         }
         while (!opcao.equals("S"));
-        return s;
     }
 
     //------------------------
     // Editar descrição de uma reunião
     // Devolve o slot com a informação alterada caso seja possivel alterar
     //------------------------
-    private Slot editDesc(Slot s) {
+    private void editDesc(Slot s) {
         out.print("Nova descricao: ");
         String newDesc = Input.lerString();
         while (newDesc.equals("")) {
@@ -376,16 +394,14 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             out.print("Nova descricao: ");
             newDesc = Input.lerString();
         }
-        s = model.editDescSlot(s, newDesc);
-        out.println(GREEN_BOLD + "Descricao alterada com sucesso!"+ RESET);
-        return s;
+        model.editDescSlot(s, newDesc);
     }
 
     //------------------------
     // Editar local de uma reunião
     // Devolve o slot com a informação alterada caso seja possivel alterar
     //------------------------
-    private Slot editLocal(Slot s) {
+    private void editLocal(Slot s) {
         out.print("Novo local: ");
         String newLocal = Input.lerString();
         while (newLocal.equals("")) {
@@ -393,25 +409,16 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             out.print("Novo local: ");
             newLocal = Input.lerString();
         }
-        s = model.editLocalSlot(s, newLocal);
-        out.println(GREEN_BOLD + "Local alterado com sucesso!" + RESET);
-        return s;
+        model.editLocalSlot(s, newLocal);
     }
 
     //------------------------
     // Editar duracao de uma reunião
     // Devolve o slot com a informação alterada caso seja possivel alterar
     //------------------------
-    private Slot editDuration(Slot s) {
+    private boolean editDuration(Slot s) {
         Duration newDuration = getDurationFromInput();
-        s = model.editDurationSlot(s, newDuration);
-        if(s.getDuration().equals(newDuration)){
-            out.println(GREEN_BOLD + "Duracao alterada com sucesso!"+ RESET);
-        }
-        else{
-            out.println(RED_BOLD + "Sobreposicao com outras reunioes ja agendadas!"+ RESET);
-        }
-        return s;
+        return model.editDurationSlot(s, newDuration);
     }
 
 
@@ -420,16 +427,18 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     // Avançar ou recuar dias, semanas, meses ou anos
     // Devolve o slot com a informação alterada caso seja possivel alterar
     //------------------------
-    private Slot flowEditDataSlot(Slot s) {
+    private void flowEditDataSlot(Long idSelectSlot) {
         Menu menu = viewScheduleTxt.getMenu(5);
         String opcao;
         String errorMessage = "n/a";
         String statusMessage = "n/a";
         DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
         DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
+        Slot s;
+        boolean res=false;
         do {
+            s = model.getSlot(idSelectSlot);
             Temporal data;
-
             menu.addDescToTitle(Collections.singletonList(slotToString(s, getRefereceZoneId(), dtfLocal, dtfZone, true).get(0)));
             menu.addErrorMessage(errorMessage);
             menu.addStatusMessage(statusMessage);
@@ -442,25 +451,26 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                 case "M":
                     if (isSlotfromReferenceZone(s, model.getLocalZone())) {
                         data = getDateTimeFromInput((ZonedDateTime) s.getData(), model.getLocalZone());
-                        s = model.editDateSLot(s, data);
+                        res =model.editDateSLot(s, data);
                     }
                     else {
                         //Utilizar o próprio para o zone
                         data = getZoneDateTimeFromInput(viewScheduleTxt.getMenu(8), model.getZoneZone(), (ZonedDateTime) model.getDateTimeZone());
-                        s = model.editDateSLot(s, data);
-                    }
-                    if (s.getData().equals(data)) {
-                        statusMessage = "Alteracao efetuada com sucesso!";
-                    } else {
-                        errorMessage = "Sobreposicao de reunioes!";
+                        res = model.editDateSLot(s, data);
                     }
                     break;
                 case "S": break;
                 default: errorMessage = "Opcao Invalida!"; break;
             }
+            if(opcao.equals("M")){
+                if (res) {
+                    statusMessage = "Alteracao efetuada com sucesso!";
+                } else {
+                    errorMessage = "Sobreposicao de reunioes!";
+                }
+            }
         }
         while (!opcao.equals("S")) ;
-        return s;
     }
 
     //------------------------

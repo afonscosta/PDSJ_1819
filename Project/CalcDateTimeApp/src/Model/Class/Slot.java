@@ -5,6 +5,8 @@ import java.time.Duration;
 import java.time.temporal.Temporal;
 
 public class Slot implements Serializable {
+    private static long nextAvailableId=0;
+    private long idSlot;
     private Temporal data;
     private Duration duration;
     private String local;
@@ -14,11 +16,24 @@ public class Slot implements Serializable {
     public static Slot of (Temporal data, Duration duration, String local, String description) {
         return new Slot(data,duration,local,description);
     }
+    public static Slot of (Long idSlot,Temporal data, Duration duration, String local, String description) {
+        return new Slot(idSlot,data,duration,local,description);
+    }
     public static Slot of (Slot s) {
         return new Slot(s);
     }
 
     protected Slot(Temporal data, Duration duration, String local, String description) {
+        this.idSlot = nextAvailableId;
+        this.data = data;
+        this.duration = duration;
+        this.local = local;
+        this.description = description;
+        setNextAvailableId(1);
+    }
+
+    protected Slot(Long idSlot, Temporal data, Duration duration, String local, String description) {
+        this.idSlot = idSlot;
         this.data = data;
         this.duration = duration;
         this.local = local;
@@ -26,10 +41,28 @@ public class Slot implements Serializable {
     }
 
     protected Slot(Slot s) {
+        this.idSlot= s.getIdSlot();
         this.data = s.getData();
         this.duration = s.getDuration();
         this.local = s.getLocal();
         this.description = s.getDescription();
+    }
+
+    public static long getNextAvailableId() {
+        return nextAvailableId;
+    }
+
+    public static void setNextAvailableId(long nextAvailableId) {
+        System.out.println("Estou a alterar o next id do slot!");
+        Slot.nextAvailableId += nextAvailableId;
+    }
+
+    public long getIdSlot() {
+        return idSlot;
+    }
+
+    public void setIdSlot(long idSlot) {
+        this.idSlot = idSlot;
     }
 
     public Temporal getData() {

@@ -28,14 +28,16 @@ public interface InterfCalcDateTimeScheduleModel {
 
     boolean removeSlot(Slot slot,Collection c);
 
-    Slot editDurationSlot(Slot s, Duration d);
+    boolean editDurationSlot(Slot s, Duration d);
 
-    Slot editDateSLot(Slot s, Temporal data);
+    boolean editDateSLot(Slot s, Temporal data);
 
-    Slot getSlot(String infoSlot,Collection c);
+    Slot getSlot(Long infoSlot);
 
-    Slot editLocalSlot(Slot s, String edit);
+    Slot getRestrictSlot(Long infoSlot);
 
-    Slot editDescSlot(Slot s, String edit);
+    void editLocalSlot(Slot s, String edit);
+
+    void editDescSlot(Slot s, String edit);
 }
 

@@ -120,10 +120,8 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     public List<String> getMainInfoSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
         List<String> res= new ArrayList();
-        int index =0;
         for(Slot s : schedule) {
-            res.add(index + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getLocal());
-            index ++;
+            res.add(s.getIdSlot() + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getLocal());
         }
         return res;
     }
@@ -135,10 +133,8 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
 
     public List<String> getRestrictSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
         List<String> res= new ArrayList();
-        int index =0;
         for(RestrictSlot s: scheduleRestrictions){
-            res.add(index + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getPeriod());
-            index ++;
+            res.add(s.getIdSlot() + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getPeriod());
         }
         return res;
     }
@@ -151,28 +147,24 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
 
     public List<String> getModeSlots(String modeNormalized, int want, ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
         List<String> res= new ArrayList();
-        int index =0;
         for(Slot s : schedule) {
             ZonedDateTime date = ZonedDateTime.from(s.getData());
             switch (modeNormalized) {
                 case "diaria":
                     if(date.getDayOfMonth()==want){
-                        res.add(index + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getLocal());
-                        index ++;
+                        res.add(s.getIdSlot() + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getLocal());
                     }
                     break;
                 case "semanal":
                     TemporalField woy = WeekFields.ISO.weekOfYear();
                     int weekNumber = date.get(woy);
                     if(weekNumber==want){
-                        res.add(index + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getLocal());
-                        index ++;
+                        res.add(s.getIdSlot() + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getLocal());
                     }
                     break;
                 case "mensal":
                     if(date.getMonthValue()==want){
-                        res.add(index + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getLocal());
-                        index ++;
+                        res.add(s.getIdSlot() + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getLocal());
                     }
                     break;
                 default: break;
@@ -204,6 +196,8 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                 Duration durationUntilMidnight = Duration.between(ldtNewSlot, ldt2);
                 Slot slotUntilMidnight = newSlot.clone();
                 slotUntilMidnight.setDuration(durationUntilMidnight);
+                slotUntilMidnight.setIdSlot(Slot.getNextAvailableId());
+                Slot.setNextAvailableId(1);
                 slotsToAdd.add(slotUntilMidnight);
 
                 //duracao que ainda falta considerar
@@ -218,6 +212,8 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                 slotFromMidnight.setDuration(durationFromMidnight);
                 if(durationFromMidnight.toHours() < 24) {
                     //posso adicionar porque a sua duracao já foi restrita a menos de 24 horas
+                    slotFromMidnight.setIdSlot(Slot.getNextAvailableId());
+                    Slot.setNextAvailableId(1);
                     slotsToAdd.add(slotFromMidnight);
                 }
                 else {
@@ -376,17 +372,15 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     // Altera o local de um slot
     //------------------------
-    public Slot editLocalSlot(Slot s, String newLocal) {
+    public void editLocalSlot(Slot s, String newLocal) {
         s.setLocal(newLocal);
-        return s;
     }
 
     //------------------------
     // Altera a descrição de um slot
     //------------------------
-    public Slot editDescSlot(Slot s, String newDesc) {
+    public void editDescSlot(Slot s, String newDesc) {
         s.setDescription(newDesc);
-        return s;
     }
 
     //------------------------
@@ -394,34 +388,31 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     // É necessário garantir que a nova duração não provoca sobreposições
     // Remover o slot antigo -> adicionar um novo slot, com a mesma info excepto a duração.
     //------------------------
-    public Slot editDurationSlot(Slot s, Duration newDuration) {
+    public boolean editDurationSlot(Slot s, Duration newDuration) {
         Slot temp = s.clone();
         removeSlot(s,schedule);
-        Slot newSlot = Slot.of(temp.getData(),newDuration,temp.getLocal(),temp.getDescription());
+        Slot newSlot = Slot.of(temp.getIdSlot(),temp.getData(),newDuration,temp.getLocal(),temp.getDescription());
         boolean add = addSlot(newSlot,schedule);
         if(add==false) {
             addSlot(temp,schedule);
-            return temp;
         }
-        return newSlot;
+        return add;
     }
     //------------------------
     // Alterar a data de uma reuniao
     // É necessário garantir que a nova data não provoca sobreposições
     // Remover o slot antigo -> adicionar um novo slot, com a mesma info excepto a data.
     //------------------------
-    public Slot editDateSLot(Slot s, Temporal data){
+    public boolean editDateSLot(Slot s, Temporal data){
         Slot temp = s.clone();
         removeSlot(s,schedule);
-        Slot newSlot = Slot.of(data, temp.getDuration(),temp.getLocal(),temp.getDescription());
+        Slot newSlot = Slot.of(temp.getIdSlot(),data, temp.getDuration(),temp.getLocal(),temp.getDescription());
         boolean add = addSlot(newSlot,schedule);
         if(add==false){
-            System.out.println("No model não adicionou direito.");
             addSlot(temp,schedule);
-            return temp;
         }
-        System.out.println("No model adicionou direito.");
-        return newSlot;
+        System.out.println("Resultado do add: " + add);
+        return add;
     }
 
     //------------------------
@@ -429,17 +420,19 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     // Este identificador pode ser visto como temporário
     // Devolver o objecto que o identifica
     //------------------------
-    public Slot getSlot(String infoSlot, Collection c){
-        int id = Integer.parseInt(infoSlot);
-        int index =0;
-        for(Object s : c){
-            if(index==id){
-                return (Slot)s;
-            }
-            if(index>id)
-                return null;
-        index ++;
+    public Slot getSlot(Long idSlot){
+        for(Slot s: schedule){
+            if(s.getIdSlot()==idSlot)
+                return s;
         }
-        return  null;
+        return null;
+    }
+
+    public Slot getRestrictSlot(Long idSlot){
+        for(Slot s: scheduleRestrictions){
+            if(s.getIdSlot()==idSlot)
+                return s;
+        }
+        return null;
     }
 }

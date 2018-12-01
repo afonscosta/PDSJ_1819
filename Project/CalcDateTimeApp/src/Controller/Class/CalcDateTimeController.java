@@ -188,9 +188,9 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                         opcao = opcao.substring(1); // Remover o "="
 
                         for (String infoSlot : model.getRestrictSlots(referenceZone,dtfLocal,dtfZone)) {
-                            String idSlot = getIdSlot(infoSlot);
-                            if(idSlot!=null & idSlot.equals(opcao)){
-                                Slot s= model.getSlot(idSlot,model.getScheduleRestrictions());
+                            Long idSlot = getIdSlot(infoSlot);
+                            if(idSlot>=0 & idSlot==Long.valueOf(opcao)){
+                                Slot s= model.getRestrictSlot(idSlot);
                                 if(s!=null) {
                                     flowSelectRestrictSchedule(s);
                                     break;
@@ -207,7 +207,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
 
     private void flowSelectRestrictSchedule(Slot s){
         Menu menu = viewMainTxt.getMenu(10);
-        String opcao;
+        String opcao="";
         boolean res=false;
         String statusMessage = "n/a" ;
         String erroMessage = "n/a" ;
@@ -215,11 +215,16 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         DateTimeFormatter dtfLocal= DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat());
         DateTimeFormatter dtfZone = DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat());
         do{
-            List<String> dataToShow = slotToString(s,referenceZone,dtfLocal,dtfZone, true);
-            menu.addDescToTitle(Arrays.asList(dataToShow.get(0),
-                                              dataToShow.get(2),
-                                              dataToShow.get(3))
-            );
+            if(opcao.equals("R")){
+                menu.addDescToTitle(Arrays.asList(""));
+            }
+            else {
+                List<String> dataToShow = slotToString(s, referenceZone, dtfLocal, dtfZone, true);
+                menu.addDescToTitle(Arrays.asList(dataToShow.get(0),
+                        dataToShow.get(2),
+                        dataToShow.get(3))
+                );
+            }
             menu.addStatusMessage(statusMessage);
             menu.addErrorMessage(erroMessage);
             statusMessage = "n/a" ;
@@ -384,6 +389,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                     model.setZoneDateTimeFormat(setDinamicDateFormatZoned());
                     statusMessage = "Formato de apresentacao de datas com zonas modificado";
                     break;
+                case "?": helpFormatZone(); break;
                 case "S": break;
                 default: errorMessage = "Opcao Invalida!"; break;
             }
