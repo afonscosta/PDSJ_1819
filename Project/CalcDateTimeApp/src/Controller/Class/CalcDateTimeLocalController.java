@@ -473,8 +473,8 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             "O primeiro dia da semana e o 26. O segundo dia e o 27. O",
             "terceiro e o 28 e assim sucessivamente.",
             " ",
-            "Por fim, importa referir que casa seja introduzida uma",
-            BLACK_BOLD + "semana em branco" + RESET + " e apresentado o " + BLACK_BOLD + "mes completo" + RESET + " no forma",
+            "Por fim, importa referir que caso seja introduzida uma",
+            BLACK_BOLD + "semana em branco" + RESET + " e apresentado o " + BLACK_BOLD + "mes completo" + RESET + " no formato",
             "apresentado a cima. O mesmo acontece para a semana, caso",
             "o " + BLACK_BOLD + "dia" + RESET + " seja inserido em" + BLACK_BOLD + " branco" + RESET + " e apresentada a " + BLACK_BOLD + "semana ",
             "inteira" + RESET + " no formato apresentado em cima.");
