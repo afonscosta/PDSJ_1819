@@ -81,6 +81,9 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         if (configs.getScheduleRestrictions() != null) {
             this.scheduleRestrictions = configs.getScheduleRestrictions();
         }
+    }
+
+    public void initNextAvailableID(){
         long nSlot;
         long nRestrictSlot;
 

@@ -14,6 +14,8 @@ public interface InterfCalcDateTimeScheduleModel {
 
     void loadConfigs(Configs configs);
 
+    void initNextAvailableID();
+
     Collection getSchedule();
 
     Collection getScheduleRestrictions();

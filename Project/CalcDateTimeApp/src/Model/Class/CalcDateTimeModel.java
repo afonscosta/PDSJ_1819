@@ -32,6 +32,7 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
         this.modelLocal.loadConfigs(configs);
         this.modelZone.loadConfigs(configs);
         this.modelSchedule.loadConfigs(configs);
+        this.modelSchedule.initNextAvailableID();
     }
 
     //------------------------
