@@ -90,12 +90,11 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         else
             nSlot=0;
         Slot.loadAvailableId(nSlot);
-        if(schedule.size()>0) {
+        if(scheduleRestrictions.size()>0) {
             nRestrictSlot = scheduleRestrictions.stream().mapToLong(x -> x.getIdSlot()).max().getAsLong() + 1;
         }
         else
             nRestrictSlot=0;
-
         RestrictSlot.loadAvailableId(nRestrictSlot);
     }
 
