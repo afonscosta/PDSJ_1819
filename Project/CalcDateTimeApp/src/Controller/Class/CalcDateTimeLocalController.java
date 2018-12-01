@@ -336,7 +336,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             if (month != null) {
                 zdt = zdt.withMonth(month);
                 while (nweeks == null) {
-                    out.print("Semana do mes (1ª, 2ª, ...): ");
+                    out.print("Semana do mes (1, 2, ...): ");
                     str = Input.lerString();
                     nweeks = validateNumWeek(str, -1, year, month);
                     if (nweeks == null)
@@ -349,7 +349,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                 }
                 zdt = (ZonedDateTime) nextMondayN(zdt, nweeks-1);
                 while (ndays == null) {
-                    out.print("Dia da semana (1º, 2º, ...): ");
+                    out.print("Dia da semana (1, 2, ...): ");
                     str = Input.lerString();
                     ndays = validateNumDay(str, -1, year, month, nweeks);
                     if (ndays == null)
@@ -459,7 +459,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             "Isto porque o mes 11 de 2018 esta dividido nas seguintes",
             "semanas:",
             BLACK_BOLD + "                novembro 2018   ",
-            "            se te qu qu se sá do",
+            "            se te qu qu se sa do",
             "                      1  2  3  4 (Semana 1)",
             "             5  6  7  8  9 10 11 (Semana 2)",
             "            12 13 14 15 16 17 18 (Semana 3)",
@@ -468,15 +468,15 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             " ",
             "Desta forma, a quinta semana contem os seguintes dias:",
             BLACK_BOLD + "                novembro 2018   ",
-            "            se te qu qu se sá do",
+            "            se te qu qu se sa do",
             "            26 27 28 29 30      " + RESET,
-            "O primeiro dia da semana é o 26. O segundo dia é o 27. O",
-            "terceiro é o 28 e assim sucessivamente.",
+            "O primeiro dia da semana e o 26. O segundo dia e o 27. O",
+            "terceiro e o 28 e assim sucessivamente.",
             " ",
             "Por fim, importa referir que casa seja introduzida uma",
-            BLACK_BOLD + "semana em branco" + RESET + " é apresentado o " + BLACK_BOLD + "mes completo" + RESET + " no forma",
+            BLACK_BOLD + "semana em branco" + RESET + " e apresentado o " + BLACK_BOLD + "mes completo" + RESET + " no forma",
             "apresentado a cima. O mesmo acontece para a semana, caso",
-            "o " + BLACK_BOLD + "dia" + RESET + " seja inserido em" + BLACK_BOLD + " branco" + RESET + " é apresentada a " + BLACK_BOLD + "semana ",
+            "o " + BLACK_BOLD + "dia" + RESET + " seja inserido em" + BLACK_BOLD + " branco" + RESET + " e apresentada a " + BLACK_BOLD + "semana ",
             "inteira" + RESET + " no formato apresentado em cima.");
         flowHelp(viewLocalTxt.getMenu(2), l);
     }
