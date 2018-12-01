@@ -205,7 +205,7 @@ public class ControllerUtils {
                                 flowDone = true;
                             }
                         }
-                    } else if (opcao.matches("[Ss]")) { // Selecionando o zoneId por defeito com "="
+                    } else if (opcao.matches("[Ss]")) {
                         zoneIdList.add(defaultZoneid);
                         if (zoneIdList.size() == zoneIdsWanted) {
                             flowDone = true;
