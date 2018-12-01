@@ -109,10 +109,10 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         // Menu Navegador de ZoneIds
         //------------------------
         op1 = new Opcao("Pagina anterior", "<");
-        op2 = new Opcao("Procurar", "/<palavra>");
+        op2 = new Opcao("Procurar", "/palavra");
         op3 = new Opcao("Pagina seguinte", ">");
-        op4 = new Opcao("Selecionar", "=<palavra>");
-        op5 = new Opcao("Manter ZoneID atual", "S");
+        op4 = new Opcao("Selecionar", "=palavra");
+        op5 = new Opcao("Selecionar fuso atual", "S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5);
         Menu menuZoneIdNavigator = new Menu(linhas, "Navegador de ZoneIds");
         menusScheduleTxt.addMenu(8, menuZoneIdNavigator);
