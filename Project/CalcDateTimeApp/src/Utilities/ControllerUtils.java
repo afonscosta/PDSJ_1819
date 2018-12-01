@@ -239,10 +239,12 @@ public class ControllerUtils {
      */
     public static String printMonth(TemporalAccessor tacs) {
         LocalDate ld;
+        LocalDate start;
         try {
             ld = LocalDate.from(tacs);
+            start = LocalDate.from(tacs);
             printHeader(ld.getMonthValue());
-            while (ld.getMonthValue() == ld.getMonthValue()) {
+            while (ld.getMonthValue() == start.getMonthValue()) {
                 out.println(ld.query(BusinessUtils::organizeDays));
                 ld = (LocalDate) nextMondayN(ld, 1);
             }

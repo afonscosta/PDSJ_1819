@@ -21,7 +21,7 @@ public class CalcDateTimeZoneModel extends CalcDateTimeLocalModel implements Int
 
     private CalcDateTimeZoneModel() {
         super();
-        this.zoneDateTimeFormat = "yyyy/MM/dd H:m - VV";
+        this.zoneDateTimeFormat = "yyyy/MM/dd HH:mm - VV";
     }
 
     public static CalcDateTimeZoneModel of () {

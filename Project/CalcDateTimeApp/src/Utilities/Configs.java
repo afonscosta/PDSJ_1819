@@ -36,8 +36,8 @@ public class Configs implements Serializable{
     public Configs() {
         this.schedule = null;
         this.scheduleRestrictions = null;
-        this.zoneDateTimeFormat = "yyyy/MM/dd H:m - VV";
-        this.localDateTimeFormat = "yyyy/MM/dd H:m";
+        this.zoneDateTimeFormat = "yyyy/MM/dd HH:mm - VV";
+        this.localDateTimeFormat = "yyyy/MM/dd HH:mm";
         this.zoneId = ZoneId.systemDefault().toString();
     }
 
