@@ -445,7 +445,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     }
                     else {
                         //Utilizar o próprio para o zone
-                        data = getZoneDateTimeFromInput(viewScheduleTxt.getMenu(8), model.getZoneZone(), (ZonedDateTime) model.getDateTimeZone());
+                        data = getZoneDateTimeFromInput(viewScheduleTxt.getMenu(8), ((ZonedDateTime) s.getData()).getZone().getId(), (ZonedDateTime) s.getData());
                         res = model.editDateSLot(idSelectSlot, data);
                     }
                     break;

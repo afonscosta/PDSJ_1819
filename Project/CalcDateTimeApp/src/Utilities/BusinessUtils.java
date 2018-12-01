@@ -183,7 +183,7 @@ public class BusinessUtils {
      */
     public static Integer validateMonth(String str, Integer def) {
         Integer num = null;
-        if (str.matches("^([1-9]|1[0-2])$")) {
+        if (str.matches("^(0?[1-9]|1[0-2])$")) {
             num = Integer.parseInt(str);
         }
         else if (str.isEmpty())
@@ -223,7 +223,7 @@ public class BusinessUtils {
     public static Integer validateDay(String str, Integer def, int year, int month) {
         int end = YearMonth.of(year, month).lengthOfMonth();
         Integer num = null;
-        if (str.matches("^([1-9]|1[0-9]|2[0-9]|3[01])$")) {
+        if (str.matches("^(0?[1-9]|1[0-9]|2[0-9]|3[01])$")) {
             num = Integer.parseInt(str);
             if (num > end) // O dia escolhido não existe no mês
                 num = null;
@@ -260,7 +260,7 @@ public class BusinessUtils {
      */
     public static Integer validateHour(String str, Integer def) {
         Integer num = null;
-        if (str.matches("^([0-9]|1[0-9]|2[0-3])$")) {
+        if (str.matches("^(0?[0-9]|1[0-9]|2[0-3])$")) {
             num = Integer.parseInt(str);
         }
         else if (str.isEmpty()) {
@@ -276,7 +276,7 @@ public class BusinessUtils {
      */
     public static Integer validateMinSec(String str, Integer def) {
         Integer num = null;
-        if (str.matches("^([0-9]|[1-5][0-9])$")) {
+        if (str.matches("^(0?[0-9]|[1-5][0-9])$")) {
             num = Integer.parseInt(str);
         }
         else if (str.isEmpty()) {

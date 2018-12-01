@@ -2,10 +2,8 @@ package Utilities;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,7 +12,6 @@ import static Utilities.BusinessUtils.*;
 import static Utilities.ConsoleColors.*;
 import static java.lang.Integer.parseInt;
 import static java.lang.System.out;
-import static java.time.temporal.ChronoField.HOUR_OF_DAY;
 import static java.time.temporal.ChronoUnit.HOURS;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
@@ -286,13 +283,13 @@ public class ControllerUtils {
 
         out.print("Duracao (hh:mm): ");
         String dur = Input.lerString();
-        pattern = Pattern.compile("^([0-9]|1[0-9]|2[0-3]):([0-9]|[1-5][0-9])$");
+        pattern = Pattern.compile("^(\\d+):(0?[0-9]|[1-5][0-9])$");
         matcher = pattern.matcher(dur);
         while (!matcher.find()) {
             out.println(RED_BOLD + "[!] Sintaxe Invalida." + RESET);
             out.print("Duracao (hh:mm): ");
             dur = Input.lerString();
-            pattern = Pattern.compile("^([0-9]|1[0-9]|2[0-3]):([0-9]|[1-5][0-9])$");
+            pattern = Pattern.compile("^(\\d+):(0?[0-9]|[1-5][0-9])$");
             matcher = pattern.matcher(dur);
         }
 
