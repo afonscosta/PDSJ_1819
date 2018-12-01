@@ -129,7 +129,7 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         //------------------------
         op1 = new Opcao("Pagina anterior", "<");
         op2 = new Opcao("Pagina seguinte", ">");
-        op3 = new Opcao("Selecionar", "=palavra");
+        op3 = new Opcao("Selecionar", "=id_restricao");
         op4 = new Opcao("Voltar ao Menu Restricoes", "S");
         linhas = Arrays.asList(op1,op2,op3,op4);
         Menu menuRestrictNavigator = new Menu(linhas, "Restricoes definidas");

@@ -73,6 +73,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     public static CalcDateTimeScheduleModel of() {
         return new CalcDateTimeScheduleModel();
     }
+
     @Override
     public void loadConfigs(Configs configs) {
         if (configs.getSchedule() != null) {
@@ -194,7 +195,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     //Restrições que sejam definidas em que abrangem mais que uma, teram de ser separadas, para cada dia ser tratado individulamente
     //------------------------
-    public List<Slot> partitionSlot(Slot newSlot) {
+    private List<Slot> partitionSlot(Slot newSlot) {
         List<Slot> slotsToAdd = new ArrayList<>();
 
         Duration durationNewSlot = newSlot.getDuration();
@@ -254,7 +255,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     // compara em termos de LocalTime dois slots
     //------------------------
-    public boolean compareTime(LocalTime ldt1, LocalTime ldt2, Slot newSlot, Slot s){
+    private boolean compareTime(LocalTime ldt1, LocalTime ldt2, Slot newSlot, Slot s){
         if (ldt1.isBefore(ldt2)) {
             Duration d1 = newSlot.getDuration();
             LocalTime data1Final = ldt1.plus(d1);
@@ -277,7 +278,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     // compara em termos de LocalDateTime dois slots
     //------------------------
-    public boolean compareLocalDateTime(LocalDateTime ldt1, LocalDateTime ldt2, Slot newSlot, Slot s){
+    private boolean compareLocalDateTime(LocalDateTime ldt1, LocalDateTime ldt2, Slot newSlot, Slot s){
         if (ldt1.isBefore(ldt2)) {
             Duration d1 = newSlot.getDuration();
             LocalDateTime data1Final = ldt1.plus(d1);
@@ -300,7 +301,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     // Só posso agendar uma reunião se não houver nenhuma restrição definida que sobreponha
     //------------------------
-    public boolean doesNotBreakAnyRestrict(Slot newSlot){
+    private boolean doesNotBreakAnyRestrict(Slot newSlot){
         boolean res;
         LocalDateTime ldtNewSlot = convertToZone(newSlot.getData(), getReferenceZone()).toLocalDateTime();
         for(RestrictSlot s : scheduleRestrictions){
@@ -336,7 +337,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     // Só posso adicionar uma restrição se não houver nenhuma reunião já agendada que quebra a restrição que se pretenda adicionar
     //------------------------
 
-    public boolean doesNotOverlapAnySchedule(List<Slot> slotsToAdd,Collection c){
+    private boolean doesNotOverlapAnySchedule(List<Slot> slotsToAdd, Collection c){
         boolean state=true;
         boolean res;
         for(Slot sToAdd : slotsToAdd) {
