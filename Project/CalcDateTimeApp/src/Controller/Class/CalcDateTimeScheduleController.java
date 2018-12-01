@@ -437,6 +437,20 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     private void help() {
         List<String> l = asList(
                 BLACK_BOLD + "Opcoes:" + RESET,
+                BLACK_BOLD + "=id_evento" + RESET +
+                        "   Cada reuniao contem antes da sua descricao",
+                "         um identificador.",
+                "         Pretendendo selecionar, por exemplo, a reuniao",
+                "         com o identifcador 0, o utilizador devera introduzir",
+                "         a opcao "+ RESET + BLACK_BOLD + "=0" + RESET +".",
+                "         No novo menu apresentado podera alterar qualquer ",
+                "         dado da reuniao, remover ou ver detalhes da mesma.",
+                " ",
+                BLACK_BOLD + "<" + RESET +
+                        "        Recuar a pagina que esta ser apresentada.",
+                BLACK_BOLD + ">" + RESET +
+                        "        Avancar a pagina que esta ser apresentada.",
+                " ",
                 BLACK_BOLD + "/<vista>" + RESET +
                         " Permite ter uma visao diaria, semanal ou mensal",
                 "         das reunioes. Se pretender uma visao diaria devera ",
@@ -446,12 +460,6 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                 "         agendadas devera introduzir apenas" + RESET + BLACK_BOLD + " /" + RESET + ".",
                 "         O principio e o mesmo para os restantes",
                 "         modos de visualizacao."+ RESET,
-                " ",
-                BLACK_BOLD + "<" + RESET +
-                        "        Recuar a pagina que esta ser apresentada.",
-                BLACK_BOLD + ">" + RESET +
-                        "        Avancar a pagina que esta ser apresentada.",
-                " ",
                 BLACK_BOLD + ">>" + RESET +
                         "       Caso prentenda avancar no dia/semana/mes referente",
                 "         ao modo de visualizacao. Por exemplo, foi selecionada",
@@ -464,17 +472,8 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                         "       Da mesma forma que a anterior, esta opcao permite recuar um",
                 "         dia, semana ou mes de acordo com o modo de visualizacao.",
                 "         Estas duas ultimas opcoes permitem navegar sempre com a",
-                "         apresentacao no mesmo intervalo.",
-                " ",
-                BLACK_BOLD + "=<id>" + RESET +
-                        "   Cada reuniao contem antes da sua descricao",
-                "         um identificador.",
-                "         Pretendendo selecionar, por exemplo, a reuniao",
-                "         com o identifcador 0, o utilizador devera introduzir",
-                "         a opcao "+ RESET + BLACK_BOLD + "=0" + RESET +".",
-                "         No novo menu apresentado podera alterar qualquer ",
-                "         dado da reuniao, remover ou ver detalhes da mesma."
-        );
+                "         apresentacao no mesmo intervalo."
+                );
         flowHelp(viewScheduleTxt.getMenu(7),l);
     }
 }

@@ -31,7 +31,7 @@ public class CalcDateTimeZoneView implements InterfCalcDateTimeZoneView {
         op7 = new Opcao("Converter para fuso", "F");
         op8 = new Opcao("Diferenca entre dois fusos", "DF");
         op9 = new Opcao("Ajuda", "?");
-        op10 = new Opcao("Sair da aplicacao", "S");
+        op10 = new Opcao("Voltar ao Menu principal", "S");
         List<Opcao> linhas = Arrays.asList(op1,op2,op3,op4,op5,op6,op7,op8,op9,op10);
         Menu menuCalcDateTimeZone = new Menu(linhas,"Menu Calculadora de Zonas");
         menusZoneTxt.addMenu(0,menuCalcDateTimeZone);
@@ -56,7 +56,7 @@ public class CalcDateTimeZoneView implements InterfCalcDateTimeZoneView {
         // Menu Shift WorkDays DateTimeZone
         //------------------------
         op1 = new Opcao("Aritmetica de dias uteis", "M");
-        op2 = new Opcao("Voltar a Calc. Local", "S");
+        op2 = new Opcao("Voltar a Calc. de Zonas", "S");
         linhas = Arrays.asList(op1, op2);
         Menu menuShiftWorkDaysDateTime = new Menu(linhas, "Aritmetica de Dias Uteis");
         menusZoneTxt.addMenu(2, menuShiftWorkDaysDateTime);
@@ -66,7 +66,7 @@ public class CalcDateTimeZoneView implements InterfCalcDateTimeZoneView {
         //------------------------
         op1 = new Opcao("Alterar data de inicio", "I");
         op2 = new Opcao("Inserir data de fim", "F");
-        op3 = new Opcao("Voltar a Calc. Local", "S");
+        op3 = new Opcao("Voltar a Calc. de Zonas", "S");
         linhas = Arrays.asList(op1, op2, op3);
         Menu menuDiffDateTime = new Menu(linhas, "Diferenca entre Datas");
         menusZoneTxt.addMenu(3, menuDiffDateTime);
@@ -75,10 +75,10 @@ public class CalcDateTimeZoneView implements InterfCalcDateTimeZoneView {
         // Menu Navegador de ZoneIds
         //------------------------
         op1 = new Opcao("Pagina anterior", "<");
-        op2 = new Opcao("Procurar", "/<palavra>");
+        op2 = new Opcao("Procurar", "/palavra_a_procurar");
         op3 = new Opcao("Ver lista completa", "/");
         op4 = new Opcao("Pagina seguinte", ">");
-        op5 = new Opcao("Selecionar", "=<palavra>");
+        op5 = new Opcao("Selecionar", "=fuso_pretendido");
         op6 = new Opcao("Manter ZoneID atual", "S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5, op6);
         Menu menuZoneIdNavigator = new Menu(linhas, "Navegador de ZoneIds");

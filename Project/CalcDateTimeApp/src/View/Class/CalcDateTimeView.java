@@ -55,7 +55,7 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         op1 = new Opcao("Pagina anterior", "<");
         op2 = new Opcao("Procurar", "/palavra_a_procurar");
         op3 = new Opcao("Pagina seguinte", ">");
-        op4 = new Opcao("Selecionar", "=palavra_a_selecionar");
+        op4 = new Opcao("Selecionar", "=fuso_pretendido");
         op5 = new Opcao("Selecionar fuso atual", "S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5);
         Menu menuZoneIdNavigator = new Menu(linhas, "Navegador de ZoneIds");

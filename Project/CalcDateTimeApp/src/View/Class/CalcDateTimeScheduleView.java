@@ -32,7 +32,7 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         //------------------------
         // Menu Busy slots navigator
         //------------------------
-        op1 = new Opcao("Selecionar", "=id_evento_pretendido");
+        op1 = new Opcao("Selecionar", "=id_evento");
         op2 = new Opcao("Pagina anterior", "<");
         op3 = new Opcao("Pagina seguinte", ">");
         op4 = new Opcao("Vista(diaria/semanal/mensal)", "/vista_pretendida");

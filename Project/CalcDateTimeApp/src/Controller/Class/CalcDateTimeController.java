@@ -435,8 +435,25 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
     private void helpConfig() {
-        out.println("Menu de ajuda da configuracao.");
-        Input.lerString();
+        List<String> l = asList(
+                BLACK_BOLD + "Opcao FL:" + RESET + " permite ao utilizador definir o formato",
+                "          de apresentacao das datas locais.",
+                " ",
+                BLACK_BOLD + "Opcao FF:" + RESET + " permite ao utilizador definir o formato",
+                "          de apresentacao das datas com fusos.",
+                " ",
+                BLACK_BOLD + "Opcao F:" + RESET + " permite ao utilizador definir o seu ",
+                "         fuso local.",
+                " ",
+                BLACK_BOLD + "Opcao R:" + RESET + " permite ao utilizador definir restricoes",
+                "         que queira impor sobre a agenda. Podera ser",
+                "         uma restricao numa data especifica, ou uma",
+                "         restricao global a agenda, desde diaria a semanal.",
+                " ",
+                BLACK_BOLD + "Opcao ?:" + RESET + " permite ao utilizador visualizar este menu.",
+                " ",
+                BLACK_BOLD + "Opcao S:" + RESET + " permite ao utilizador voltar para o menu principal.");
+        flowHelp(viewMainTxt.getMenu(3), l);
     }
 
     //------------------------
@@ -453,6 +470,10 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 " ",
                 BLACK_BOLD + "Opcao A:" + RESET + " permite ao utilizador aceder ao menu ",
                 "         onde se encontram as funcionalidades da agenda.",
+                " ",
+                BLACK_BOLD + "Opcao C:" + RESET + " permite ao utilizador definir o formato",
+                "         da apresentacao das datas, o seu fuso local e",
+                "         restricoes que queira impor sobre a agenda.",
                 " ",
                 BLACK_BOLD + "Opcao ?:" + RESET + " permite ao utilizador visualizar este menu.",
                 " ",
