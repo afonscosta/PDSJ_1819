@@ -81,6 +81,22 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         if (configs.getScheduleRestrictions() != null) {
             this.scheduleRestrictions = configs.getScheduleRestrictions();
         }
+        long nSlot;
+        long nRestrictSlot;
+
+        if(schedule.size()>0) {
+            nSlot = schedule.stream().mapToLong(x -> x.getIdSlot()).max().getAsLong() + 1;
+        }
+        else
+            nSlot=0;
+        Slot.loadAvailableId(nSlot);
+        if(schedule.size()>0) {
+            nRestrictSlot = scheduleRestrictions.stream().mapToLong(x -> x.getIdSlot()).max().getAsLong() + 1;
+        }
+        else
+            nRestrictSlot=0;
+
+        RestrictSlot.loadAvailableId(nRestrictSlot);
     }
 
     //------------------------

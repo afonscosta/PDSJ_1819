@@ -27,7 +27,7 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         //------------------------
         op1 = new Opcao("Calculadora DateTime Local", "L");
         op2 = new Opcao("Calculadora DateTime com Zonas", "Z");
-        op3 = new Opcao("Agenda de Reunioes","A");
+        op3 = new Opcao("Agenda de Eventos","A");
         op4 = new Opcao("Configuracoes","C");
         op5 = new Opcao("Ajuda", "?");
         op6 = new Opcao("Sair da Aplicacao", "S");
@@ -53,9 +53,9 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         // Menu Navegador de ZoneIds
         //------------------------
         op1 = new Opcao("Pagina anterior", "<");
-        op2 = new Opcao("Procurar", "/palavra");
+        op2 = new Opcao("Procurar", "/palavra_a_procurar");
         op3 = new Opcao("Pagina seguinte", ">");
-        op4 = new Opcao("Selecionar", "=palavra");
+        op4 = new Opcao("Selecionar", "=palavra_a_selecionar");
         op5 = new Opcao("Selecionar fuso atual", "S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5);
         Menu menuZoneIdNavigator = new Menu(linhas, "Navegador de ZoneIds");

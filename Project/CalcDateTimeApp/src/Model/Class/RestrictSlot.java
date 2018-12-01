@@ -54,6 +54,11 @@ public class RestrictSlot extends Slot {
         System.out.println("nextAvailableId restrict:->" + nextAvailableId);
     }
 
+    public static void loadAvailableId(long initValue){
+        System.out.println("init restrict-> " + initValue);
+        nextAvailableId = initValue;
+    }
+
     public String getPeriod() {
         return period;
     }

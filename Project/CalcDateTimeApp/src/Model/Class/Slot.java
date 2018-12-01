@@ -5,7 +5,7 @@ import java.time.Duration;
 import java.time.temporal.Temporal;
 
 public class Slot implements Serializable {
-    private static long nextAvailableId=0;
+    private static long nextAvailableId;
     private long idSlot;
     private Temporal data;
     private Duration duration;
@@ -62,6 +62,11 @@ public class Slot implements Serializable {
         if(nextAvailableId>0)
                 nextAvailableId --;
         System.out.println("nextAvailableId slot:->" + nextAvailableId);
+    }
+
+    public static void loadAvailableId(long initValue){
+        System.out.println("init slot-> " + initValue);
+        nextAvailableId = initValue;
     }
 
     public long getIdSlot() {
