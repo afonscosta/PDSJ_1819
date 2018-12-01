@@ -281,23 +281,11 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
 
     private boolean addRestrictSchedule(String mode){
         ZonedDateTime zdt = ZonedDateTime.from(model.getDateTimeLocal());
-        ZoneId referenceZoneID = zdt.getZone();
-        out.println("Data da restricao:");
-        Temporal date = getDateTimeFromInput((ZonedDateTime) model.getDateTimeLocal(), referenceZoneID);
-        out.println("Duracao");
-        out.print("Horas ira demorar: ");
-        int horas = Input.lerInt();
-        out.print("Minutos ira demorar: ");
-        int minutos = Input.lerInt();
-        Duration duration = Duration.of(horas, ChronoUnit.HOURS);
-        duration = duration.plus(minutos, ChronoUnit.MINUTES);
-
-        out.print("Introduza uma descricao da restricao: ");
-        String desc = Input.lerString();
-
+        Temporal date = getDateTimeFromInput(zdt, zdt.getZone());
+        Duration duration = getDurationFromInput();
+        String desc = getDescFromInput();
         RestrictSlot newSlot = RestrictSlot.of(date, duration, null, desc, mode);
         return model.addSlot(newSlot,model.getScheduleRestrictions());
-
     }
 
     private void flowSetZone() {
@@ -354,15 +342,15 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             opcao = opcao.toUpperCase();
             switch(opcao) {
                 case "1":
-                    model.setLocalDateTimeFormat("dd-MM-yyy HH:mm");
+                    model.setLocalDateTimeFormat("dd-MM-yyyy HH:mm");
                     statusMessage = "Formato de apresentacao local modificado";
                     break;
                 case "2":
-                    model.setLocalDateTimeFormat("dd-MM-yyy HH:mm:ss");
+                    model.setLocalDateTimeFormat("dd-MM-yyyy HH:mm:ss");
                     statusMessage = "Formato de apresentacao local modificado";
                     break;
                 case "3":
-                    model.setLocalDateTimeFormat("dd-MM-yyy HH:mm:ss:nn");
+                    model.setLocalDateTimeFormat("dd-MM-yyyy HH:mm:ss:nn");
                     statusMessage = "Formato de apresentacao local modificado";
                     break;
                 case "S": break;
@@ -419,19 +407,19 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             opcao = opcao.toUpperCase();
             switch(opcao) {
                 case "1":
-                    model.setZoneDateTimeFormat("dd-MM-yyy HH:mm VV");
+                    model.setZoneDateTimeFormat("dd-MM-yyyy HH:mm VV");
                     statusMessage = "Formato de apresentacao de datas com zonas modificado";
                     break;
                 case "2":
-                    model.setZoneDateTimeFormat("dd-MM-yyy HH:mm:ss VV");
+                    model.setZoneDateTimeFormat("dd-MM-yyyy HH:mm:ss VV");
                     statusMessage = "Formato de apresentacao de datas com zonas modificado";
                     break;
                 case "3":
-                    model.setZoneDateTimeFormat("dd-MM-yyy HH:mm:ss O");
+                    model.setZoneDateTimeFormat("dd-MM-yyyy HH:mm:ss O");
                     statusMessage = "Formato de apresentacao de datas com zonas modificado";
                     break;
                 case "4":
-                    model.setZoneDateTimeFormat("dd-MM-yyy HH:mm VV O");
+                    model.setZoneDateTimeFormat("dd-MM-yyyy HH:mm VV O");
                     statusMessage = "Formato de apresentacao de datas com zonas modificado";
                     break;
                 case "S": break;
@@ -480,18 +468,18 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 "Pode ser feita qualquer combinacao com:",
                 "   G: era formato textual",
                 "   y: ano (2018)",
-                "   M: mes formato numero(12)",
-                "   L: mes formato textual(Dezembro)",
-                "   d: dia do mes(24)",
-                "   D: dia do ano(189)",
+                "   M: mes formato numero (12)",
+                "   L: mes formato textual (dezembro)",
+                "   d: dia do mes (24)",
+                "   D: dia do ano (189)",
                 "",
                 "   W: Semana do mes com base no primeiro dia da semana",
-                "   E : dia da semana formato textual(Tuesday)",
+                "   E : dia da semana formato textual (Tuesday)",
                 "",
                 "   a: am ou pm",
-                "   h: horas apresentadas(1-12)",
-                "   k: horas apresentadas(1-24)",
-                "   H: horas de um dia(0-23)",
+                "   h: horas apresentadas (1-12)",
+                "   k: horas apresentadas (1-24)",
+                "   H: horas de um dia (0-23)",
                 "   m: minutos de uma hora",
                 "   s: segundos de um minuto",
                 "   A: mili de um dia",
@@ -500,7 +488,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 "",
                 "   VV: identificador do fuso (Europe/Lisbon)",
                 "   z: nome do fuso (Portugal)",
-                "   O: zone-offset(GMT+0)"
+                "   O: zone-offset (GMT+0)"
             );
         flowHelp(viewMainTxt.getMenu(3), l);
     }

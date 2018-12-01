@@ -47,21 +47,21 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     //------------------------
     // Retorna o formato para LocalDateTime definido no ficheiro de configurações
     //------------------------
-    public DateTimeFormatter getDateTimeFormatterLocal(){
+    private DateTimeFormatter getDateTimeFormatterLocal(){
         return DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat());
     }
 
     //------------------------
     // Retorna o formato para ZonedDateTime definido no ficheiro de configurações
     //------------------------
-    public DateTimeFormatter getDateTimeFormatterZoned(){
+    private DateTimeFormatter getDateTimeFormatterZoned(){
         return DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat());
     }
 
     //------------------------
     // Retorna o zonedId definido no ficheiro de configurações
     //------------------------
-    public ZoneId getRefereceZoneId(){
+    private ZoneId getRefereceZoneId(){
         ZonedDateTime zdt = ZonedDateTime.from(model.getDateTimeLocal());
         return zdt.getZone();
     }
@@ -116,8 +116,8 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             switch(opcao) {
                 case "L" : res = addSlot(tempLocal);break;
                 case "Z" : res = addSlot(tempZone); break;
-                case "ML": Temporal date = getDateFromInput("ML");res = addSlot(date); break;
-                case "MF":  date = getDateFromInput("MF"); res = addSlot(date); break;
+                case "ML": Temporal date = getManualDateTime("ML"); res = addSlot(date); break;
+                case "MF":  date = getManualDateTime("MF"); res = addSlot(date); break;
                 case "S": break;
                 default: errorMessage = "Opcao Invalida !"; break;
             }
@@ -133,13 +133,12 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         while(!(opcao.equals("S")));
     }
 
-    public Temporal getDateFromInput(String typeOfDate){
+    private Temporal getManualDateTime(String typeOfDate){
         ZoneId zonedId = getRefereceZoneId();
         if(typeOfDate.equals("MF")){
             String zoneIdString = flowGetNZoneIds(1, viewScheduleTxt.getMenu(8), model.getZoneZone()).get(0);
             zonedId = ZoneId.of(zoneIdString);
         }
-
         return  getDateTimeFromInput((ZonedDateTime) model.getDateTimeLocal(), zonedId);
     }
 
@@ -147,29 +146,13 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     // Adicionar uma nova reunião
     //------------------------
     private boolean addSlot(Temporal date){
-        String local;
-        String desc;
         Duration duration = getDurationFromInput();
-
-        out.print("Local: ");
-        local = Input.lerString();
-        while (local.equals("")) {
-            out.println(RED_BOLD + "[!] Tem de ser preenchido." + RESET);
-            out.print("Local: ");
-            local = Input.lerString();
-        }
-
-        out.print("Descricao: ");
-        desc= Input.lerString();
-        while (desc.equals("")) {
-            out.println(RED_BOLD + "[!] Tem de ser preenchida." + RESET);
-            out.print("Descricao: ");
-            desc= Input.lerString();
-        }
-
+        String local = getLocalFromInput();
+        String desc = getDescFromInput();
         Slot newSlot = Slot.of(date, duration, local, desc);
         return model.addSlot(newSlot, model.getSchedule());
     }
+
 
     //------------------------
     // Fluxo de visualizar reuniões agendadas
@@ -267,16 +250,16 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     //------------------------
     // Dado modo, a data atual do modo e a operação desejada pelo utilizador, atualiza a data do modo.
     //------------------------
-    public LocalDate changeDataMode(LocalDate currentDateMode, String mode, int n){
+    private LocalDate changeDataMode(LocalDate currentDateMode, String mode, int n){
         switch (mode){
             case "":
                 return currentDateMode;
             case "diaria":
-                return (LocalDate)BusinessUtils.shiftDateTime(currentDateMode,n,DAYS);
+                return (LocalDate) shiftDateTime(currentDateMode,n,DAYS);
             case"semanal":
-                return (LocalDate)BusinessUtils.shiftDateTime(currentDateMode,n,WEEKS);
+                return (LocalDate) shiftDateTime(currentDateMode,n,WEEKS);
             case"mensal":
-                return (LocalDate)BusinessUtils.shiftDateTime(currentDateMode,n,MONTHS);
+                return (LocalDate) shiftDateTime(currentDateMode,n,MONTHS);
         }
         return currentDateMode;
     }
@@ -285,7 +268,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     // Fluxo ao selecionar uma reunião
     // Pode-se optar por alterar, remover, ver detalhes dessa reunião
     //------------------------
-    public void flowSelectBusySlot(Long idSelectSlot) {
+    private void flowSelectBusySlot(Long idSelectSlot) {
         Menu menu = viewScheduleTxt.getMenu(2);
         String opcao="";
         String errorMessage = "n/a";
@@ -373,31 +356,17 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
 
     //------------------------
     // Editar descrição de uma reunião
-    // Devolve o slot com a informação alterada caso seja possivel alterar
     //------------------------
     private void editDesc(Long idSelectSlot) {
-        out.print("Nova descricao: ");
-        String newDesc = Input.lerString();
-        while (newDesc.equals("")) {
-            out.println(RED_BOLD + "[!] Tem de ser preenchida." + RESET);
-            out.print("Nova descricao: ");
-            newDesc = Input.lerString();
-        }
+        String newDesc = getNewDescFromInput();
         model.editDescSlot(idSelectSlot, newDesc);
     }
 
     //------------------------
     // Editar local de uma reunião
-    // Devolve o slot com a informação alterada caso seja possivel alterar
     //------------------------
     private void editLocal(Long idSelectSlot) {
-        out.print("Novo local: ");
-        String newLocal = Input.lerString();
-        while (newLocal.equals("")) {
-            out.println(RED_BOLD + "[!] Tem de ser preenchido." + RESET);
-            out.print("Novo local: ");
-            newLocal = Input.lerString();
-        }
+        String newLocal = getNewLocalFromInput();
         model.editLocalSlot(idSelectSlot, newLocal);
     }
 
@@ -409,7 +378,6 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         Duration newDuration = getDurationFromInput();
         return model.editDurationSlot(idSelectSlot, newDuration);
     }
-
 
     //------------------------
     // Fluxo para editar data de uma reunião

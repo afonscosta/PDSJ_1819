@@ -296,4 +296,61 @@ public class ControllerUtils {
         Duration newDuration = Duration.of(parseInt(matcher.group(1)), HOURS);
         return newDuration.plus(parseInt(matcher.group(2)), MINUTES);
     }
+
+    //------------------------
+    // Recebe o local de um evento do input
+    //------------------------
+    public static String getLocalFromInput() {
+        out.print("Local: ");
+        String local = Input.lerString();
+        while (local.equals("")) {
+            out.println(RED_BOLD + "[!] Tem de ser preenchido." + RESET);
+            out.print("Local: ");
+            local = Input.lerString();
+        }
+        return local;
+    }
+
+    //------------------------
+    // Recebe a descrição de um evento do input
+    //------------------------
+    public static String getDescFromInput() {
+        out.print("Descricao: ");
+        String desc= Input.lerString();
+        while (desc.equals("")) {
+            out.println(RED_BOLD + "[!] Tem de ser preenchida." + RESET);
+            out.print("Descricao: ");
+            desc= Input.lerString();
+        }
+        return desc;
+    }
+
+    //------------------------
+    // Recebe nova descrição de um evento do input
+    //------------------------
+    public static String getNewDescFromInput() {
+        out.print("Nova descricao: ");
+        String newDesc = Input.lerString();
+        while (newDesc.equals("")) {
+            out.println(RED_BOLD + "[!] Tem de ser preenchida." + RESET);
+            out.print("Nova descricao: ");
+            newDesc = Input.lerString();
+        }
+        return newDesc;
+    }
+
+    //------------------------
+    // Recebe novo local de um evento do input
+    //------------------------
+    public static String getNewLocalFromInput() {
+        out.print("Novo local: ");
+        String newLocal = Input.lerString();
+        while (newLocal.equals("")) {
+            out.println(RED_BOLD + "[!] Tem de ser preenchido." + RESET);
+            out.print("Novo local: ");
+            newLocal = Input.lerString();
+        }
+        return newLocal;
+    }
+
 }
