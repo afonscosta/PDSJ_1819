@@ -19,7 +19,7 @@ public class RestrictSlot extends Slot {
 
     private RestrictSlot(Temporal data, Duration duration, String local, String description,String period) {
         super(nextAvailableId,data,duration,local,description);
-        setNextAvailableId(1);
+        RestrictSlot.setNextAvailableId(1);
         this.period = period;
     }
 
@@ -33,8 +33,25 @@ public class RestrictSlot extends Slot {
     }
 
     public static void setNextAvailableId(long nextAvailableId) {
-        System.out.println("Estou a alterar o next id do slot!");
-        RestrictSlot.nextAvailableId = nextAvailableId;
+        RestrictSlot.nextAvailableId += nextAvailableId;
+        System.out.println("nextAvailableId restrict:->" + nextAvailableId);
+
+    }
+
+    public static long getAndSetNextAvailableId(long nextAvailableId){
+        System.out.println("Estou a alterar o next id do restrictSlot!");
+        long res = getNextAvailableId();
+        RestrictSlot.nextAvailableId += nextAvailableId;
+        System.out.println("nextAvailableId restrict:->" + nextAvailableId);
+
+        return res;
+    }
+
+    public static void abortLastUpdateToNextId(){
+        System.out.println("REMOVER LAST UPDATE ABORT");
+        if(nextAvailableId>0)
+            nextAvailableId --;
+        System.out.println("nextAvailableId restrict:->" + nextAvailableId);
     }
 
     public String getPeriod() {

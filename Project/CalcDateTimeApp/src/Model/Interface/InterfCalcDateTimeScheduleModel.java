@@ -26,18 +26,23 @@ public interface InterfCalcDateTimeScheduleModel {
 
     List<String> getRestrictSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
 
-    boolean removeSlot(Slot slot,Collection c);
+    boolean removeSlot(Slot s,Collection c);
 
-    boolean editDurationSlot(Slot s, Duration d);
+    boolean editDurationSlot(Long idSlot, Duration d);
 
-    boolean editDateSLot(Slot s, Temporal data);
+    boolean editDateSLot(Long idSlot, Temporal data);
 
     Slot getSlot(Long infoSlot);
 
     Slot getRestrictSlot(Long infoSlot);
 
-    void editLocalSlot(Slot s, String edit);
+    void editLocalSlot(Long idSlot, String edit);
 
-    void editDescSlot(Slot s, String edit);
+    void editDescSlot(Long idSlot, String edit);
+
+    boolean existSlot(Long idSlot);
+
+    boolean existRestrictSlot(Long idSlot);
+
 }
 

@@ -190,9 +190,8 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                         for (String infoSlot : model.getRestrictSlots(referenceZone,dtfLocal,dtfZone)) {
                             Long idSlot = getIdSlot(infoSlot);
                             if(idSlot>=0 & idSlot==Long.valueOf(opcao)){
-                                Slot s= model.getRestrictSlot(idSlot);
-                                if(s!=null) {
-                                    flowSelectRestrictSchedule(s);
+                               if(model.existRestrictSlot(idSlot)) {
+                                    flowSelectRestrictSchedule(idSlot);
                                     break;
                                 }
                             }
@@ -205,7 +204,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         while(!opcao.equals("S"));
     }
 
-    private void flowSelectRestrictSchedule(Slot s){
+    private void flowSelectRestrictSchedule(Long idSelectSlot){
         Menu menu = viewMainTxt.getMenu(10);
         String opcao="";
         boolean res=false;
@@ -214,17 +213,20 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         ZoneId referenceZone = ZonedDateTime.from(model.getDateTimeLocal()).getZone();
         DateTimeFormatter dtfLocal= DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat());
         DateTimeFormatter dtfZone = DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat());
+        Slot s;
         do{
             if(opcao.equals("R")){
                 menu.addDescToTitle(Arrays.asList(""));
             }
             else {
+                s = model.getRestrictSlot(idSelectSlot);
                 List<String> dataToShow = slotToString(s, referenceZone, dtfLocal, dtfZone, true);
                 menu.addDescToTitle(Arrays.asList(dataToShow.get(0),
                         dataToShow.get(2),
                         dataToShow.get(3))
                 );
             }
+
             menu.addStatusMessage(statusMessage);
             menu.addErrorMessage(erroMessage);
             statusMessage = "n/a" ;
@@ -233,7 +235,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch (opcao){
-                case "R": res = model.removeSlot(s,model.getScheduleRestrictions());break;
+                case "R": res = model.removeSlot(model.getRestrictSlot(idSelectSlot),model.getScheduleRestrictions());break;
                 case "S": break;
 
             }

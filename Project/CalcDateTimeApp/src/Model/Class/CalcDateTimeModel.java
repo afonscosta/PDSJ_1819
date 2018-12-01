@@ -209,27 +209,32 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     }
 
     @Override
-    public boolean removeSlot(Slot slot, Collection c){
-        return modelSchedule.removeSlot(slot,c);
+    public boolean removeSlot(Slot s, Collection c){
+        return modelSchedule.removeSlot(s,c);
     }
 
     @Override
-    public void editLocalSlot(Slot s, String edit) {
-        modelSchedule.editLocalSlot(s, edit);
+    public void editLocalSlot(Long idSlot, String edit) {
+        modelSchedule.editLocalSlot(idSlot, edit);
     }
 
     @Override
-    public void editDescSlot(Slot s, String edit) {
-        modelSchedule.editDescSlot(s, edit);
+    public void editDescSlot(Long idSlot, String edit) {
+        modelSchedule.editDescSlot(idSlot, edit);
     }
 
     @Override
-    public boolean editDurationSlot(Slot s, Duration d) { return modelSchedule.editDurationSlot(s,d);
+    public boolean editDurationSlot(Long idSlot, Duration d) { return modelSchedule.editDurationSlot(idSlot,d);
     }
 
     @Override
-    public boolean editDateSLot(Slot s, Temporal data) {
-        return modelSchedule.editDateSLot(s,data);
+    public boolean editDateSLot(Long idSlot, Temporal data) {
+        return modelSchedule.editDateSLot(idSlot,data);
     }
+
+    public boolean existSlot(Long idSlot){return modelSchedule.existSlot(idSlot);}
+
+    public boolean existRestrictSlot(Long idSlot){return modelSchedule.existRestrictSlot(idSlot);}
+
 
 }
