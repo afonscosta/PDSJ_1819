@@ -19,7 +19,7 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 
     protected CalcDateTimeLocalModel() {
         this.ldt = ZonedDateTime.now();
-        this.localDateTimeFormat = "yyyy/MM/dd H:m";
+        this.localDateTimeFormat = "yyyy/MM/dd HH:mm";
     }
 
     public static CalcDateTimeLocalModel of () {
