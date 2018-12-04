@@ -227,16 +227,21 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                         currentDateMode = LocalDate.now(); //ao atualizar o modo, volta ao now
                     }
                     else if (opcao.matches("=.*")) {
-                        opcao = opcao.substring(1); // Remover o "="
-                        for (String infoSlot : model.getMainInfoSlots(referenceZonedId,dtfLocal,dtfZoned)) {
-                            long idSlot = getIdSlot(infoSlot);
-                            if(idSlot>=0 & idSlot==Long.valueOf(opcao)){
-                                if(model.existSlot(idSlot)){
-                                    flowSelectBusySlot(idSlot);
-                                    break;
+                         try {
+                            long idSelect = Long.valueOf(opcao.substring(1)); // Remover o "="
+                            for (String infoSlot : model.getMainInfoSlots(referenceZonedId, dtfLocal, dtfZoned)) {
+                                long idSlot = getIdSlot(infoSlot);
+                                if (idSlot >= 0 & idSlot == idSelect) {
+                                    if (model.existSlot(idSlot)) {
+                                        flowSelectBusySlot(idSlot);
+                                        break;
+                                    }
                                 }
-                            }
 
+                            }
+                        }
+                        catch (NumberFormatException e) {
+                            break;
                         }
                     }
                     else {
@@ -277,34 +282,45 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
         Slot s;
         boolean res= false;
+        boolean eliminated = false;
         do {
             s = model.getSlot(idSelectSlot);
-            if(opcao.equals("R")){
+            if (eliminated) {
                 menu.addDescToTitle(Arrays.asList(""));
-            }
-            else{
+            } else {
                 menu.addDescToTitle(slotToString(s, getRefereceZoneId(), dtfLocal, dtfZone, true));
             }
             menu.addErrorMessage(errorMessage);
             menu.addStatusMessage(statusMessage);
-            errorMessage="n/a";
-            statusMessage="n/a";
+            errorMessage = "n/a";
+            statusMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch (opcao) {
-                case "A": flowEditSlot(idSelectSlot); break;
-                case "R": res= model.removeSlot(model.getSlot(idSelectSlot),model.getSchedule()); break;
-                case "S": break;
-                default: errorMessage = "Opcao Invalida !"; break;
+                case "A":
+                    if (!eliminated)
+                        flowEditSlot(idSelectSlot);
+                    else
+                        errorMessage = "Slot removido, impossivel altera-lo!";
+                    break;
+                case "R":
+                    res = model.removeSlot(model.getSlot(idSelectSlot), model.getSchedule());
+                    eliminated = !eliminated ? res : eliminated;
+                    break;
+                case "S":
+                    break;
+                default:
+                    errorMessage = "Opcao Invalida !";
+                    break;
             }
-            if(opcao.equals("R")){
-                    if(res){
-                        statusMessage="Removido com sucesso!";
-                    }
-                    else{
-                        errorMessage= "De momento, não e possivel remover o slot!";
-                    }
+            if (opcao.equals("R")) {
+                if (res)
+                    statusMessage = "Removido com sucesso!";
+                else if (!res & !eliminated)
+                    errorMessage = "Nao e possivel remover o slot!";
+                else
+                errorMessage = "O slot ja foi removido!";
             }
         }
         while (!(opcao.equals("S")));
