@@ -229,18 +229,20 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     else if (opcao.matches("=.*")) {
                          try {
                             long idSelect = Long.valueOf(opcao.substring(1)); // Remover o "="
-                            for (String infoSlot : model.getMainInfoSlots(referenceZonedId, dtfLocal, dtfZoned)) {
+                             errorMessage = "Nao existe um evento com esse identificador";
+                             for (String infoSlot : model.getMainInfoSlots(referenceZonedId, dtfLocal, dtfZoned)) {
                                 long idSlot = getIdSlot(infoSlot);
                                 if (idSlot >= 0 & idSlot == idSelect) {
                                     if (model.existSlot(idSlot)) {
                                         flowSelectBusySlot(idSlot);
+                                        errorMessage ="n/a";
                                         break;
                                     }
                                 }
-
                             }
                         }
                         catch (NumberFormatException e) {
+                             errorMessage = "Opcao Invalida, introduza o identificador!";
                             break;
                         }
                     }
@@ -281,15 +283,9 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
         DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
         Slot s;
-        boolean res= false;
-        boolean eliminated = false;
         do {
             s = model.getSlot(idSelectSlot);
-            if (eliminated) {
-                menu.addDescToTitle(Arrays.asList(""));
-            } else {
-                menu.addDescToTitle(slotToString(s, getRefereceZoneId(), dtfLocal, dtfZone, true));
-            }
+            menu.addDescToTitle(slotToString(s, getRefereceZoneId(), dtfLocal, dtfZone, true));
             menu.addErrorMessage(errorMessage);
             menu.addStatusMessage(statusMessage);
             errorMessage = "n/a";
@@ -299,14 +295,10 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             opcao = opcao.toUpperCase();
             switch (opcao) {
                 case "A":
-                    if (!eliminated)
                         flowEditSlot(idSelectSlot);
-                    else
-                        errorMessage = "Slot removido, impossivel altera-lo!";
-                    break;
+                        break;
                 case "R":
-                    res = model.removeSlot(model.getSlot(idSelectSlot), model.getSchedule());
-                    eliminated = !eliminated ? res : eliminated;
+                    model.removeSlot(model.getSlot(idSelectSlot), model.getSchedule());
                     break;
                 case "S":
                     break;
@@ -314,16 +306,8 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     errorMessage = "Opcao Invalida !";
                     break;
             }
-            if (opcao.equals("R")) {
-                if (res)
-                    statusMessage = "Removido com sucesso!";
-                else if (!res & !eliminated)
-                    errorMessage = "Nao e possivel remover o slot!";
-                else
-                errorMessage = "O slot ja foi removido!";
-            }
         }
-        while (!(opcao.equals("S")));
+        while (!(opcao.equals("S") | opcao.equals("R")));
     }
 
     //------------------------
