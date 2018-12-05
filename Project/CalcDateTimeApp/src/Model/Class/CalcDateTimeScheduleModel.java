@@ -14,8 +14,8 @@ import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
 
-import static Utilities.BusinessUtils.convertToZone;
-import static Utilities.BusinessUtils.slotToString;
+import static Utilities.Utils.convertToZone;
+import static Utilities.Utils.slotToString;
 import static java.time.temporal.ChronoUnit.DAYS;
 
 public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleModel,Serializable {

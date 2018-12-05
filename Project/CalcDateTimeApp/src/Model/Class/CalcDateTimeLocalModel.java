@@ -1,7 +1,7 @@
 package Model.Class;
 
 import Model.Interface.InterfCalcDateTimeLocalModel;
-import Utilities.BusinessUtils;
+import Utilities.Utils;
 import Utilities.Configs;
 
 import java.time.ZoneId;
@@ -10,7 +10,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.zone.ZoneRulesException;
 
-import static Utilities.BusinessUtils.*;
+import static Utilities.Utils.*;
 
 public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 
@@ -47,7 +47,7 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 
     @Override
     public void shiftDateTime(int n, ChronoUnit cu) {
-        ldt = (ZonedDateTime) BusinessUtils.shiftDateTime(ldt, n, cu);
+        ldt = (ZonedDateTime) Utils.shiftDateTime(ldt, n, cu);
     }
 
     @Override

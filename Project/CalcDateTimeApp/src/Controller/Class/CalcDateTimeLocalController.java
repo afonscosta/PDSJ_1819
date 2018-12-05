@@ -2,18 +2,17 @@ package Controller.Class;
 
 import Controller.Interface.InterfCalcDateTimeLocalController;
 import Model.Interface.InterfCalcDateTimeModel;
-import Utilities.BusinessUtils;
+import Utilities.Utils;
 import Utilities.ControllerUtils;
 import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeLocalView;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static Utilities.BusinessUtils.*;
+import static Utilities.Utils.*;
 import static Utilities.ConsoleColors.*;
 import static Utilities.ControllerUtils.*;
 import static java.lang.System.out;
@@ -362,7 +361,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                 //Imprime a data do dia em questão
                 zdt = (ZonedDateTime) nextDayN(zdt, ndays-1); // -1 porque o atual conta
                 model.fromDateTimeLocal(zdt);
-                out.println("\n" + GREEN_BOLD + "Resultado: " + zdt.query(BusinessUtils::tempToLocalDateStr) + RESET);
+                out.println("\n" + GREEN_BOLD + "Resultado: " + zdt.query(Utils::tempToLocalDateStr) + RESET);
             }
         }
         out.print("Prima Enter para continuar.");

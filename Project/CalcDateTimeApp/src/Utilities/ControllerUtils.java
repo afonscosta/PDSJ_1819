@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static Utilities.BusinessUtils.*;
+import static Utilities.Utils.*;
 import static Utilities.ConsoleColors.*;
 import static java.lang.Integer.parseInt;
 import static java.lang.System.out;
@@ -245,7 +245,7 @@ public class ControllerUtils {
             start = LocalDate.from(tacs);
             printHeader(ld.getMonthValue());
             while (ld.getMonthValue() == start.getMonthValue()) {
-                out.println(ld.query(BusinessUtils::organizeDays));
+                out.println(ld.query(Utils::organizeDays));
                 ld = (LocalDate) nextMondayN(ld, 1);
             }
             out.println();
@@ -265,7 +265,7 @@ public class ControllerUtils {
         try {
             ld = LocalDate.from(tacs);
             printHeader(ld.getMonthValue());
-            out.println(ld.query(BusinessUtils::organizeDays));
+            out.println(ld.query(Utils::organizeDays));
             out.println();
             return null;
         }

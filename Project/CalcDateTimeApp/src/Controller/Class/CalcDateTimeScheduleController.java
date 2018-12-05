@@ -3,7 +3,6 @@ package Controller.Class;
 import Controller.Interface.InterfCalcDateTimeScheduleController;
 import Model.Class.Slot;
 import Model.Interface.InterfCalcDateTimeModel;
-import Utilities.BusinessUtils;
 import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeScheduleView;
@@ -18,10 +17,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static Utilities.BusinessUtils.*;
+import static Utilities.Utils.*;
 import static Utilities.ConsoleColors.*;
 import static Utilities.ControllerUtils.*;
-import static java.lang.System.out;
 import static java.time.temporal.ChronoUnit.*;
 import static java.util.Arrays.asList;
 

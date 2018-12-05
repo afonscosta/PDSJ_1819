@@ -21,7 +21,7 @@ import static java.time.temporal.TemporalAdjusters.next;
 import static java.time.temporal.TemporalAdjusters.previous;
 
 // Metodos estáticos aqui
-public class BusinessUtils {
+public class Utils {
 
     /*
      * O temp ou é uma ZonedDateTime ou uma LocalDateTime.
@@ -76,13 +76,13 @@ public class BusinessUtils {
     public static Temporal shiftWorkDays(Temporal temp, int n) {
         int conta = 0;  // conta dias úteis
         try {
-            if (temp.query(BusinessUtils::isWeekend)) conta = 1;
+            if (temp.query(Utils::isWeekend)) conta = 1;
             while (conta < abs(n)) {
-                if (!temp.query(BusinessUtils::isWeekend)) conta++;
+                if (!temp.query(Utils::isWeekend)) conta++;
                 temp = temp.plus(n / abs(n), DAYS);
             }
             // Ajustar o dia final para não ficar num fim de semana.
-            if (temp.query(BusinessUtils::isWeekend)) {
+            if (temp.query(Utils::isWeekend)) {
                 if (n > 0) {
                     temp = nextMondayN(temp, 1);
                 } else if (n < 0) {
@@ -141,16 +141,16 @@ public class BusinessUtils {
     public static long countWorkDays(Temporal start, Temporal stop) {
         long count;
         long extra = 0;
-        if (start.query(BusinessUtils::isWeekend)) {
+        if (start.query(Utils::isWeekend)) {
             start = nextMondayN(start, 1);
             extra += 1;
         }
-        if (stop.query(BusinessUtils::isWeekend)) {
+        if (stop.query(Utils::isWeekend)) {
             stop = nextMondayN(stop, 1);
             extra -= 1;
         }
-        final DayOfWeek startW = start.query(BusinessUtils::getDayOfWeek);
-        final DayOfWeek stopW = stop.query(BusinessUtils::getDayOfWeek);
+        final DayOfWeek startW = start.query(Utils::getDayOfWeek);
+        final DayOfWeek stopW = stop.query(Utils::getDayOfWeek);
 
         final long days = ChronoUnit.DAYS.between( start , stop );
         final long daysWithoutWeekends = days - 2 * ( ( days + startW.getValue() ) / 7 );

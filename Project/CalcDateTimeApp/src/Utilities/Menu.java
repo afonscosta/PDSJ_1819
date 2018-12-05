@@ -3,7 +3,7 @@ package Utilities;
 import java.util.ArrayList;
 import java.util.List;
 
-import static Utilities.BusinessUtils.repeatStringN;
+import static Utilities.Utils.repeatStringN;
 import static Utilities.ConsoleColors.*;
 
 public class Menu {
