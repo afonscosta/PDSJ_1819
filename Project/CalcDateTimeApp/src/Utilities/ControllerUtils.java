@@ -17,9 +17,6 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 
 public class ControllerUtils {
 
-    /**
-     * TODO: VERIFICAR SE É CORRETO USAR CLEARCONSOLE COMO UM MÉTODO ESTÁTICO
-     */
     public static void clearConsole() {
         //Só deve funcionar para linux
         System.out.print("\033[H\033[2J");
@@ -157,6 +154,7 @@ public class ControllerUtils {
         int totalPages = chosenZoneIdsByPage.size();
         List<String> description;
         String opcao;
+        Boolean previousZoneWrong = false;
         do {
 
             // Mais complexo do que necessário para o caso em que a lista de procuras está vazia,
@@ -173,6 +171,11 @@ public class ControllerUtils {
             description.add(String.format(CYAN_BOLD + "ZoneIds adicionados: (%d/%d)" + RESET, zoneIdList.size(), zoneIdsWanted));
 
             menu.addDescToTitle(description);
+
+            if (previousZoneWrong) {
+                menu.addErrorMessage("Zona não existe! (Nota: O parametro distingue maiusculas de minusculas");
+                previousZoneWrong = false;
+            }
 
             menu.show();
             opcao = Input.lerString();
@@ -201,6 +204,8 @@ public class ControllerUtils {
                             if (zoneIdList.size() == zoneIdsWanted) {
                                 flowDone = true;
                             }
+                        } else {
+                            previousZoneWrong = true;
                         }
                     } else if (opcao.matches("[Ss]")) {
                         zoneIdList.add(defaultZoneid);
