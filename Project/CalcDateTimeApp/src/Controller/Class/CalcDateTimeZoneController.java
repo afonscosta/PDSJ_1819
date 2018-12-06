@@ -12,9 +12,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
-import static Utilities.Utils.*;
 import static Utilities.ConsoleColors.*;
 import static Utilities.ControllerUtils.*;
+import static Utilities.Utils.*;
 import static java.lang.System.out;
 import static java.time.temporal.ChronoUnit.*;
 import static java.util.Arrays.asList;
@@ -40,27 +40,21 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         this.viewZoneTxt = viewZone;
     }
 
-
-    private String buildZoneDateTimeTitle() {
-        ZonedDateTime zdt = (ZonedDateTime) model.getDateTimeZone();
-        return zoneDateTimeToString(zdt, DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat()));
-    }
-
     //------------------------
     // FlowLocal
     //------------------------
     @Override
     public void flowZone() {
         Menu menu = viewZoneTxt.getMenu(0);
-        String zld;
+        String zd;
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
         String prefix = "Data inicial: ";
         resetDateTimeZone();
         do {
-            zld = buildZoneDateTimeTitle();
-            menu.addDescToTitle(Arrays.asList(BLUE_BOLD + prefix + zld + RESET));
+            zd = zoneDateTimeToString((ZonedDateTime) model.getDateTimeZone(), DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat()));
+            menu.addDescToTitle(Arrays.asList(BLUE_BOLD + prefix + zd + RESET));
             menu.addStatusMessage(statusMessage);
             menu.addErrorMessage(errorMessage);
             statusMessage = "n/a";
@@ -99,24 +93,35 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         } while(!opcao.equals("S"));
     }
 
+    //------------------------
+    // FlowSetDateTime
+    //------------------------
     private void setDateTimeZone() {
-        ZonedDateTime zdt = getZoneDateTimeFromInput();
+        ZonedDateTime zdt = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), model.getZoneZone(), (ZonedDateTime) model.getDateTimeZone());
         model.fromDateTimeZone(zdt);
     }
 
+    //------------------------
+    // FlowResetDateTime
+    //------------------------
     private void resetDateTimeZone() {
         model.fromDateTimeZone(getNowOfZone(ZoneId.of(model.getZoneZone())));
     }
 
+    //------------------------
+    // FlowShiftDateTime
+    //------------------------
     private String flowShiftZoneDateTime(String prefix) {
         String ld;
         Menu menu = viewZoneTxt.getMenu(1);
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
+        ZonedDateTime zdt = (ZonedDateTime) model.getDateTimeZone();
+        String prefixTemp = prefix;
         do {
-            ld = buildZoneDateTimeTitle();
-            menu.addDescToTitle(Arrays.asList(BLUE_BOLD + prefix + ld + RESET));
+            ld = zoneDateTimeToString(zdt, DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat()));
+            menu.addDescToTitle(Arrays.asList(BLUE_BOLD + prefixTemp + ld + RESET));
             menu.addStatusMessage(statusMessage);
             menu.addErrorMessage(errorMessage);
             errorMessage = "n/a";
@@ -125,61 +130,70 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
             opcao = Input.lerString().toUpperCase();
             switch(opcao) {
                 case "ANO" :
-                    model.shiftDateTimeZone(shift("anos"), YEARS);
+                    zdt = (ZonedDateTime) shiftDateTime(zdt, shift("anos"), YEARS);
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
                     break;
                 case "MES" :
-                    model.shiftDateTimeZone(shift("meses"), MONTHS);
+                    zdt = (ZonedDateTime) shiftDateTime(zdt, shift("meses"), MONTHS);
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
                     break;
                 case "SEM" :
-                    model.shiftDateTimeZone(shift("semanas"), WEEKS);
+                    zdt = (ZonedDateTime) shiftDateTime(zdt, shift("semanas"), WEEKS);
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
                     break;
                 case "DIA" :
-                    model.shiftDateTimeZone(shift("dias"), DAYS);
+                    zdt = (ZonedDateTime) shiftDateTime(zdt, shift("dias"), DAYS);
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
                     break;
                 case "HOR" :
-                    model.shiftDateTimeZone(shift("horas"), HOURS);
+                    zdt = (ZonedDateTime) shiftDateTime(zdt, shift("horas"), HOURS);
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
                     break;
                 case "MIN" :
-                    model.shiftDateTimeZone(shift("minutos"), MINUTES);
+                    zdt = (ZonedDateTime) shiftDateTime(zdt, shift("minutos"), MINUTES);
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
                     break;
                 case "SEG" :
-                    model.shiftDateTimeZone(shift("segundos"), SECONDS);
+                    zdt = (ZonedDateTime) shiftDateTime(zdt, shift("segundos"), SECONDS);
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
                     break;
                 case "NAN" :
-                    model.shiftDateTimeZone(shift("nanosegundos"), NANOS);
+                    zdt = (ZonedDateTime) shiftDateTime(zdt, shift("nanosegundos"), NANOS);
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
+                    break;
+                case "G":
+                    model.fromDateTimeZone(zdt);
+                    prefix = prefixTemp;
                     break;
                 case "S": break;
                 default: errorMessage = "Opcao Invalida!"; break;
             }
         }
-        while(!opcao.equals("S"));
+        while(!(opcao.equals("S") || opcao.equals("G")));
         return prefix;
     }
 
+    //------------------------
+    // FlowShiftWorkDaysDateTime
+    //------------------------
     private String flowShiftWorkDaysDateTimeZone(String prefix) {
         String ld;
         Menu menu = viewZoneTxt.getMenu(2);
         String opcao;
         String errorMessage = "n/a";
+        ZonedDateTime zdt = (ZonedDateTime) model.getDateTimeZone();
+        String prefixTemp = prefix;
         do {
-            ld = buildZoneDateTimeTitle();
-            menu.addDescToTitle(Arrays.asList(BLUE_BOLD + prefix + ld + RESET));
+            ld = zoneDateTimeToString(zdt, DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat()));
+            menu.addDescToTitle(Arrays.asList(BLUE_BOLD + prefixTemp + ld + RESET));
             menu.addErrorMessage(errorMessage);
             errorMessage = "n/a";
             menu.show();
@@ -187,26 +201,34 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
             opcao = opcao.toUpperCase();
             switch(opcao) {
                 case "M" :
-                    model.shiftWorkDaysDateTimeZone(shift("dias"));
-                    prefix = "Data acumulada: ";
+                    zdt = (ZonedDateTime) shiftWorkDays(zdt, shift("dias uteis"));
+                    prefixTemp = "Data acumulada: ";
+                    break;
+                case "G":
+                    model.fromDateTimeZone(zdt);
+                    prefix = prefixTemp;
                     break;
                 case "S": break;
                 default: errorMessage = "Opcão Inválida !"; break;
             }
         }
-        while(!opcao.equals("S"));
+        while(!(opcao.equals("S") || opcao.equals("G")));
         return prefix;
     }
 
+    //------------------------
+    // FlowDiffDateTime
+    //------------------------
     private void flowDiffDateTimeZone() {
         String ld;
         Menu menu = viewZoneTxt.getMenu(3);
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
+        ZonedDateTime zdt = (ZonedDateTime) model.getDateTimeZone();
         do {
-            ld = buildZoneDateTimeTitle();
-            menu.addDescToTitle(Arrays.asList(BLUE_BOLD + "Data inicial: " + ld + RESET));
+            ld = zoneDateTimeToString(zdt, DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat()));
+            menu.addDescToTitle(Arrays.asList(BLUE_BOLD + "Data inicio: " + ld + RESET));
             menu.addStatusMessage(statusMessage);
             menu.addErrorMessage(errorMessage);
             statusMessage = "n/a";
@@ -215,36 +237,39 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "I" : fromDateTimeZone(); statusMessage = "Data modificada com sucesso"; break;
-                case "F" : diffDateTimeZone(); break;
+                case "I":
+                    zdt = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), zdt.getZone().getId(), zdt);
+                    statusMessage = "Data de inicio modificada com sucesso";
+                    break;
+                case "F": diffDateTimeZone(zdt); break;
                 case "S": break;
                 default: errorMessage = "Opcão Inválida !"; break;
             }
         }
         while(!opcao.equals("S"));
     }
-
-    private void diffDateTimeZone() {
-        ZonedDateTime toDateTime = null;
-        while(toDateTime == null) {
-            toDateTime = getZoneDateTimeFromInput();
-        }
-        String resDiff = model.diffDateTimeZone(toDateTime);
+    private void diffDateTimeZone(ZonedDateTime start) {
+        ZonedDateTime stop = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), start.getZone().getId(), start);
+        String resDiff = diffBetweenDateTime(start, stop);
 
         out.println(GREEN_BOLD + "\nResultado: " + resDiff + RESET);
         out.print("Prima Enter para continuar.");
         Input.lerString();
     }
 
+    //------------------------
+    // FlowDiffWorkDaysDateTime
+    //------------------------
     private void flowDiffWorkDaysDateTimeZone() {
         String ld;
         Menu menu = viewZoneTxt.getMenu(3);
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
+        ZonedDateTime zdt = (ZonedDateTime) model.getDateTimeZone();
         do {
-            ld = buildZoneDateTimeTitle();
-            menu.addDescToTitle(Arrays.asList(BLUE_BOLD + "Data inicial: " + ld + RESET));
+            ld = zoneDateTimeToString(zdt, DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat()));
+            menu.addDescToTitle(Arrays.asList(BLUE_BOLD + "Data inicio: " + ld + RESET));
             menu.addStatusMessage(statusMessage);
             menu.addErrorMessage(errorMessage);
             statusMessage = "n/a";
@@ -253,32 +278,29 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "I" : fromDateTimeZone(); statusMessage = "Data modificada com sucesso"; break;
-                case "F" : diffWorkDaysDateTimeZone(); break;
+                case "I" :
+                    zdt = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), zdt.getZone().getId(), zdt);
+                    statusMessage = "Data de inicio modificada com sucesso";
+                    break;
+                case "F" : diffWorkDaysDateTimeZone(zdt); break;
                 case "S": break;
                 default: errorMessage = "Opcão Inválida !"; break;
             }
         }
         while(!opcao.equals("S"));
     }
-
-    private void diffWorkDaysDateTimeZone() {
-        ZonedDateTime toDateTime = null;
-        while(toDateTime == null) {
-            toDateTime = getZoneDateTimeFromInput();
-        }
-        String resDiff = model.diffWorkDaysDateTimeZone(toDateTime);
+    private void diffWorkDaysDateTimeZone(ZonedDateTime start) {
+        ZonedDateTime stop = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), start.getZone().getId(), start);
+        String resDiff = countWorkDays(start, stop) + " dias úteis";
 
         out.println(GREEN_BOLD + "\nResultado: " + resDiff + RESET);
         out.print("Prima Enter para continuar.");
         Input.lerString();
-
     }
 
     //------------------------
     // FlowConvertZone
     //------------------------
-    // Pedir para que zona queremos mudar a data
     private void flowConvertZone() {
         try {
             String answerZone = flowGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneZone()).get(0);
@@ -287,6 +309,9 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         catch (IndexOutOfBoundsException e){}
     }
 
+    //------------------------
+    // FlowDiffInTimeZones
+    //------------------------
     private void flowDiffInTimeZones() {
         List<String> zoneIdsTxt = flowGetNZoneIds(2, viewZoneTxt.getMenu(4), model.getZoneZone());
 
@@ -305,30 +330,9 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         Input.lerString();
     }
 
-    private void fromDateTimeZone() {
-        ZonedDateTime newLDT = null;
-        while(newLDT == null) {
-            newLDT = getZoneDateTimeFromInput();
-        }
-        model.fromDateTimeZone(newLDT);
-    }
-
-    private ZonedDateTime getZoneDateTimeFromInput() {
-        String zoneIdString = flowGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneZone()).get(0);
-        ZoneId zoneId = ZoneId.of(zoneIdString);
-
-        return getDateTimeFromInput((ZonedDateTime) model.getDateTimeZone(), zoneId);
-    }
-
     //------------------------
-    // FlowShowCurrentTimeInZone
+    // FlowHelp
     //------------------------
-    // Saber que data atual é numa certa região
-    private void flowShowCurrentTimeInZone() {
-        String answerZone = flowGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneZone()).get(0);
-        model.changeToCurrentDateInZone(answerZone);
-    }
-
     private void help() {
         ZonedDateTime ld = (ZonedDateTime) model.getDateTimeLocal();
         String sld = zoneDateTimeToString(ld, DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat()));

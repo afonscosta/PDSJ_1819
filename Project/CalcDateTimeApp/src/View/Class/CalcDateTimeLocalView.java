@@ -17,7 +17,7 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
 
     private Menus initView() {
         Menus menusLocalTxt = new Menus();
-        Opcao op1, op2, op3, op4, op5, op6, op7, op8, op9;
+        Opcao op1, op2, op3, op4, op5, op6, op7, op8, op9, op10;
 
 
         //------------------------
@@ -64,8 +64,9 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
         op6 = new Opcao("Aritmetica de minutos", "MIN");
         op7 = new Opcao("Aritmetica de segundos", "SEG");
         op8 = new Opcao("Aritmetica de nanosegundos", "NAN");
-        op9 = new Opcao("Voltar a Calc. Local", "S");
-        linhas = Arrays.asList(op1, op2, op3, op4, op5, op6, op7, op8, op9);
+        op9 = new Opcao("Guardar data e voltar a Calc. Local", "G");
+        op10 = new Opcao("Voltar a Calc. Local", "S");
+        linhas = Arrays.asList(op1, op2, op3, op4, op5, op6, op7, op8, op9, op10);
         Menu menuShiftDateTime = new Menu(linhas, "Aritmetica de Datas");
         menusLocalTxt.addMenu(3, menuShiftDateTime);
 
@@ -73,8 +74,9 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
         // Menu Shift WorkDays DateTime
         //------------------------
         op1 = new Opcao("Aritmetica de dias uteis", "A");
-        op2 = new Opcao("Voltar a Calc. Local", "S");
-        linhas = Arrays.asList(op1, op2);
+        op2 = new Opcao("Guardar data e voltar a Calc. Local", "G");
+        op3 = new Opcao("Voltar a Calc. Local", "S");
+        linhas = Arrays.asList(op1, op2, op3);
         Menu menuShiftWorkDaysDateTime = new Menu(linhas, "Aritmetica de Dias Uteis");
         menusLocalTxt.addMenu(4, menuShiftWorkDaysDateTime);
 
@@ -87,6 +89,16 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
         linhas = Arrays.asList(op1, op2, op3);
         Menu menuDiffDateTime = new Menu(linhas, "Diferenca entre Datas");
         menusLocalTxt.addMenu(5, menuDiffDateTime);
+
+        //------------------------
+        // Menu Obter DateTime
+        //------------------------
+        op1 = new Opcao("Obter um dia", "O");
+        op2 = new Opcao("Guardar data e voltar a Calc. Local", "G");
+        op3 = new Opcao("Voltar a Calc. Local", "S");
+        linhas = Arrays.asList(op1, op2, op3);
+        Menu menuObterDateTime = new Menu(linhas, "Obter um dia");
+        menusLocalTxt.addMenu(6, menuObterDateTime);
 
         return menusLocalTxt;
     }

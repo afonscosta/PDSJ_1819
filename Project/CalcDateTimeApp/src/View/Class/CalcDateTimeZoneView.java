@@ -47,8 +47,9 @@ public class CalcDateTimeZoneView implements InterfCalcDateTimeZoneView {
         op6 = new Opcao("Aritmetica de minutos", "MIN");
         op7 = new Opcao("Aritmetica de segundos", "SEG");
         op8 = new Opcao("Aritmetica de nanosegundos", "NAN");
-        op9 = new Opcao("Voltar a Calc. de Zonas", "S");
-        linhas = Arrays.asList(op1, op2, op3, op4, op5, op6, op7, op8, op9);
+        op9 = new Opcao("Guardar data e voltar a Calc. de Zonas", "G");
+        op10 = new Opcao("Voltar a Calc. de Zonas", "S");
+        linhas = Arrays.asList(op1, op2, op3, op4, op5, op6, op7, op8, op9, op10);
         Menu menuShiftDateTime = new Menu(linhas, "Aritmetica de Datas");
         menusZoneTxt.addMenu(1, menuShiftDateTime);
 
@@ -56,8 +57,9 @@ public class CalcDateTimeZoneView implements InterfCalcDateTimeZoneView {
         // Menu Shift WorkDays DateTimeZone
         //------------------------
         op1 = new Opcao("Aritmetica de dias uteis", "M");
-        op2 = new Opcao("Voltar a Calc. de Zonas", "S");
-        linhas = Arrays.asList(op1, op2);
+        op2 = new Opcao("Guardar data e voltar a Calc. de Zonas", "G");
+        op3 = new Opcao("Voltar a Calc. de Zonas", "S");
+        linhas = Arrays.asList(op1, op2, op3);
         Menu menuShiftWorkDaysDateTime = new Menu(linhas, "Aritmetica de Dias Uteis");
         menusZoneTxt.addMenu(2, menuShiftWorkDaysDateTime);
 
