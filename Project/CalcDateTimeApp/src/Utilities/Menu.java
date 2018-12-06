@@ -1,5 +1,6 @@
 package Utilities;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,9 +32,22 @@ public class Menu {
      * TEM QUE SE TIRAR DAQUI
      */
     private void clearConsole() {
-        //Só deve funcionar para linux
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
+
+        // Se o terminal apoia padrão ansi
+        if (System.getenv().get("TERM") != null) {
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
+            // Se terminal windows
+        } else if (System.getProperty("os.name").contains("Windows")) {
+            try {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     public void show() {
@@ -47,8 +61,8 @@ public class Menu {
             tag = stripColors(o.getTag());
             txt = stripColors(o.getTexto());
             System.out.println("| " + txt + " " +
-                               repeatStringN(".", max-2-txt.length()-tag.length()) +
-                               " " + tag + " |");
+                    repeatStringN(".", max-2-txt.length()-tag.length()) +
+                    " " + tag + " |");
         }
         System.out.println("+" + repeatStringN("=", max+2) + "+");
         // Print da mensagem de sucesso
@@ -72,7 +86,7 @@ public class Menu {
         int lenTxt = stripColors(titulo).length();
         System.out.println("+" + repeatStringN("=", max+2) + "+");
         System.out.println("|" + repeatStringN(" ", (max-lenTxt+2)/2) + titulo +
-                           repeatStringN(" ", (max+2-((max-lenTxt+2)/2)-lenTxt)) + "|");
+                repeatStringN(" ", (max+2-((max-lenTxt+2)/2)-lenTxt)) + "|");
         if (desc.size() > 0) {
             System.out.println("+" + repeatStringN("-", max+2) + "+");
             for (String d : desc) {
@@ -115,7 +129,7 @@ public class Menu {
     }
 
     public void addStatusMessage(String statusMessage) {
-       this.statusMessage = statusMessage;
+        this.statusMessage = statusMessage;
     }
 
     public void addErrorMessage(String errorMessage) {
