@@ -10,6 +10,7 @@ import View.Interface.InterfCalcDateTimeLocalView;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.Temporal;
 import java.util.List;
 
 import static Utilities.Utils.*;
@@ -90,9 +91,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                 case "D": flowDiffDateTime(); break;
                 case "DU": flowDiffWorkDaysDateTime(); break;
                 case "O":
-                    getDateTimeLocal();
-                    statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefix = flowGetDateTime(prefix);
                     break;
                 case "?": help(); statusMessage = "n/a"; break;
                 case "S": break;
@@ -111,6 +110,9 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         model.fromDateTimeLocal(ldt);
     }
 
+    //------------------------
+    // FlowResetDateTime
+    //------------------------
     private void resetDateTimeLocal() {
         model.fromDateTimeLocal(getNowOfZone(model.getLocalZone()));
     }
@@ -124,9 +126,11 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
+        Temporal ldt = model.getDateTimeLocal();
+        String prefixTemp = prefix;
         do {
-            ld = localDateTimeToString(model.getDateTimeLocal(), DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
-            menu.addDescToTitle(asList(BLUE_BOLD + prefix + ld + RESET));
+            ld = localDateTimeToString(ldt, DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
+            menu.addDescToTitle(asList(BLUE_BOLD + prefixTemp + ld + RESET));
             menu.addStatusMessage(statusMessage);
             menu.addErrorMessage(errorMessage);
             errorMessage = "n/a";
@@ -136,50 +140,54 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             opcao = opcao.toUpperCase();
             switch(opcao) {
                 case "ANO" :
-                    model.shiftDateTimeLocal(shift("anos"), YEARS);
+                    ldt = shiftDateTime(ldt, shift("anos"), YEARS);
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
                     break;
                 case "MES" :
-                    model.shiftDateTimeLocal(shift("meses"), MONTHS);
+                    ldt = shiftDateTime(ldt, shift("meses"), MONTHS);
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
                     break;
                 case "SEM" :
-                    model.shiftDateTimeLocal(shift("semanas"), WEEKS);
+                    ldt = shiftDateTime(ldt, shift("semanas"), WEEKS);
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
                     break;
                 case "DIA" :
-                    model.shiftDateTimeLocal(shift("dias"), DAYS);
+                    ldt = shiftDateTime(ldt, shift("dias"), DAYS);
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
                     break;
                 case "HOR" :
-                    model.shiftDateTimeLocal(shift("horas"), HOURS);
+                    ldt = shiftDateTime(ldt, shift("horas"), HOURS);
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
                     break;
                 case "MIN" :
-                    model.shiftDateTimeLocal(shift("minutos"), MINUTES);
+                    ldt = shiftDateTime(ldt, shift("minutos"), MINUTES);
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
                     break;
                 case "SEG" :
-                    model.shiftDateTimeLocal(shift("segundos"), SECONDS);
+                    ldt = shiftDateTime(ldt, shift("segundos"), SECONDS);
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
                     break;
                 case "NAN" :
-                    model.shiftDateTimeLocal(shift("nanosegundos"), NANOS);
+                    ldt = shiftDateTime(ldt, shift("nanosegundos"), NANOS);
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
+                    break;
+                case "G":
+                    model.fromDateTimeLocal((ZonedDateTime) ldt);
+                    prefix = prefixTemp;
                     break;
                 case "S": break;
                 default: errorMessage = "Opcao Invalida!"; break;
             }
         }
-        while(!opcao.equals("S"));
+        while(!(opcao.equals("S") || opcao.equals("G")));
         return prefix;
     }
 
@@ -192,9 +200,11 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
+        Temporal ldt = model.getDateTimeLocal();
+        String prefixTemp = prefix;
         do {
-            ld = localDateTimeToString(model.getDateTimeLocal(), DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
-            menu.addDescToTitle(asList(BLUE_BOLD + prefix + ld + RESET));
+            ld = localDateTimeToString(ldt, DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
+            menu.addDescToTitle(asList(BLUE_BOLD + prefixTemp + ld + RESET));
             menu.addStatusMessage(statusMessage);
             menu.addErrorMessage(errorMessage);
             errorMessage = "n/a";
@@ -204,16 +214,20 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             opcao = opcao.toUpperCase();
             switch(opcao) {
                 case "A" :
-                    model.shiftWorkDaysDateTimeLocal(shift("dias uteis"));
+                    ldt = shiftWorkDays(ldt, shift("dias uteis"));
                     statusMessage = "Data modificada com sucesso";
-                    prefix = "Data acumulada: ";
+                    prefixTemp = "Data acumulada: ";
+                    break;
+                case "G":
+                    model.fromDateTimeLocal((ZonedDateTime) ldt);
+                    prefix = prefixTemp;
                     break;
                 case "S": break;
                 default: errorMessage = "Opcao Invalida!"; break;
             }
 
         }
-        while(!opcao.equals("S"));
+        while(!(opcao.equals("S") || opcao.equals("G")));
         return prefix;
     }
 
@@ -226,32 +240,32 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
+        ZonedDateTime ldt = (ZonedDateTime) model.getDateTimeLocal();
         do {
-            ld = localDateTimeToString(model.getDateTimeLocal(), DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
+            ld = localDateTimeToString(ldt, DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
+            menu.addDescToTitle(asList(BLUE_BOLD + "Data inicio: " + ld + RESET));
             menu.addStatusMessage(statusMessage);
             menu.addErrorMessage(errorMessage);
             errorMessage = "n/a";
             statusMessage = "n/a";
-            menu.addDescToTitle(asList(BLUE_BOLD + "Data inicial: " + ld + RESET));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "I" : fromDateTimeLocal(); statusMessage = "Data modificada com sucesso"; break;
-                case "F" : diffDateTimeLocal(); break;
+                case "I" :
+                    ldt = getDateTimeFromInput(ldt, ldt.getZone());
+                    statusMessage = "Data de inicio modificada com sucesso";
+                    break;
+                case "F" : diffDateTimeLocal(ldt); break;
                 case "S": break;
                 default: errorMessage = "Opcao Invalida!"; break;
             }
         }
         while(!opcao.equals("S"));
     }
-    private void diffDateTimeLocal() {
-        ZonedDateTime toDateTime = null;
-        while(toDateTime == null) {
-            ZonedDateTime currentLDT = (ZonedDateTime) model.getDateTimeLocal();
-            toDateTime = getDateTimeFromInput(currentLDT, currentLDT.getZone());
-        }
-        String resDiff = model.diffDateTimeLocal(toDateTime);
+    private void diffDateTimeLocal(ZonedDateTime start) {
+        ZonedDateTime stop = getDateTimeFromInput(start, start.getZone());
+        String resDiff = diffBetweenDateTime(start, stop);
 
         out.println(GREEN_BOLD + "\nResultado: " + resDiff + RESET);
         out.print("Prima Enter para continuar.");
@@ -267,32 +281,32 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
+        ZonedDateTime ldt = (ZonedDateTime) model.getDateTimeLocal();
         do {
-            ld = localDateTimeToString(model.getDateTimeLocal(), DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
+            ld = localDateTimeToString(ldt, DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
+            menu.addDescToTitle(asList(BLUE_BOLD + "Data inicio: " + ld + RESET));
             menu.addStatusMessage(statusMessage);
             menu.addErrorMessage(errorMessage);
             errorMessage = "n/a";
             statusMessage = "n/a";
-            menu.addDescToTitle(asList(BLUE_BOLD + "Data inicial: " + ld + RESET));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "I" : fromDateTimeLocal(); statusMessage = "Data modificada com sucesso"; break;
-                case "F" : diffWorkDaysDateTime(); break;
+                case "I" :
+                    ldt = getDateTimeFromInput(ldt, ldt.getZone());
+                    statusMessage = "Data de inicio modificada com sucesso";
+                    break;
+                case "F" : diffWorkDaysDateTime(ldt); break;
                 case "S": break;
                 default: errorMessage = "Opcao Invalida!"; break;
             }
         }
         while(!opcao.equals("S"));
     }
-    private void diffWorkDaysDateTime() {
-        ZonedDateTime toDateTime = null;
-        while(toDateTime == null) {
-            ZonedDateTime currentLDT = (ZonedDateTime) model.getDateTimeLocal();
-            toDateTime = getDateTimeFromInput(currentLDT, currentLDT.getZone());
-        }
-        String resDiff = model.diffWorkDaysDateTimeLocal(toDateTime);
+    private void diffWorkDaysDateTime(ZonedDateTime start) {
+        ZonedDateTime stop = getDateTimeFromInput(start, start.getZone());
+        String resDiff = countWorkDays(start, stop) + " dias úteis";
 
         out.println(GREEN_BOLD + "\nResultado: " + resDiff + RESET);
         out.print("Prima Enter para continuar.");
@@ -302,7 +316,43 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     //------------------------
     // FlowGetDateTime
     //------------------------
-    private void getDateTimeLocal() {
+    private String flowGetDateTime(String prefix) {
+        String ld;
+        Menu menu = viewLocalTxt.getMenu(6);
+        String opcao;
+        String statusMessage = "n/a";
+        String errorMessage = "n/a";
+        Temporal ldt = model.getDateTimeLocal();
+        String prefixTemp = prefix;
+        do {
+            ld = localDateTimeToString(ldt, DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
+            menu.addDescToTitle(asList(BLUE_BOLD + prefixTemp + ld + RESET));
+            menu.addStatusMessage(statusMessage);
+            menu.addErrorMessage(errorMessage);
+            errorMessage = "n/a";
+            statusMessage = "n/a";
+            menu.show();
+            opcao = Input.lerString();
+            opcao = opcao.toUpperCase();
+            switch(opcao) {
+                case "O" :
+                    ldt = getDateTimeLocal();
+                    statusMessage = "Data modificada com sucesso";
+                    prefixTemp = "Data acumulada: ";
+                    break;
+                case "G":
+                    model.fromDateTimeLocal((ZonedDateTime) ldt);
+                    prefix = prefixTemp;
+                    break;
+                case "S": break;
+                default: errorMessage = "Opcao Invalida!"; break;
+            }
+
+        }
+        while(!(opcao.equals("S") || opcao.equals("G")));
+        return prefix;
+    }
+    private ZonedDateTime getDateTimeLocal() {
         Integer year = null;
         Integer month = null;
         Integer nweeks = null;
@@ -360,24 +410,9 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                 }
                 //Imprime a data do dia em questão
                 zdt = (ZonedDateTime) nextDayN(zdt, ndays-1); // -1 porque o atual conta
-                model.fromDateTimeLocal(zdt);
-                out.println("\n" + GREEN_BOLD + "Resultado: " + zdt.query(Utils::tempToLocalDateStr) + RESET);
             }
         }
-        out.print("Prima Enter para continuar.");
-        Input.lerString();
-    }
-
-    //------------------------
-    // FlowFromDateTime
-    //------------------------
-    private void fromDateTimeLocal() {
-        ZonedDateTime newLDT = null;
-        while(newLDT == null) {
-            ZonedDateTime currentLDT = (ZonedDateTime) model.getDateTimeLocal();
-            newLDT = getDateTimeFromInput(currentLDT, currentLDT.getZone());
-        }
-        model.fromDateTimeLocal(newLDT);
+        return zdt;
     }
 
     //------------------------
@@ -417,7 +452,6 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             BLACK_BOLD + "Opcao O:" + RESET + " permite ao utilizador saber a data dando um ano, ",
             "         mes, numero da semana nesse mes e numero do dia ",
             "         nessa semana.",
-            BLUE_BOLD + "         Altera a data que se encontra no registo!" + RESET,
             " ",
             BLACK_BOLD + "Opcao ?:" + RESET + " permite ao utilizador visualizar este menu.",
             " ",
@@ -452,8 +486,6 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             "   Semana: 5",
             "   Dia: 3",
             "Obtem-se como resultado: o dia 28 de novembro de 2018.",
-            "Este, " + RED_BOLD + "substituiu o valor que se encontra no registo da ",
-            "data" + RESET + " na seccao superior do menu da calculadora.",
             " ",
             "Isto porque o mes 11 de 2018 esta dividido nas seguintes",
             "semanas:",
