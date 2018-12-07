@@ -155,6 +155,7 @@ public class ControllerUtils {
         List<String> description;
         String opcao;
         Boolean previousZoneWrong = false;
+        Boolean previousInputIncorrect = false;
         do {
 
             // Mais complexo do que necessário para o caso em que a lista de procuras está vazia,
@@ -173,8 +174,12 @@ public class ControllerUtils {
             menu.addDescToTitle(description);
 
             if (previousZoneWrong) {
-                menu.addErrorMessage("Zona não existe! (Nota: O parametro distingue maiusculas de minusculas");
+                menu.addErrorMessage("Zona nao existe! (Nota: O parametro distingue maiusculas de minusculas)");
                 previousZoneWrong = false;
+            }
+            if (previousInputIncorrect) {
+                menu.addErrorMessage("Opcao invalida!");
+                previousInputIncorrect = false;
             }
 
             menu.show();
@@ -212,6 +217,8 @@ public class ControllerUtils {
                         if (zoneIdList.size() == zoneIdsWanted) {
                             flowDone = true;
                         }
+                    } else {
+                        previousInputIncorrect = true;
                     }
                     break;
             }
