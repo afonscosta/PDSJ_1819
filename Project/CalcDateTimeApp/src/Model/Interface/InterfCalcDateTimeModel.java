@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.List;
 
 public interface InterfCalcDateTimeModel {
-        //extends InterfCalcDateTimeLocalModel, InterfCalcDateTimeZoneModel, InterfCalcDateTimeScheduleModel {
 
     Temporal getDateTimeLocal();
 

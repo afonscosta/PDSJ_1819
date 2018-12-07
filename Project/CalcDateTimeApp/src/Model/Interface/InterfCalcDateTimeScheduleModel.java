@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface InterfCalcDateTimeScheduleModel {
 
@@ -17,6 +18,8 @@ public interface InterfCalcDateTimeScheduleModel {
     void initNextAvailableID();
 
     Collection getSchedule();
+
+    void setSchedule(Set<Slot> schedule);
 
     Collection getScheduleRestrictions();
 

@@ -17,15 +17,11 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 
 public class ControllerUtils {
 
-    public static void clearConsole() {
-        //Só deve funcionar para linux
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-    }
-
-    // Pede ao utilizador uma data.
-    // Se não disser nada fica a que se encontra no modelLocal.
-    // Devolve null caso dê uma exceção.
+    /*
+    * Pede ao utilizador uma data.
+    * Se não disser nada fica a que se encontra no modelLocal.
+    * Devolve null caso dê uma exceção.
+    */
     public static ZonedDateTime getDateTimeFromInput(ZonedDateTime zdt, ZoneId zid) {
         Integer year = null;
         Integer month = null;
@@ -102,8 +98,9 @@ public class ControllerUtils {
         return getDateTimeFromInput(zdt, zoneId);
     }
 
-
-    //substitui o shitfDays shiftWeeks shiftMonth shitfYears e shiftWorkDays
+    /*
+    * Substitui o shitfDays shiftWeeks shiftMonth shitfYears e shiftWorkDays
+    */
     public static int shift(String type) {
         out.print("(+|-) numero de " + type + ": ");
         return Input.lerInt();

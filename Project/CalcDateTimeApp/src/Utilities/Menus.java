@@ -8,7 +8,6 @@ public class Menus {
         menus = new HashMap<Integer,Menu>();
     }
 
-
     public void addMenu(int codigo, Menu menu) {
         menus.put(codigo,menu);
     }

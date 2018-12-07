@@ -34,28 +34,20 @@ public class RestrictSlot extends Slot {
 
     public static void setNextAvailableId(long nextAvailableId) {
         RestrictSlot.nextAvailableId += nextAvailableId;
-        System.out.println("nextAvailableId restrict:->" + nextAvailableId);
-
     }
 
     public static long getAndSetNextAvailableId(long nextAvailableId){
-        System.out.println("Estou a alterar o next id do restrictSlot!");
         long res = getNextAvailableId();
         RestrictSlot.nextAvailableId += nextAvailableId;
-        System.out.println("nextAvailableId restrict:->" + nextAvailableId);
-
         return res;
     }
 
     public static void abortLastUpdateToNextId(){
-        System.out.println("REMOVER LAST UPDATE ABORT");
         if(nextAvailableId>0)
             nextAvailableId --;
-        System.out.println("nextAvailableId restrict:->" + nextAvailableId);
     }
 
     public static void loadAvailableId(long initValue){
-        System.out.println("init restrict-> " + initValue);
         nextAvailableId = initValue;
     }
 

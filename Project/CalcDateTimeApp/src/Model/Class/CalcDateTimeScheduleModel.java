@@ -22,7 +22,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     private Set<Slot> schedule;
     private List<RestrictSlot> scheduleRestrictions;
 
-    private Comparator<Slot> slotComparator;
+    private final Comparator<Slot> slotComparator;
     static final long serialVersionUID = 1L;
 
     private CalcDateTimeScheduleModel() {
@@ -42,13 +42,9 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                         if (data2.getClass().getSimpleName().equals("ZonedDateTime")) {
                             ldt2 = convertToZone(data2,referenceZone).toLocalDateTime();
                         }
-                        //System.out.println("ldt1->" + ldt1.toString());
-                        //System.out.println("ldt2->" + ldt2.toString());
-
                         if (ldt1.isBefore(ldt2)) {
                             Duration d1 = s1.getDuration();
                             LocalDateTime data1Final = ldt1.plus(d1);
-                            //System.out.println("data1Final->" + data1Final);
                             if (data1Final.isBefore(ldt2))
                                 return -1;
                             else {
@@ -57,7 +53,6 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                         } else {
                             Duration d2 = s2.getDuration();
                             LocalDateTime data2Final = ldt2.plus(d2);
-                            //System.out.println("data2Final->" + data2Final);
                             if (data2Final.isBefore(ldt1))
                                 return 1;
                             else {
@@ -84,6 +79,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         }
     }
 
+    @Override
     public void initNextAvailableID(){
         long nSlot;
         long nRestrictSlot;
@@ -91,14 +87,16 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         if(schedule.size()>0) {
             nSlot = schedule.stream().mapToLong(x -> x.getIdSlot()).max().getAsLong() + 1;
         }
-        else
-            nSlot=0;
+        else {
+            nSlot = 0;
+        }
         Slot.loadAvailableId(nSlot);
         if(scheduleRestrictions.size()>0) {
             nRestrictSlot = scheduleRestrictions.stream().mapToLong(x -> x.getIdSlot()).max().getAsLong() + 1;
         }
-        else
-            nRestrictSlot=0;
+        else {
+            nRestrictSlot = 0;
+        }
         RestrictSlot.loadAvailableId(nRestrictSlot);
     }
 
@@ -120,23 +118,27 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         }
     }
 
+    @Override
     public Set<Slot> getSchedule() {
         return schedule;
     }
 
+    @Override
     public List<RestrictSlot> getScheduleRestrictions() {
         return scheduleRestrictions;
     }
 
-    public void setschedule(Set<Slot> schedule) {
+    @Override
+    public void setSchedule(Set<Slot> schedule) {
         this.schedule = schedule;
     }
 
     //------------------------
-    // Devolve todas as reuniões existentes
-    // É apresentada cada reunião de forma aglutinada, pela sua data e local.
-    // Se a reunião estiver na zoned default, não é apresentada a zoned
+    // Devolve todos os eventos existentes
+    // É apresentado cada evento de uma forma aglutinada, pela sua data e local.
+    // Se o evento estiver na zoned local, é seguido o formato para date time local.
     //------------------------
+    @Override
     public List<String> getMainInfoSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
         List<String> res= new ArrayList();
         for(Slot s : schedule) {
@@ -149,7 +151,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     // Devolve todas as restrições existentes
     // É apresentada cada restrição de forma aglutinada, pela sua data e tipo de restrição definida(diaria, semanal ou pontual).
     //------------------------
-
+    @Override
     public List<String> getRestrictSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
         List<String> res= new ArrayList();
         for(RestrictSlot s: scheduleRestrictions){
@@ -160,10 +162,10 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
 
     //------------------------
     // ModeNormalized: diaria, semanal, mensal
-    // want -> a igualdade a verficar na schedule
+    // want -> a igualdade a verficar no schedule
     // Por exemplo, utilizador escolhe diaria -> want diz-me o dia referente
     //------------------------
-
+    @Override
     public List<String> getModeSlots(String modeNormalized, int want, ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
         List<String> res= new ArrayList();
         for(Slot s : schedule) {
@@ -193,16 +195,14 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     }
 
     //------------------------
-    //Restrições que sejam definidas em que abrangem mais que uma, teram de ser separadas, para cada dia ser tratado individulamente
+    //Restrições que sejam definidas em que abrangem mais que um dia, teram de ser separadas, para cada dia ser tratado individualmente
     //------------------------
     private List<Slot> partitionSlot(Slot newSlot) {
         List<Slot> slotsToAdd = new ArrayList<>();
 
         Duration durationNewSlot = newSlot.getDuration();
         LocalDateTime ldtNewSlot = convertToZone(newSlot.getData(), getReferenceZone()).toLocalDateTime();
-        System.out.println("ldt1->" + ldtNewSlot);
         Temporal finalDate = ldtNewSlot.plus(durationNewSlot);
-        System.out.println("finalDate->" + finalDate);
         //A duracao definida faz com passe da meia noite
         if (!LocalDate.from(ldtNewSlot).equals(LocalDate.from(finalDate))) {
             Duration durationFromMidnight;
@@ -242,18 +242,13 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
             while (durationFromMidnight.toHours() > 24);
         }
         else {
-            System.out.println("Não há problemas no slot");
             slotsToAdd.add(newSlot);
-        }
-        System.out.println("-------SLOTS TO ADD:");
-        for (Slot s : slotsToAdd) {
-            System.out.println(s.getData() + "," + s.getDuration());
         }
         return slotsToAdd;
     }
 
     //------------------------
-    // compara em termos de LocalTime dois slots
+    // compara em termos de LocalTime, dois slots
     //------------------------
     private boolean compareTime(LocalTime ldt1, LocalTime ldt2, Slot newSlot, Slot s){
         if (ldt1.isBefore(ldt2)) {
@@ -276,7 +271,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     }
 
     //------------------------
-    // compara em termos de LocalDateTime dois slots
+    // compara em termos de LocalDateTime, dois slots
     //------------------------
     private boolean compareLocalDateTime(LocalDateTime ldt1, LocalDateTime ldt2, Slot newSlot, Slot s){
         if (ldt1.isBefore(ldt2)) {
@@ -299,7 +294,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     }
 
     //------------------------
-    // Só posso agendar uma reunião se não houver nenhuma restrição definida que sobreponha
+    // Só posso agendar um evento se não houver nenhuma restrição definida que sobreponha
     //------------------------
     private boolean doesNotBreakAnyRestrict(Slot newSlot){
         boolean res;
@@ -310,7 +305,6 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                if(ldtNewSlot.getDayOfWeek().equals(ldtRestrictSlot.getDayOfWeek())){
                    res = compareTime(LocalTime.from(ldtNewSlot),LocalTime.from(ldtRestrictSlot),newSlot,s);
                    if(res==false) {
-                        System.out.println("SOBREPOSICAO COM A RESTRICAO: " + ldtRestrictSlot);
                        return false;
                    }
                }
@@ -318,14 +312,12 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
             else if(s.getPeriod().equals("pontual")){
                 res = compareLocalDateTime(ldtNewSlot,ldtRestrictSlot,newSlot,s);
                 if(res==false) {
-                    System.out.println("SOBREPOSICAO COM A RESTRICAO: " + ldtRestrictSlot);
                     return false;
                 }
             }
             else if(s.getPeriod().equals("diaria")){
                 res = compareTime(LocalTime.from(ldtNewSlot),LocalTime.from(ldtRestrictSlot),newSlot,s);
                 if(res==false) {
-                    System.out.println("SOBREPOSICAO COM A RESTRICAO: " + ldtRestrictSlot);
                     return false;
                 }
             }
@@ -334,9 +326,8 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     }
 
     //------------------------
-    // Só posso adicionar uma restrição se não houver nenhuma reunião já agendada que quebra a restrição que se pretenda adicionar
+    // Só posso adicionar uma restrição se não houver nenhum evento já agendado que quebra a restrição que se pretenda adicionar
     //------------------------
-
     private boolean doesNotOverlapAnySchedule(List<Slot> slotsToAdd, Collection c){
         boolean state=true;
         boolean res;
@@ -344,7 +335,6 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
             c.add(sToAdd);
             for (Slot s : schedule) {
                 if (!doesNotBreakAnyRestrict(s)) {
-                    System.out.println("SOBREPOSICAO COM A REUNIAO AGENDADA->" + s.getData());
                     c.remove(sToAdd);
                     RestrictSlot.abortLastUpdateToNextId();
                     state = false;
@@ -368,10 +358,11 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     }
 
     //------------------------
-    // Adicionar uma reunião ao schedule ou adicionar uma restrição ao scheduleRestrictions
-    // Só posso agendar uma reunião se não houver nenhuma restrição definida que sobreponha
-    // Só posso adicionar uma restrição se não houver nenhuma reunião já agendada que quebra a restrição que se pretenda adicionar
+    // Adicionar um evento ao schedule ou adicionar uma restrição ao scheduleRestrictions
+    // Só posso agendar um evento se não houver nenhuma restrição definida que sobreponha
+    // Só posso adicionar uma restrição se não houver nenhum evento já agendado que quebra a restrição que se pretenda adicionar
     //------------------------
+    @Override
     public boolean addSlot(Slot newSlot, Collection c) {
         boolean res;
         if(newSlot.getClass().getSimpleName().equals("Slot")){
@@ -393,8 +384,9 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     }
 
     //------------------------
-    // Remover uma reunião da schedule
+    // Remover um evento da schedule
     //------------------------
+    @Override
     public boolean removeSlot(Slot s, Collection c){
         return c.remove(s);
     }
@@ -402,6 +394,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     // Altera o local de um slot
     //------------------------
+    @Override
     public void editLocalSlot(Long idSelectSlot, String newLocal) {
         Slot s= getSlot(idSelectSlot);
         s.setLocal(newLocal);
@@ -410,16 +403,18 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     // Altera a descrição de um slot
     //------------------------
+    @Override
     public void editDescSlot(Long idSelectSlot, String newDesc) {
         Slot s = getSlot(idSelectSlot);
         s.setDescription(newDesc);
     }
 
     //------------------------
-    // Alterar a duração de uma reuniao
+    // Alterar a duração de um evento
     // É necessário garantir que a nova duração não provoca sobreposições
     // Remover o slot antigo -> adicionar um novo slot, com a mesma info excepto a duração.
     //------------------------
+    @Override
     public boolean editDurationSlot(Long idSelectSlot, Duration newDuration) {
         Slot s = getSlot(idSelectSlot);
         Slot temp = s.clone();
@@ -433,10 +428,11 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         return add;
     }
     //------------------------
-    // Alterar a data de uma reuniao
+    // Alterar a data de um evento
     // É necessário garantir que a nova data não provoca sobreposições
     // Remover o slot antigo -> adicionar um novo slot, com a mesma info excepto a data.
     //------------------------
+    @Override
     public boolean editDateSLot(Long idSelectSlot, Temporal data){
         Slot s = getSlot(idSelectSlot);
         Slot temp = s.clone();
@@ -450,11 +446,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         return add;
     }
 
-    //------------------------
-    // Dado o idenficador gerado ao nivel da interface ao percorrer a collection(schedule ou sch
-    // Este identificador pode ser visto como temporário
-    // Devolver o objecto que o identifica
-    //------------------------
+    @Override
     public Slot getSlot(Long idSlot){
         for(Slot s: schedule){
             if(s.getIdSlot()==idSlot)
@@ -462,7 +454,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         }
         return null;
     }
-
+    @Override
     public Slot getRestrictSlot(Long idSlot){
         for(Slot s: scheduleRestrictions){
             if(s.getIdSlot()==idSlot)
@@ -471,6 +463,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         return null;
     }
 
+    @Override
     public boolean existSlot(Long idSlot){
         for(Slot s: schedule){
             if(s.getIdSlot()==idSlot)
@@ -479,6 +472,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
         return false;
     }
 
+    @Override
     public boolean existRestrictSlot(Long idSlot){
         for(Slot s: scheduleRestrictions){
             if(s.getIdSlot()==idSlot)

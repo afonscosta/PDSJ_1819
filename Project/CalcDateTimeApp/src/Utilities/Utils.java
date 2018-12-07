@@ -15,32 +15,17 @@ import static Utilities.ConsoleColors.RESET;
 import static Utilities.ControllerUtils.prettyPrintDuration;
 import static java.lang.Math.abs;
 import static java.time.DayOfWeek.*;
-import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.time.temporal.ChronoUnit.*;
 import static java.time.temporal.TemporalAdjusters.next;
 import static java.time.temporal.TemporalAdjusters.previous;
 
-// Metodos estáticos aqui
+
 public class Utils {
 
     /*
      * O temp ou é uma ZonedDateTime ou uma LocalDateTime.
      * Temporal -> String
-     * Formato de saída: dd/mm/aaaa
-     */
-    public static String tempToLocalDateStr(TemporalAccessor tacs) {
-        LocalDate ld;
-        try { ld = LocalDate.from(tacs); }
-        catch (DateTimeException e) { return null; }
-        return ld.getDayOfMonth() + "/" +
-               ld.getMonth().getValue() + "/" +
-               ld.getYear();
-    }
-
-    /*
-     * O temp ou é uma ZonedDateTime ou uma LocalDateTime.
-     * Temporal -> String
-     * Formato de saída: dd/mm/aaaa  hh:mm:ss
+     * Formato de saída: formato definido
      */
     public static String localDateTimeToString(Temporal temp, DateTimeFormatter localDateTimeFormatter) {
         LocalDateTime ldt;
@@ -51,13 +36,13 @@ public class Utils {
 
     /*
      * ZonedDateTime -> String
-     * Formato de saída: dd/mm/aaaa  hh:mm:ss [zona]
+     * Formato de saída: formato definido
      */
     public static String zoneDateTimeToString(ZonedDateTime zdt, DateTimeFormatter zonedDateTimeFormatter) {
         return zdt.format(zonedDateTimeFormatter);
     }
 
-    // Dada uma ZonedDateTime, soma ou subtrai, dependendo do mode, n ChronoUnits.
+
     public static Temporal shiftDateTime(Temporal temp, int n, ChronoUnit cu) {
         return temp.plus(n, cu);
     }
@@ -69,8 +54,7 @@ public class Utils {
     }
 
     /*
-     * Temporal, int, EnumDateTimeShiftMode -> LocalDateTime
-     * Soma ou subtrai, dependendo do valor do mode, n dias úteis ao ldt.
+     * Temporal, int(+/- n dias)
      * Retorna null se o argumento temp não tiver uma componente Date.
      */
     public static Temporal shiftWorkDays(Temporal temp, int n) {
@@ -95,7 +79,7 @@ public class Utils {
 
     /*
      * LocalDateTime, LocalDateTime -> String
-     * Calcula a diferença temporal entre dois temporais desde que estejam na mesma zona.
+     * Calcula a diferença temporal entre dois zonedDateTime desde que estejam na mesma zona.
      * Formato do output: X anos Y meses Z dias W horas V minutos U segundos D nanosegundos
      * Nota: o segundo argumento é modificado.
      */
@@ -440,7 +424,6 @@ public class Utils {
         return ret;
     }
 
-
     /*
      * StringBuilder, int -> StringBuilder
      * Adiciona ao res o dom normalizado.
@@ -510,8 +493,8 @@ public class Utils {
 
     //------------------------
     // Business utils referentes ao slot
-    // Se a zoned for a de referencia, não quero imprimir a zoned
-    // A zoned de referencia é a dada no ficheiro de configuração
+    // Se a zoned for a de referencia, utilizador o formato definido para localDateTime
+    // A zoned de referencia é a do ficheiro de configuração
     //------------------------
     public static List<String> slotToString(Slot s, ZoneId referenceZone, DateTimeFormatter dtfLocal,
                                             DateTimeFormatter dtfZone, boolean subtitles){
@@ -533,13 +516,14 @@ public class Utils {
         ZonedDateTime date = ZonedDateTime.from(s.getData());
         return date.getZone().equals(referenceZone);
     }
+
     public static ZonedDateTime convertToZone (Temporal data,ZoneId referenceZone) {
         ZonedDateTime zoneData= ZonedDateTime.from(data);
         return zoneData.withZoneSameInstant(referenceZone);
     }
 
     //------------------------
-    // Dado a caracterização da reunião(id, data, local) devolve apenas o seu identificador gerado ao nivel da interface
+    // Dado a caracterização do evento (id, data, local) devolve apenas o seu identificador
     // -1 caso de erro
     //------------------------
     public static long getIdSlot(String infoSlot){

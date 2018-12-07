@@ -73,15 +73,6 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     public ZoneId getLocalZone() {
         return modelLocal.getZone();
     }
-    /*
-    public ZoneId getZoneZone() {
-        return modelZone.getZone();
-    }
-    */
-
-    public void setZoneId(ZoneId zoneId) {
-        modelLocal.setZoneId(zoneId);
-    }
 
     @Override
     public void shiftDateTimeLocal(int n, ChronoUnit cu) {
@@ -190,6 +181,7 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
         return modelSchedule.getModeSlots(modeNormalized,want,referenceZone,dtfLocal,dtfZone);
     }
 
+    @Override
     public List<String> getRestrictSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
         return modelSchedule.getRestrictSlots(referenceZone,dtfLocal,dtfZone);
     }
@@ -200,11 +192,12 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     @Override
     public Slot getRestrictSlot(Long infoSlot){ return modelSchedule.getRestrictSlot(infoSlot);}
 
-
+    @Override
     public Collection getSchedule(){
         return modelSchedule.getSchedule();
     }
 
+    @Override
     public Collection getScheduleRestrictions(){
         return modelSchedule.getScheduleRestrictions();
     }
@@ -233,8 +226,10 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
         return modelSchedule.editDateSLot(idSlot,data);
     }
 
+    @Override
     public boolean existSlot(Long idSlot){return modelSchedule.existSlot(idSlot);}
 
+    @Override
     public boolean existRestrictSlot(Long idSlot){return modelSchedule.existRestrictSlot(idSlot);}
 
 

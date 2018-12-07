@@ -54,18 +54,14 @@ public class Slot implements Serializable {
 
     public static void setNextAvailableId(long nextAvailableId) {
         Slot.nextAvailableId += nextAvailableId;
-        System.out.println("nextAvailableId slot:->" + nextAvailableId);
     }
 
     public static void abortLastUpdateToNextId(){
-        System.out.println("REMOVER LAST UPDATE ABORT");
         if(nextAvailableId>0)
                 nextAvailableId --;
-        System.out.println("nextAvailableId slot:->" + nextAvailableId);
     }
 
     public static void loadAvailableId(long initValue){
-        System.out.println("init slot-> " + initValue);
         nextAvailableId = initValue;
     }
 

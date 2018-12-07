@@ -381,7 +381,6 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         DateTimeFormatter dtfZone = getDateTimeFormatterZoned();
         Slot s;
         boolean res=false;
-        System.out.println("IdSelect -> " + idSelectSlot);
         do {
             s = model.getSlot(idSelectSlot);
             Temporal data;
