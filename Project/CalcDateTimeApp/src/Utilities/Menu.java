@@ -27,10 +27,6 @@ public class Menu {
 
     }
 
-    /*
-     * ESTÁ REPETIDO NO UTILS. DEPOIS DE VER SE PODE FICAR LÁ
-     * TEM QUE SE TIRAR DAQUI
-     */
     private void clearConsole() {
         // Se o terminal apoia padrão ansi
         if (System.getenv().get("TERM") != null) {
