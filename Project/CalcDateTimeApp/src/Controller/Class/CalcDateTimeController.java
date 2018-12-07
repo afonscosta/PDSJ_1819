@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static Utilities.Utils.*;
@@ -64,12 +65,11 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     //------------------------
     @Override
     public void startFlow() {
-        // Início do fluxo de execução
-        Menu menu = viewMainTxt.getMenu(0);
+        Menu menu;
         String opcao;
         String errorMessage = "n/a";
         do {
-            menu.addErrorMessage(errorMessage);
+            menu = viewMainTxt.getDynamicMenu(0,"n/a",errorMessage);
             errorMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
@@ -91,14 +91,13 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     // Menu de configuração
     //------------------------
     private void flowConfig() {
-        Menu menu = viewMainTxt.getMenu(1);
+        Menu menu;
         String opcao;
         boolean configChanged = false;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
         do {
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu = viewMainTxt.getDynamicMenu(1,statusMessage,errorMessage);
             errorMessage = "n/a";
             statusMessage = "n/a";
             menu.show();
@@ -122,30 +121,29 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
     private void flowRestrictSchedule(){
-        Menu menu = viewMainTxt.getMenu(7);
+        Menu menu;
         String opcao;
-        Boolean configChanged=false;
+        Boolean res=false;
         String statusMessage = "n/a" ;
-        String erroMessage = "Ira definir uma periodo de tempo para o qual nao sera permitido agendar reunioes" ;
+        String errorMessage = "Ira definir uma periodo de tempo para o qual nao sera permitido agendar reunioes" ;
         do{
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(erroMessage);
+            menu = viewMainTxt.getDynamicMenu(7,statusMessage,errorMessage);
             statusMessage = "n/a" ;
-            erroMessage = "n/a" ;
+            errorMessage = "n/a" ;
             menu.show();
             opcao= Input.lerString();
             opcao = opcao.toUpperCase();
             switch (opcao){
-                case "E":  configChanged = addRestrictSchedule("pontual"); break;
+                case "E":  res = addRestrictSchedule("pontual"); break;
                 case "G": flowGlobalRestrictSchedule(); break;
                 case "V": flowShowRestrictSchedule(); break;
                 case "S": break;
             }
             if(opcao.equals("E")){
-                if(configChanged)
+                if(res)
                     statusMessage = "Restricao adicionada com sucesso!";
                 else
-                    erroMessage = "Restricao em conflito com reunioes ja agendadas!";
+                    errorMessage = "Restricao em conflito com reunioes ja agendadas!";
 
             }
         }
@@ -153,9 +151,10 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
     private void flowShowRestrictSchedule(){
-        Menu menu = viewMainTxt.getMenu(9);
+        Menu menu;
         String opcao;
         List<String> description;
+        String errorMessage= "n/a";
         ZoneId referenceZone = ZonedDateTime.from(model.getDateTimeLocal()).getZone();
         DateTimeFormatter dtfLocal= DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat());
         DateTimeFormatter dtfZone = DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat());
@@ -173,7 +172,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             int pageIndexToDisplay = (totalPages == 0) ? 0 : pageIndex + 1;
             description.add(String.format("Pagina (%s/%s)", pageIndexToDisplay, totalPages));
 
-            menu.addDescToTitle(description);
+            menu = viewMainTxt.getDynamicMenu(9,"n/a",errorMessage, description);
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -183,16 +182,24 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 case"S":
                 default:
                     if (opcao.matches("=.*")) {
-                        opcao = opcao.substring(1); // Remover o "="
+                        try {
+                            long idSelect = Long.valueOf(opcao.substring(1)); // Remover o "="
+                            errorMessage = "Nao existe um evento com esse identificador";
 
-                        for (String infoSlot : model.getRestrictSlots(referenceZone,dtfLocal,dtfZone)) {
-                            Long idSlot = getIdSlot(infoSlot);
-                            if(idSlot>=0 & idSlot==Long.valueOf(opcao)){
-                               if(model.existRestrictSlot(idSlot)) {
-                                    flowSelectRestrictSchedule(idSlot);
-                                    break;
+                            for (String infoSlot : model.getRestrictSlots(referenceZone,dtfLocal,dtfZone)) {
+                                Long idSlot = getIdSlot(infoSlot);
+                                if(idSlot>=0 & idSlot==idSelect){
+                                   if(model.existRestrictSlot(idSlot)) {
+                                        flowSelectRestrictSchedule(idSlot);
+                                        errorMessage ="n/a";
+                                        break;
+                                    }
                                 }
                             }
+                        }
+                        catch (NumberFormatException e){
+                            errorMessage = "Opcao Invalida, introduza o identificador!";
+                            break;
                         }
 
                     }
@@ -203,74 +210,57 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
     private void flowSelectRestrictSchedule(Long idSelectSlot){
-        Menu menu = viewMainTxt.getMenu(10);
-        String opcao="";
-        boolean res=false;
+        Menu menu;
+        String opcao;
         String statusMessage = "n/a" ;
-        String erroMessage = "n/a" ;
+        String errorMessage = "n/a" ;
         ZoneId referenceZone = ZonedDateTime.from(model.getDateTimeLocal()).getZone();
         DateTimeFormatter dtfLocal= DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat());
         DateTimeFormatter dtfZone = DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat());
         Slot s;
         do{
-            if(opcao.equals("R")){
-                menu.addDescToTitle(Arrays.asList(""));
-            }
-            else {
-                s = model.getRestrictSlot(idSelectSlot);
-                List<String> dataToShow = slotToString(s, referenceZone, dtfLocal, dtfZone, true);
-                menu.addDescToTitle(Arrays.asList(dataToShow.get(0),
-                        dataToShow.get(2),
-                        dataToShow.get(3))
-                );
-            }
-
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(erroMessage);
+            s = model.getRestrictSlot(idSelectSlot);
+            List<String> dataToShow = slotToString(s, referenceZone, dtfLocal, dtfZone, true);
+            menu = viewMainTxt.getDynamicMenu(10,statusMessage,errorMessage,Arrays.asList(dataToShow.get(0),
+                                                                                             dataToShow.get(2),
+                                                                                             dataToShow.get(3)));
             statusMessage = "n/a" ;
-            erroMessage = "n/a" ;
+            errorMessage = "n/a" ;
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch (opcao){
-                case "R": res = model.removeSlot(model.getRestrictSlot(idSelectSlot),model.getScheduleRestrictions());break;
+                case "R": model.removeSlot(model.getRestrictSlot(idSelectSlot),model.getScheduleRestrictions());break;
                 case "S": break;
 
             }
-            if(opcao.equals("R")){
-                if(res)
-                    statusMessage="Restricao removida com sucesso!";
-                else
-                    erroMessage="Nao e possivel remover a restricao...";
-            }
         }
-        while(!opcao.equals("S"));
+        while(!(opcao.equals("S")| opcao.equals("R")));
     }
 
     private boolean flowGlobalRestrictSchedule(){
-        Menu menu = viewMainTxt.getMenu(8);
-        boolean configChanged= false;
+        Menu menu;
+        boolean res= false;
         String opcao;
         String statusMessage = "n/a" ;
-        String erroMessage = "n/a" ;
+        String errorMessage = "n/a" ;
         do{
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(erroMessage);
+            menu = viewMainTxt.getDynamicMenu(8,statusMessage,errorMessage);
             statusMessage = "n/a" ;
-            erroMessage = "n/a" ;
+            errorMessage = "n/a" ;
             menu.show();
             opcao= Input.lerString();
             opcao = opcao.toUpperCase();
             switch (opcao){
-                case "DIA": configChanged = addRestrictSchedule("diaria"); break;
-                case "SEM": configChanged = addRestrictSchedule("semanal"); break;
+                case "DIA": res = addRestrictSchedule("diaria"); break;
+                case "SEM": res = addRestrictSchedule("semanal"); break;
                 case "S": break;
             }
             if(opcao.equals("DIA") | opcao.equals("SEM")){
-                if(configChanged)
+                if(res)
                     statusMessage = "Restricao adicionada com sucesso!";
                 else
-                    erroMessage="Restricao em conflito com reunioes ja agendadas!";
+                    errorMessage="Restricao em conflito com reunioes ja agendadas!";
             }
         }
         while(!(opcao.equals("S")));
@@ -293,13 +283,12 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
     private void flowSetDateFormatLocal(){
-        Menu menu = viewMainTxt.getMenu(4);
+        Menu menu;
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
         do {
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu = viewMainTxt.getDynamicMenu(4,statusMessage,errorMessage);
             errorMessage = "n/a";
             statusMessage = "n/a";
             menu.show();
@@ -326,13 +315,12 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
     private void flowPreDefinedDateFormatLocal(){
-        Menu menu = viewMainTxt.getMenu(5);
+        Menu menu;
         String opcao;
         String statusMessage = "n/a" ;
         String errorMessage = "n/a";
         do {
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu = viewMainTxt.getDynamicMenu(5, statusMessage, errorMessage);
             errorMessage = "n/a";
             statusMessage = "n/a";
             menu.show();
@@ -359,13 +347,12 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
     private void flowSetDateFormatZoned(){
-        Menu menu = viewMainTxt.getMenu(4);
+        Menu menu;
         String opcao;
         String statusMessage = "n/a" ;
         String errorMessage = "n/a";
         do {
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu = viewMainTxt.getDynamicMenu(4,statusMessage,errorMessage);
             errorMessage = "n/a";
             statusMessage = "n/a";
             menu.show();
@@ -391,13 +378,12 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
     private void flowPreDefinedDateFormatZoned(){
-        Menu menu = viewMainTxt.getMenu(6);
+        Menu menu;
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
         do {
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu = viewMainTxt.getDynamicMenu(6, statusMessage, errorMessage);
             errorMessage = "n/a";
             statusMessage = "n/a";
             menu.show();
@@ -425,11 +411,6 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             }
         }
         while(!opcao.equals("S"));
-    }
-
-    private void setLocal() {
-        String zone = flowGetNZoneIds(1,viewMainTxt.getMenu(2), ZoneId.systemDefault().toString()).get(0);
-        controlLocal.withZone(zone);
     }
 
     private void helpConfig() {

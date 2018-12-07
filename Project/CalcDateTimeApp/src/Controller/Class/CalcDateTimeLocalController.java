@@ -40,7 +40,6 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     @Override
     public void setView(InterfCalcDateTimeLocalView viewLocal) {
         this.viewLocalTxt = viewLocal;
-
     }
 
     @Override
@@ -50,11 +49,11 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
 
     //------------------------
     // FlowLocal
+    // início do fluxo de execução
     //------------------------
     @Override
     public void flowLocal() {
-        // Início do fluxo de execução
-        Menu menu = viewLocalTxt.getMenu(0);
+        Menu menu;
         String ld;
         String opcao;
         String statusMessage = "n/a";
@@ -63,9 +62,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         resetDateTimeLocal();
         do {
             ld = localDateTimeToString(model.getDateTimeLocal(), DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
-            menu.addDescToTitle(asList(BLUE_BOLD + prefix + ld + RESET));
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu = viewLocalTxt.getDynamicMenu(0,statusMessage,errorMessage,asList(BLUE_BOLD + prefix + ld + RESET));
             errorMessage = "n/a";
             statusMessage = "n/a";
             menu.show();
@@ -122,7 +119,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     //------------------------
     private String flowShiftDateTime(String prefix) {
         String ld;
-        Menu menu = viewLocalTxt.getMenu(3);
+        Menu menu;
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
@@ -130,9 +127,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String prefixTemp = prefix;
         do {
             ld = localDateTimeToString(ldt, DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
-            menu.addDescToTitle(asList(BLUE_BOLD + prefixTemp + ld + RESET));
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu = viewLocalTxt.getDynamicMenu(3,statusMessage,errorMessage,asList(BLUE_BOLD + prefixTemp + ld + RESET));
             errorMessage = "n/a";
             statusMessage = "n/a";
             menu.show();
@@ -196,7 +191,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     //------------------------
     private String flowShiftWorkDaysDateTime(String prefix) {
         String ld;
-        Menu menu = viewLocalTxt.getMenu(4);
+        Menu menu;
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
@@ -204,9 +199,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String prefixTemp = prefix;
         do {
             ld = localDateTimeToString(ldt, DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
-            menu.addDescToTitle(asList(BLUE_BOLD + prefixTemp + ld + RESET));
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu= viewLocalTxt.getDynamicMenu(4, statusMessage, errorMessage, asList(BLUE_BOLD + prefixTemp + ld + RESET));
             errorMessage = "n/a";
             statusMessage = "n/a";
             menu.show();
@@ -225,7 +218,6 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
                 case "S": break;
                 default: errorMessage = "Opcao Invalida!"; break;
             }
-
         }
         while(!(opcao.equals("S") || opcao.equals("G")));
         return prefix;
@@ -236,16 +228,14 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     //------------------------
     private void flowDiffDateTime() {
         String ld;
-        Menu menu = viewLocalTxt.getMenu(5);
+        Menu menu;
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
         ZonedDateTime ldt = (ZonedDateTime) model.getDateTimeLocal();
         do {
             ld = localDateTimeToString(ldt, DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
-            menu.addDescToTitle(asList(BLUE_BOLD + "Data inicio: " + ld + RESET));
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu = viewLocalTxt.getDynamicMenu(5,statusMessage,errorMessage,asList(BLUE_BOLD + "Data inicio: " + ld + RESET));
             errorMessage = "n/a";
             statusMessage = "n/a";
             menu.show();
@@ -263,6 +253,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         }
         while(!opcao.equals("S"));
     }
+
     private void diffDateTimeLocal(ZonedDateTime start) {
         ZonedDateTime stop = getDateTimeFromInput(start, start.getZone());
         String resDiff = diffBetweenDateTime(start, stop);
@@ -277,16 +268,14 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     //------------------------
     private void flowDiffWorkDaysDateTime() {
         String ld;
-        Menu menu = viewLocalTxt.getMenu(5);
+        Menu menu;
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
         ZonedDateTime ldt = (ZonedDateTime) model.getDateTimeLocal();
         do {
             ld = localDateTimeToString(ldt, DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
-            menu.addDescToTitle(asList(BLUE_BOLD + "Data inicio: " + ld + RESET));
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu = viewLocalTxt.getDynamicMenu(5,statusMessage,errorMessage,asList(BLUE_BOLD + "Data inicio: " + ld + RESET));
             errorMessage = "n/a";
             statusMessage = "n/a";
             menu.show();
@@ -318,7 +307,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     //------------------------
     private String flowGetDateTime(String prefix) {
         String ld;
-        Menu menu = viewLocalTxt.getMenu(6);
+        Menu menu;
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
@@ -326,9 +315,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         String prefixTemp = prefix;
         do {
             ld = localDateTimeToString(ldt, DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
-            menu.addDescToTitle(asList(BLUE_BOLD + prefixTemp + ld + RESET));
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu = viewLocalTxt.getDynamicMenu(6,statusMessage,errorMessage,asList(BLUE_BOLD + prefixTemp + ld + RESET));
             errorMessage = "n/a";
             statusMessage = "n/a";
             menu.show();
@@ -421,7 +408,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     private void help() {
         ZonedDateTime ld = (ZonedDateTime) model.getDateTimeLocal();
         String sld = localDateTimeToString(ld, DateTimeFormatter.ofPattern(model.getLocalDateTimeFormat()));
-        Menu menu = viewLocalTxt.getMenu(1);
+        Menu menu;
         List<String> l = asList(
             RED_BOLD + "Data: " + sld + RESET,
             BLACK_BOLD + "^^^^" + RESET + " - A data presente no registo e usada por omissao.",
@@ -456,12 +443,10 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
             BLACK_BOLD + "Opcao ?:" + RESET + " permite ao utilizador visualizar este menu.",
             " ",
             BLACK_BOLD + "Opcao S:" + RESET + " permite ao utilizador voltar ao Menu Principal.");
-
         String opcao;
         String errorMessage = "n/a";
         do {
-            menu.addDescToTitle(l);
-            menu.addErrorMessage(errorMessage);
+            menu = viewLocalTxt.getDynamicMenu(1,"n/a",errorMessage,l);
             errorMessage = "n/a";
             menu.show();
             opcao = Input.lerString();

@@ -68,11 +68,11 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     // Fluxo inicial do menu agenda
     //------------------------
     public void flowSchedule(){
-        Menu menu = viewScheduleTxt.getMenu(0);
         String opcao;
         String errorMessage = "n/a";
+        Menu menu;
         do {
-            menu.addErrorMessage(errorMessage);
+            menu = viewScheduleTxt.getDynamicMenu(0,"n/a", errorMessage);
             errorMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
@@ -88,11 +88,11 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     }
 
     //------------------------
-    // Fluxo de adicionar uma nova reunião
-    // Pode-se optar por usar a data da calculora local, de zona ou inserir uma data manual.
+    // Fluxo de adicionar um novo evento
+    // Pode-se optar por usar a data da calculora local, de zona ou inserir uma data manual com fusos ou sem fusos
     //------------------------
     private void flowAddSlot(){
-        Menu menu = viewScheduleTxt.getMenu(3);
+        Menu menu;
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
@@ -102,12 +102,10 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             Temporal tempZone = model.getDateTimeZone();
             String ldt = localDateTimeToString(tempLocal, getDateTimeFormatterLocal());
             String zdt = zoneDateTimeToString((ZonedDateTime)tempZone, getDateTimeFormatterZoned());
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu = viewScheduleTxt.getDynamicMenu(3, statusMessage, errorMessage, asList("Data calc. local: " + ldt,
+                                                                                             "Data calc. com fusos: " + zdt));
             errorMessage = "n/a";
             statusMessage = "n/a";
-            menu.addDescToTitle(Arrays.asList("Data calc. local: " + ldt,
-                                              "Data calc. com fusos: " + zdt));
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
@@ -124,13 +122,16 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     statusMessage="Reuniao adicionada com sucesso!";
                 }
                 else{
-                    errorMessage="Sobreposicao com reunioes ou restricoes...";
+                    errorMessage="Sobreposicao com eventos ja agendados ou restricoes...";
                 }
             }
         }
         while(!(opcao.equals("S")));
     }
 
+    //------------------------
+    // Introdução manual por parte do utilizador de uma datetime com fusos ou sem fusos
+    //------------------------
     private Temporal getManualDateTime(String typeOfDate){
         ZoneId zonedId = getRefereceZoneId();
         if(typeOfDate.equals("MF")){
@@ -141,7 +142,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     }
 
     //------------------------
-    // Adicionar uma nova reunião
+    // Adicionar um novo evento
     //------------------------
     private boolean addSlot(Temporal date){
         Duration duration = getDurationFromInput();
@@ -153,17 +154,18 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
 
 
     //------------------------
-    // Fluxo de visualizar reuniões agendadas
+    // Fluxo de visualizar eventos agendados
+    // currentDateMode -> identifica a localdate que está a ser usada nas vistas
+    // modeNormalized -> identifica a vista selecionada
     //------------------------
     private void flowGetBusySlots() {
-        Boolean flowDone = false;
         LocalDate currentDateMode = LocalDate.now();
-        Menu menu = viewScheduleTxt.getMenu(1);
+        Menu menu;
         List<String> description;
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
-        String modeNormalized = "";//identifca o modo geral
+        String modeNormalized = ""; //identifica a vista geral
         int pageIndex = 0;
         ZoneId referenceZonedId = getRefereceZoneId();
         DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
@@ -190,21 +192,17 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     slotsOfMode = partitionIntoPages(model.getModeSlots(modeNormalized,currentDateMode.getMonthValue(),referenceZonedId,dtfLocal,dtfZoned),25);
                     totalPages = slotsOfMode.size();
                     break;
-
             }
             try {
                 description = new ArrayList(slotsOfMode.get(pageIndex));
             } catch (IndexOutOfBoundsException e) {
                 description = new ArrayList<>();
             }
-
             description.add(""); // Linha branca na descrição
             int pageIndexToDisplay = (totalPages == 0) ? 0 : pageIndex + 1;
             description.add(String.format("Pagina (%s/%s)", pageIndexToDisplay, totalPages));
 
-            menu.addDescToTitle(description);
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu = viewScheduleTxt.getDynamicMenu(1,statusMessage,errorMessage,description);
             errorMessage = "n/a";
             statusMessage = "n/a";
             menu.show();
@@ -216,12 +214,11 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                 case ">>": currentDateMode = changeDataMode(currentDateMode,modeNormalized,1); break;
                 case "<<": currentDateMode = changeDataMode(currentDateMode,modeNormalized,-1); break;
                 case "?" : help(); break;
-                case "S": flowDone = true; break;
+                case "S": break;
                 default:
                     if (opcao.matches("\\/.*")) {
-                        List<String> matches = new ArrayList<>();
                         pageIndex = 0;
-                        modeNormalized = opcao.substring(1).toLowerCase(); // Remover o "?" e lowercase
+                        modeNormalized = opcao.substring(1).toLowerCase(); // Remover o "/" e lowercase
                         currentDateMode = LocalDate.now(); //ao atualizar o modo, volta ao now
                     }
                     else if (opcao.matches("=.*")) {
@@ -249,7 +246,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     }
                     break;
             }
-        } while(!flowDone);
+        } while(!(opcao.equals("S")));
     }
 
     //------------------------
@@ -270,12 +267,12 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     }
 
     //------------------------
-    // Fluxo ao selecionar uma reunião
-    // Pode-se optar por alterar, remover, ver detalhes dessa reunião
+    // Fluxo ao selecionar um evento
+    // Pode-se optar por alterar, remover, ver detalhes desse evento
     //------------------------
     private void flowSelectBusySlot(Long idSelectSlot) {
-        Menu menu = viewScheduleTxt.getMenu(2);
-        String opcao="";
+        Menu menu;
+        String opcao;
         String errorMessage = "n/a";
         String statusMessage= "n/a";
         DateTimeFormatter dtfLocal = getDateTimeFormatterLocal();
@@ -283,9 +280,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         Slot s;
         do {
             s = model.getSlot(idSelectSlot);
-            menu.addDescToTitle(slotToString(s, getRefereceZoneId(), dtfLocal, dtfZone, true));
-            menu.addErrorMessage(errorMessage);
-            menu.addStatusMessage(statusMessage);
+            menu = viewScheduleTxt.getDynamicMenu(2,statusMessage,errorMessage,slotToString(s, getRefereceZoneId(), dtfLocal, dtfZone, true));
             errorMessage = "n/a";
             statusMessage = "n/a";
             menu.show();
@@ -309,12 +304,11 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     }
 
     //------------------------
-    // Fluxo de editar uma reunião
+    // Fluxo de editar um evento
     // Pode-se optar por alterar a data, duracao, local e a descrição
-    // Devolve o slot alterado ou o slot original
     //------------------------
     private void flowEditSlot(Long idSelectSlot){
-        Menu menu = viewScheduleTxt.getMenu(4);
+        Menu menu;
         String opcao;
         String errorMessage = "n/a";
         String statusMessage = "n/a";
@@ -324,9 +318,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         boolean res=false;
         do {
             s = model.getSlot(idSelectSlot);
-            menu.addDescToTitle(slotToString(s,getRefereceZoneId(),dtfLocal,dtfZone, true));
-            menu.addErrorMessage(errorMessage);
-            menu.addStatusMessage(statusMessage);
+            menu = viewScheduleTxt.getDynamicMenu(4,statusMessage,errorMessage,slotToString(s,getRefereceZoneId(),dtfLocal,dtfZone, true));
             errorMessage="n/a";
             statusMessage="n/a";
             menu.show();
@@ -353,7 +345,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     }
 
     //------------------------
-    // Editar descrição de uma reunião
+    // Editar descrição de um evento
     //------------------------
     private void editDesc(Long idSelectSlot) {
         String newDesc = getNewDescFromInput();
@@ -361,7 +353,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     }
 
     //------------------------
-    // Editar local de uma reunião
+    // Editar local de um evento
     //------------------------
     private void editLocal(Long idSelectSlot) {
         String newLocal = getNewLocalFromInput();
@@ -369,8 +361,8 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     }
 
     //------------------------
-    // Editar duracao de uma reunião
-    // Devolve o slot com a informação alterada caso seja possivel alterar
+    // Editar duracao de um evento
+    // É confirmado se a alteração da duração não provoca sobreposição com outros eventos
     //------------------------
     private boolean editDuration(Long idSelectSlot) {
         Duration newDuration = getDurationFromInput();
@@ -378,12 +370,10 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     }
 
     //------------------------
-    // Fluxo para editar data de uma reunião
-    // Avançar ou recuar dias, semanas, meses ou anos
-    // Devolve o slot com a informação alterada caso seja possivel alterar
+    // Fluxo para editar data de um evento
     //------------------------
     private void flowEditDataSlot(Long idSelectSlot) {
-        Menu menu = viewScheduleTxt.getMenu(5);
+        Menu menu;
         String opcao;
         String errorMessage = "n/a";
         String statusMessage = "n/a";
@@ -395,9 +385,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         do {
             s = model.getSlot(idSelectSlot);
             Temporal data;
-            menu.addDescToTitle(Collections.singletonList(slotToString(s, getRefereceZoneId(), dtfLocal, dtfZone, true).get(0)));
-            menu.addErrorMessage(errorMessage);
-            menu.addStatusMessage(statusMessage);
+            menu = viewScheduleTxt.getDynamicMenu(5, statusMessage, errorMessage, Collections.singletonList(slotToString(s, getRefereceZoneId(), dtfLocal, dtfZone, true).get(0)));
             errorMessage = "n/a";
             statusMessage= "n/a";
             menu.show();
@@ -430,7 +418,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     }
 
     //------------------------
-    // Breve explicação das opções do menu de visualização de reuniões agendadas
+    // Breve explicação das opções do menu de visualização de eventos agendados
     //------------------------
     private void help() {
         List<String> l = asList(

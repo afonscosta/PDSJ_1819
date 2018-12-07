@@ -148,7 +148,25 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         return menuMainTxt;
     }
 
+    @Override
     public Menu getMenu(int id) {
         return menuMainViewTxt.getMenu(id);
+    }
+
+    @Override
+    public Menu getDynamicMenu(int id, String statusMessage, String errorMessage, List des) {
+        Menu menu = menuMainViewTxt.getMenu(id);
+        menu.addDescToTitle(des);
+        menu.addStatusMessage(statusMessage);
+        menu.addErrorMessage(errorMessage);
+        return menu;
+    }
+
+    @Override
+    public Menu getDynamicMenu(int id, String statusMessage, String errorMessage){
+        Menu menu = menuMainViewTxt.getMenu(id);
+        menu.addStatusMessage(statusMessage);
+        menu.addErrorMessage(errorMessage);
+        return menu;
     }
 }
