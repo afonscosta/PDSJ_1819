@@ -173,7 +173,7 @@ public class ControllerUtils {
             menu.addDescToTitle(description);
 
             if (previousZoneWrong) {
-                menu.addErrorMessage("Zona não existe! (Nota: O parametro distingue maiusculas de minusculas");
+                menu.addErrorMessage("Zona nao existe! (Nota: O parametro distingue maiusculas de minusculas)");
                 previousZoneWrong = false;
             }
 
