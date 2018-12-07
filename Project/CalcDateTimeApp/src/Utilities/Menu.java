@@ -32,7 +32,6 @@ public class Menu {
      * TEM QUE SE TIRAR DAQUI
      */
     private void clearConsole() {
-
         // Se o terminal apoia padrão ansi
         if (System.getenv().get("TERM") != null) {
             System.out.print("\033[H\033[2J");
@@ -47,7 +46,6 @@ public class Menu {
                 e.printStackTrace();
             }
         }
-
     }
 
     public void show() {
