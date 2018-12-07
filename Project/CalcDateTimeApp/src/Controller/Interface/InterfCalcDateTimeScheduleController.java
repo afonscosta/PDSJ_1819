@@ -1,15 +1,13 @@
 package Controller.Interface;
 
 import Model.Interface.InterfCalcDateTimeModel;
-import View.Interface.InterfCalcDateTimeScheduleView;
-
-import java.time.format.DateTimeFormatter;
+import View.Interface.InterfCalcDateTimeView;
 
 public interface InterfCalcDateTimeScheduleController {
 
     void flowSchedule();
 
-    void setView(InterfCalcDateTimeScheduleView viewSchedule);
+    void setView(InterfCalcDateTimeView viewSchedule);
 
     void setModel(InterfCalcDateTimeModel model);
 }

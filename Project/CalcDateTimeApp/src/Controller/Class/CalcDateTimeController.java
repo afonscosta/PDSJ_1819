@@ -276,7 +276,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
     private void flowSetZone() {
-        String zone = flowGetNZoneIds(1,viewMainTxt.getMenu(2), ZoneId.systemDefault().toString()).get(0);
+        String zone = flowGetNZoneIds(1,viewMainTxt, 2, ZoneId.systemDefault().toString()).get(0);
         model.withZoneLocal(zone);
         model.withZoneZone(zone);
     }

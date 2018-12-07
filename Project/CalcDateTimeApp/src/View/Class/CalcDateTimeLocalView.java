@@ -1,6 +1,6 @@
 package View.Class;
 
-import View.Interface.InterfCalcDateTimeLocalView;
+import View.Interface.InterfCalcDateTimeView;
 import Utilities.Menu;
 import Utilities.Menus;
 import Utilities.Opcao;
@@ -8,7 +8,7 @@ import Utilities.Opcao;
 import java.util.Arrays;
 import java.util.List;
 
-public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
+public class CalcDateTimeLocalView implements InterfCalcDateTimeView {
     private Menus menuLocalViewTxt;
 
     public CalcDateTimeLocalView() {
@@ -103,13 +103,23 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
         return menusLocalTxt;
     }
 
+    @Override
     public Menu getMenu(int id) {
         return menuLocalViewTxt.getMenu(id);
     }
 
+    @Override
     public Menu getDynamicMenu(int id, String statusMessage, String errorMessage, List des) {
         Menu menu = menuLocalViewTxt.getMenu(id);
         menu.addDescToTitle(des);
+        menu.addStatusMessage(statusMessage);
+        menu.addErrorMessage(errorMessage);
+        return menu;
+    }
+
+    @Override
+    public Menu getDynamicMenu(int id, String statusMessage, String errorMessage) {
+        Menu menu = menuLocalViewTxt.getMenu(id);
         menu.addStatusMessage(statusMessage);
         menu.addErrorMessage(errorMessage);
         return menu;

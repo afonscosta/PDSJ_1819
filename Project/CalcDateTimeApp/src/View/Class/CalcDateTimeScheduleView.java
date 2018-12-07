@@ -3,13 +3,11 @@ package View.Class;
 import Utilities.Menu;
 import Utilities.Menus;
 import Utilities.Opcao;
-import View.Interface.InterfCalcDateTimeScheduleView;
-
-import java.util.ArrayList;
+import View.Interface.InterfCalcDateTimeView;
 import java.util.Arrays;
 import java.util.List;
 
-public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView {
+public class CalcDateTimeScheduleView implements InterfCalcDateTimeView {
     private Menus menuScheduleViewTxt;
 
     public CalcDateTimeScheduleView() {
@@ -135,6 +133,7 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         return menu;
     }
 
+    @Override
     public Menu getDynamicMenu(int id, String statusMessage, String errorMessage) {
         Menu menu = menuScheduleViewTxt.getMenu(id);
         menu.addStatusMessage(statusMessage);

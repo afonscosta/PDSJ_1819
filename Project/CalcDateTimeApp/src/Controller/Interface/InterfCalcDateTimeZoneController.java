@@ -1,9 +1,7 @@
 package Controller.Interface;
 
 import Model.Interface.InterfCalcDateTimeModel;
-import View.Interface.InterfCalcDateTimeZoneView;
-
-import java.time.format.DateTimeFormatter;
+import View.Interface.InterfCalcDateTimeView;
 
 public interface InterfCalcDateTimeZoneController {
 
@@ -11,5 +9,5 @@ public interface InterfCalcDateTimeZoneController {
 
     void setModel(InterfCalcDateTimeModel model);
 
-    void setView(InterfCalcDateTimeZoneView viewZone);
+    void setView(InterfCalcDateTimeView viewZone);
 }

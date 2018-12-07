@@ -19,14 +19,8 @@ import View.Class.CalcDateTimeLocalView;
 import View.Class.CalcDateTimeScheduleView;
 import View.Class.CalcDateTimeView;
 import View.Class.CalcDateTimeZoneView;
-import View.Interface.InterfCalcDateTimeLocalView;
-import View.Interface.InterfCalcDateTimeScheduleView;
 import View.Interface.InterfCalcDateTimeView;
-import View.Interface.InterfCalcDateTimeZoneView;
 
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 public final class CalcDateTimeApp {
 
@@ -49,9 +43,9 @@ public final class CalcDateTimeApp {
         InterfCalcDateTimeModel model = new CalcDateTimeModel(modelLocal, modelZone, modelSchedule, configs);
 
         //--------------------------------
-        InterfCalcDateTimeLocalView viewLocal = new CalcDateTimeLocalView();
-        InterfCalcDateTimeZoneView viewZone = new CalcDateTimeZoneView();
-        InterfCalcDateTimeScheduleView viewSchedule = new CalcDateTimeScheduleView();
+        InterfCalcDateTimeView viewLocal = new CalcDateTimeLocalView();
+        InterfCalcDateTimeView viewZone = new CalcDateTimeZoneView();
+        InterfCalcDateTimeView viewSchedule = new CalcDateTimeScheduleView();
         InterfCalcDateTimeView view = new CalcDateTimeView();
 
         //--------------------------------

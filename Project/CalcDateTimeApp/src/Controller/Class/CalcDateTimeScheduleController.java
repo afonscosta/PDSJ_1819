@@ -5,7 +5,7 @@ import Model.Class.Slot;
 import Model.Interface.InterfCalcDateTimeModel;
 import Utilities.Input;
 import Utilities.Menu;
-import View.Interface.InterfCalcDateTimeScheduleView;
+import View.Interface.InterfCalcDateTimeView;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -13,7 +13,6 @@ import java.time.temporal.Temporal;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,7 +25,7 @@ import static java.util.Arrays.asList;
 public class CalcDateTimeScheduleController implements InterfCalcDateTimeScheduleController {
 
     private InterfCalcDateTimeModel model;
-    private InterfCalcDateTimeScheduleView viewScheduleTxt;
+    private InterfCalcDateTimeView viewScheduleTxt;
 
     public static CalcDateTimeScheduleController of() {
         return new CalcDateTimeScheduleController();
@@ -34,7 +33,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
 
     private CalcDateTimeScheduleController() { }
 
-    public void setView(InterfCalcDateTimeScheduleView viewSchedule) {
+    public void setView(InterfCalcDateTimeView viewSchedule) {
         this.viewScheduleTxt = viewSchedule;
     }
 
@@ -135,7 +134,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     private Temporal getManualDateTime(String typeOfDate){
         ZoneId zonedId = getRefereceZoneId();
         if(typeOfDate.equals("MF")){
-            String zoneIdString = flowGetNZoneIds(1, viewScheduleTxt.getMenu(8), model.getZoneZone()).get(0);
+            String zoneIdString = flowGetNZoneIds(1, viewScheduleTxt, 8, model.getZoneZone()).get(0);
             zonedId = ZoneId.of(zoneIdString);
         }
         return  getDateTimeFromInput((ZonedDateTime) model.getDateTimeLocal(), zonedId);
@@ -398,7 +397,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                     }
                     else {
                         //Utilizar o próprio para o zone
-                        data = getZoneDateTimeFromInput(viewScheduleTxt.getMenu(8), ((ZonedDateTime) s.getData()).getZone().getId(), (ZonedDateTime) s.getData());
+                        data = getZoneDateTimeFromInput(viewScheduleTxt, 8, ((ZonedDateTime) s.getData()).getZone().getId(), (ZonedDateTime) s.getData());
                         res = model.editDateSLot(idSelectSlot, data);
                     }
                     break;

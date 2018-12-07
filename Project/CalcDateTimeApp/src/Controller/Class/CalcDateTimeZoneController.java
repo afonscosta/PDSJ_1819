@@ -4,7 +4,7 @@ import Controller.Interface.InterfCalcDateTimeZoneController;
 import Model.Interface.InterfCalcDateTimeModel;
 import Utilities.Input;
 import Utilities.Menu;
-import View.Interface.InterfCalcDateTimeZoneView;
+import View.Interface.InterfCalcDateTimeView;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -21,7 +21,7 @@ import static java.util.Arrays.asList;
 
 public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneController {
     private InterfCalcDateTimeModel model;
-    private InterfCalcDateTimeZoneView viewZoneTxt;
+    private InterfCalcDateTimeView viewZoneTxt;
 
     public static CalcDateTimeZoneController of() {
         return new CalcDateTimeZoneController();
@@ -36,7 +36,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     }
 
     @Override
-    public void setView(InterfCalcDateTimeZoneView viewZone) {
+    public void setView(InterfCalcDateTimeView viewZone) {
         this.viewZoneTxt = viewZone;
     }
 
@@ -95,7 +95,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     // FlowSetDateTime
     //------------------------
     private void setDateTimeZone() {
-        ZonedDateTime zdt = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), model.getZoneZone(), (ZonedDateTime) model.getDateTimeZone());
+        ZonedDateTime zdt = getZoneDateTimeFromInput(viewZoneTxt, 4, model.getZoneZone(), (ZonedDateTime) model.getDateTimeZone());
         model.fromDateTimeZone(zdt);
     }
 
@@ -231,7 +231,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
             opcao = opcao.toUpperCase();
             switch(opcao) {
                 case "I":
-                    zdt = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), zdt.getZone().getId(), zdt);
+                    zdt = getZoneDateTimeFromInput(viewZoneTxt,4, zdt.getZone().getId(), zdt);
                     statusMessage = "Data de inicio modificada com sucesso";
                     break;
                 case "F": diffDateTimeZone(zdt); break;
@@ -243,7 +243,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     }
 
     private void diffDateTimeZone(ZonedDateTime start) {
-        ZonedDateTime stop = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), start.getZone().getId(), start);
+        ZonedDateTime stop = getZoneDateTimeFromInput(viewZoneTxt, 4, start.getZone().getId(), start);
         String resDiff = diffBetweenDateTime(start, stop);
 
         out.println(GREEN_BOLD + "\nResultado: " + resDiff + RESET);
@@ -271,7 +271,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
             opcao = opcao.toUpperCase();
             switch(opcao) {
                 case "I" :
-                    zdt = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), zdt.getZone().getId(), zdt);
+                    zdt = getZoneDateTimeFromInput(viewZoneTxt, 4, zdt.getZone().getId(), zdt);
                     statusMessage = "Data de inicio modificada com sucesso";
                     break;
                 case "F" : diffWorkDaysDateTimeZone(zdt); break;
@@ -283,7 +283,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     }
 
     private void diffWorkDaysDateTimeZone(ZonedDateTime start) {
-        ZonedDateTime stop = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), start.getZone().getId(), start);
+        ZonedDateTime stop = getZoneDateTimeFromInput(viewZoneTxt, 4, start.getZone().getId(), start);
         String resDiff = countWorkDays(start, stop) + " dias úteis";
 
         out.println(GREEN_BOLD + "\nResultado: " + resDiff + RESET);
@@ -296,7 +296,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     //------------------------
     private void flowConvertZone() {
         try {
-            String answerZone = flowGetNZoneIds(1, viewZoneTxt.getMenu(4), model.getZoneZone()).get(0);
+            String answerZone = flowGetNZoneIds(1, viewZoneTxt, 4, model.getZoneZone()).get(0);
             model.withZoneZone(answerZone);
         }
         catch (IndexOutOfBoundsException e){}
@@ -306,7 +306,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     // FlowDiffInTimeZones
     //------------------------
     private void flowDiffInTimeZones() {
-        List<String> zoneIdsTxt = flowGetNZoneIds(2, viewZoneTxt.getMenu(4), model.getZoneZone());
+        List<String> zoneIdsTxt = flowGetNZoneIds(2, viewZoneTxt, 4, model.getZoneZone());
 
         String zoneId1 = zoneIdsTxt.get(0);
         String zoneId2 = zoneIdsTxt.get(1);

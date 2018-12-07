@@ -3,12 +3,11 @@ package View.Class;
 import Utilities.Menu;
 import Utilities.Menus;
 import Utilities.Opcao;
-import View.Interface.InterfCalcDateTimeZoneView;
-
+import View.Interface.InterfCalcDateTimeView;
 import java.util.Arrays;
 import java.util.List;
 
-public class CalcDateTimeZoneView implements InterfCalcDateTimeZoneView {
+public class CalcDateTimeZoneView implements InterfCalcDateTimeView {
     private Menus menuZoneViewTxt;
 
     public CalcDateTimeZoneView() {
@@ -107,4 +106,13 @@ public class CalcDateTimeZoneView implements InterfCalcDateTimeZoneView {
         menu.addErrorMessage(errorMessage);
         return menu;
     }
+
+    @Override
+    public Menu getDynamicMenu(int id, String statusMessage, String errorMessage) {
+        Menu menu = menuZoneViewTxt.getMenu(id);
+        menu.addStatusMessage(statusMessage);
+        menu.addErrorMessage(errorMessage);
+        return menu;
+    }
+
 }

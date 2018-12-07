@@ -1,10 +1,7 @@
 package Controller.Interface;
 
 import Model.Interface.InterfCalcDateTimeModel;
-import View.Interface.InterfCalcDateTimeLocalView;
-
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import View.Interface.InterfCalcDateTimeView;
 
 public interface InterfCalcDateTimeLocalController {
 
@@ -12,7 +9,7 @@ public interface InterfCalcDateTimeLocalController {
 
     void setModel(InterfCalcDateTimeModel model);
 
-    void setView(InterfCalcDateTimeLocalView viewLocal);
+    void setView(InterfCalcDateTimeView viewLocal);
 
     void withZone(String zid);
 }

@@ -1,5 +1,7 @@
 package Utilities;
 
+import View.Interface.InterfCalcDateTimeView;
+
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
@@ -91,8 +93,8 @@ public class ControllerUtils {
         return ZonedDateTime.of(year, month, day, hour, minute, second, nano, zid);
     }
 
-    public static ZonedDateTime getZoneDateTimeFromInput(Menu menu, String zid, ZonedDateTime zdt) {
-        String zoneIdString = flowGetNZoneIds(1, menu, zid).get(0);
+    public static ZonedDateTime getZoneDateTimeFromInput(InterfCalcDateTimeView view, int idMenu, String zid, ZonedDateTime zdt) {
+        String zoneIdString = flowGetNZoneIds(1, view,idMenu, zid).get(0);
         ZoneId zoneId = ZoneId.of(zoneIdString);
 
         return getDateTimeFromInput(zdt, zoneId);
@@ -142,7 +144,7 @@ public class ControllerUtils {
         return format;
     }
 
-    public static List<String> flowGetNZoneIds(int zoneIdsWanted, Menu menu, String defaultZoneid) {
+    public static List<String> flowGetNZoneIds(int zoneIdsWanted, InterfCalcDateTimeView view, int idMenu, String defaultZoneid) {
         List<String> zoneIdList = new ArrayList<>();
         Boolean flowDone = false;
         List<List<String>> chosenZoneIdsByPage = partitionIntoPages(getSortedAvailableZoneIdsAndOffset(),25); // If someone looks for "europe", place matches it here
@@ -153,6 +155,8 @@ public class ControllerUtils {
         String opcao;
         Boolean previousZoneWrong = false;
         Boolean previousInputIncorrect = false;
+        Menu menu;
+        String errorMessage= "n/a";
         do {
 
             // Mais complexo do que necessário para o caso em que a lista de procuras está vazia,
@@ -168,17 +172,16 @@ public class ControllerUtils {
             description.add(String.format("Pagina (%s/%s)", pageIndexToDisplay, totalPages));
             description.add(String.format(CYAN_BOLD + "ZoneIds adicionados: (%d/%d)" + RESET, zoneIdList.size(), zoneIdsWanted));
 
-            menu.addDescToTitle(description);
-
             if (previousZoneWrong) {
-                menu.addErrorMessage("Zona nao existe! (Nota: O parametro distingue maiusculas de minusculas)");
+                errorMessage = "Zona nao existe! (Nota: O parametro distingue maiusculas de minusculas)";
                 previousZoneWrong = false;
             }
             if (previousInputIncorrect) {
-                menu.addErrorMessage("Opcao invalida!");
+                errorMessage ="Opcao invalida!";
                 previousInputIncorrect = false;
             }
-
+            menu = view.getDynamicMenu(idMenu,"n/a",errorMessage,description);
+            errorMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
             switch (opcao) {

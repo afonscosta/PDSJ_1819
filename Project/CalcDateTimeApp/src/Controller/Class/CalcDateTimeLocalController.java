@@ -2,11 +2,10 @@ package Controller.Class;
 
 import Controller.Interface.InterfCalcDateTimeLocalController;
 import Model.Interface.InterfCalcDateTimeModel;
-import Utilities.Utils;
 import Utilities.ControllerUtils;
 import Utilities.Input;
 import Utilities.Menu;
-import View.Interface.InterfCalcDateTimeLocalView;
+import View.Interface.InterfCalcDateTimeView;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,7 +21,7 @@ import static java.util.Arrays.asList;
 
 public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalController {
     private InterfCalcDateTimeModel model;
-    private InterfCalcDateTimeLocalView viewLocalTxt;
+    private InterfCalcDateTimeView viewLocalTxt;
 
     public static CalcDateTimeLocalController of() {
         return new CalcDateTimeLocalController();
@@ -38,7 +37,7 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
     }
 
     @Override
-    public void setView(InterfCalcDateTimeLocalView viewLocal) {
+    public void setView(InterfCalcDateTimeView viewLocal) {
         this.viewLocalTxt = viewLocal;
     }
 
