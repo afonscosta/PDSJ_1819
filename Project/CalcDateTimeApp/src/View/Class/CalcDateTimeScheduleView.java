@@ -5,6 +5,7 @@ import Utilities.Menus;
 import Utilities.Opcao;
 import View.Interface.InterfCalcDateTimeScheduleView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -120,7 +121,24 @@ public class CalcDateTimeScheduleView implements InterfCalcDateTimeScheduleView 
         return menusScheduleTxt;
     }
 
+    @Override
     public Menu getMenu(int id) {
         return menuScheduleViewTxt.getMenu(id);
+    }
+
+    @Override
+    public Menu getDynamicMenu(int id, String statusMessage, String errorMessage, List des) {
+        Menu menu = menuScheduleViewTxt.getMenu(id);
+        menu.addDescToTitle(des);
+        menu.addStatusMessage(statusMessage);
+        menu.addErrorMessage(errorMessage);
+        return menu;
+    }
+
+    public Menu getDynamicMenu(int id, String statusMessage, String errorMessage) {
+        Menu menu = menuScheduleViewTxt.getMenu(id);
+        menu.addStatusMessage(statusMessage);
+        menu.addErrorMessage(errorMessage);
+        return menu;
     }
 }

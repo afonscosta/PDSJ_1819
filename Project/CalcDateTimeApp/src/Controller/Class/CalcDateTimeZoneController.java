@@ -45,7 +45,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     //------------------------
     @Override
     public void flowZone() {
-        Menu menu = viewZoneTxt.getMenu(0);
+        Menu menu;
         String zd;
         String opcao;
         String statusMessage = "n/a";
@@ -54,9 +54,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         resetDateTimeZone();
         do {
             zd = zoneDateTimeToString((ZonedDateTime) model.getDateTimeZone(), DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat()));
-            menu.addDescToTitle(Arrays.asList(BLUE_BOLD + prefix + zd + RESET));
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu = viewZoneTxt.getDynamicMenu(0,statusMessage,errorMessage,Arrays.asList(BLUE_BOLD + prefix + zd + RESET));
             statusMessage = "n/a";
             errorMessage = "n/a";
             menu.show();
@@ -113,7 +111,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     //------------------------
     private String flowShiftZoneDateTime(String prefix) {
         String ld;
-        Menu menu = viewZoneTxt.getMenu(1);
+        Menu menu;
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
@@ -121,9 +119,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         String prefixTemp = prefix;
         do {
             ld = zoneDateTimeToString(zdt, DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat()));
-            menu.addDescToTitle(Arrays.asList(BLUE_BOLD + prefixTemp + ld + RESET));
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu = viewZoneTxt.getDynamicMenu(1,statusMessage,errorMessage,Arrays.asList(BLUE_BOLD + prefixTemp + ld + RESET));
             errorMessage = "n/a";
             statusMessage = "n/a";
             menu.show();
@@ -186,15 +182,14 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     //------------------------
     private String flowShiftWorkDaysDateTimeZone(String prefix) {
         String ld;
-        Menu menu = viewZoneTxt.getMenu(2);
+        Menu menu;
         String opcao;
         String errorMessage = "n/a";
         ZonedDateTime zdt = (ZonedDateTime) model.getDateTimeZone();
         String prefixTemp = prefix;
         do {
             ld = zoneDateTimeToString(zdt, DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat()));
-            menu.addDescToTitle(Arrays.asList(BLUE_BOLD + prefixTemp + ld + RESET));
-            menu.addErrorMessage(errorMessage);
+            menu = viewZoneTxt.getDynamicMenu(2,"n/a",errorMessage,Arrays.asList(BLUE_BOLD + prefixTemp + ld + RESET));
             errorMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
@@ -221,16 +216,14 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     //------------------------
     private void flowDiffDateTimeZone() {
         String ld;
-        Menu menu = viewZoneTxt.getMenu(3);
+        Menu menu;
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
         ZonedDateTime zdt = (ZonedDateTime) model.getDateTimeZone();
         do {
             ld = zoneDateTimeToString(zdt, DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat()));
-            menu.addDescToTitle(Arrays.asList(BLUE_BOLD + "Data inicio: " + ld + RESET));
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu = viewZoneTxt.getDynamicMenu(3,statusMessage,errorMessage,Arrays.asList(BLUE_BOLD + "Data inicio: " + ld + RESET));
             statusMessage = "n/a";
             errorMessage = "n/a";
             menu.show();
@@ -248,6 +241,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         }
         while(!opcao.equals("S"));
     }
+
     private void diffDateTimeZone(ZonedDateTime start) {
         ZonedDateTime stop = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), start.getZone().getId(), start);
         String resDiff = diffBetweenDateTime(start, stop);
@@ -262,16 +256,14 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
     //------------------------
     private void flowDiffWorkDaysDateTimeZone() {
         String ld;
-        Menu menu = viewZoneTxt.getMenu(3);
+        Menu menu;
         String opcao;
         String statusMessage = "n/a";
         String errorMessage = "n/a";
         ZonedDateTime zdt = (ZonedDateTime) model.getDateTimeZone();
         do {
             ld = zoneDateTimeToString(zdt, DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat()));
-            menu.addDescToTitle(Arrays.asList(BLUE_BOLD + "Data inicio: " + ld + RESET));
-            menu.addStatusMessage(statusMessage);
-            menu.addErrorMessage(errorMessage);
+            menu = viewZoneTxt.getDynamicMenu(3,statusMessage,errorMessage,Arrays.asList(BLUE_BOLD + "Data inicio: " + ld + RESET));
             statusMessage = "n/a";
             errorMessage = "n/a";
             menu.show();
@@ -289,6 +281,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeZoneControl
         }
         while(!opcao.equals("S"));
     }
+
     private void diffWorkDaysDateTimeZone(ZonedDateTime start) {
         ZonedDateTime stop = getZoneDateTimeFromInput(viewZoneTxt.getMenu(4), start.getZone().getId(), start);
         String resDiff = countWorkDays(start, stop) + " dias úteis";

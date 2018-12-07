@@ -94,8 +94,17 @@ public class CalcDateTimeZoneView implements InterfCalcDateTimeZoneView {
         return menusZoneTxt;
     }
 
-
+    @Override
     public Menu getMenu(int id) {
         return menuZoneViewTxt.getMenu(id);
+    }
+
+    @Override
+    public Menu getDynamicMenu(int id, String statusMessage, String errorMessage, List des) {
+        Menu menu = menuZoneViewTxt.getMenu(id);
+        menu.addDescToTitle(des);
+        menu.addStatusMessage(statusMessage);
+        menu.addErrorMessage(errorMessage);
+        return menu;
     }
 }

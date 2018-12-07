@@ -106,4 +106,12 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeLocalView {
     public Menu getMenu(int id) {
         return menuLocalViewTxt.getMenu(id);
     }
+
+    public Menu getDynamicMenu(int id, String statusMessage, String errorMessage, List des) {
+        Menu menu = menuLocalViewTxt.getMenu(id);
+        menu.addDescToTitle(des);
+        menu.addStatusMessage(statusMessage);
+        menu.addErrorMessage(errorMessage);
+        return menu;
+    }
 }
