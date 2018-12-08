@@ -79,27 +79,6 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     }
 
     @Override
-    public void initNextAvailableID(){
-        long nSlot;
-        long nRestrictSlot;
-
-        if(schedule.size()>0) {
-            nSlot = schedule.stream().mapToLong(x -> x.getIdSlot()).max().getAsLong() + 1;
-        }
-        else {
-            nSlot = 0;
-        }
-        Slot.loadAvailableId(nSlot);
-        if(scheduleRestrictions.size()>0) {
-            nRestrictSlot = scheduleRestrictions.stream().mapToLong(x -> x.getIdSlot()).max().getAsLong() + 1;
-        }
-        else {
-            nRestrictSlot = 0;
-        }
-        RestrictSlot.loadAvailableId(nRestrictSlot);
-    }
-
-    @Override
     public Set<Slot> getSchedule() {
         return schedule;
     }
@@ -123,7 +102,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     public List<String> getMainInfoSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
         List<String> res= new ArrayList();
         for(Slot s : schedule) {
-            res.add(s.getIdSlot() + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getLocal());
+            res.add(s.getIdSlot() + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " [" + s.getLocal() + "]");
         }
         return res;
     }
@@ -136,7 +115,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     public List<String> getRestrictSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone){
         List<String> res= new ArrayList();
         for(RestrictSlot s: scheduleRestrictions){
-            res.add(s.getIdSlot() + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " || " + s.getPeriod());
+            res.add(s.getIdSlot() + ": " + slotToString(s, referenceZone, dtfLocal, dtfZone, false).get(0) + " [" + s.getPeriod() + "]");
         }
         return res;
     }
@@ -180,6 +159,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     private List<Slot> partitionSlot(Slot newSlot, ZoneId zoneId) {
         List<Slot> slotsToAdd = new ArrayList<>();
+        long nextAvailableId = newSlot.getIdSlot() + 1;
 
         Duration durationNewSlot = newSlot.getDuration();
         LocalDateTime ldtNewSlot = convertToZone(newSlot.getDate(), zoneId).toLocalDateTime();
@@ -210,12 +190,12 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                 slotFromMidnight.setDuration(durationFromMidnight);
                 if(durationFromMidnight.toHours() < 24) {
                     //posso adicionar porque a sua duracao já foi restrita a menos de 24 horas
-                    slotFromMidnight.setIdSlot(RestrictSlot.getAndSetNextAvailableId(1));
+                    slotFromMidnight.setIdSlot(nextAvailableId++);
                     slotsToAdd.add(slotFromMidnight);
                 }
                 else {
                     newSlot = slotFromMidnight.clone();
-                    newSlot.setIdSlot(RestrictSlot.getAndSetNextAvailableId(1));
+                    newSlot.setIdSlot(nextAvailableId++);
                     ldtNewSlot = convertToZone(newSlot.getDate(), zoneId).toLocalDateTime();
                     durationNewSlot = newSlot.getDuration();
                 }

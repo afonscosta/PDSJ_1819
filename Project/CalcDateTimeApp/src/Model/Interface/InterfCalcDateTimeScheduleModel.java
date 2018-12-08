@@ -16,8 +16,6 @@ public interface InterfCalcDateTimeScheduleModel {
 
     void loadConfigs(Configs configs);
 
-    void initNextAvailableID();
-
     Set<Slot> getSchedule();
 
     void setSchedule(Set<Slot> schedule);

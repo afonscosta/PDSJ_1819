@@ -42,7 +42,6 @@ public class Utils {
         return zdt.format(zonedDateTimeFormatter);
     }
 
-
     public static Temporal shiftDateTime(Temporal temp, int n, ChronoUnit cu) {
         return temp.plus(n, cu);
     }
@@ -304,7 +303,6 @@ public class Utils {
             ld = ld.minusDays(1);
         return ld.getDayOfWeek().getValue() - start + 1;
     }
-
 
     /*
      * Temporal -> DayOfWeek

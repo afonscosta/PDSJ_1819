@@ -5,7 +5,6 @@ import java.time.Duration;
 import java.time.temporal.Temporal;
 
 public class Slot implements Serializable {
-    private static long nextAvailableId;
     private long idSlot;
     private Temporal date;
     private Duration duration;
@@ -13,23 +12,12 @@ public class Slot implements Serializable {
     private String description;
     static final long serialVersionUID = 2L;
 
-    public static Slot of (Temporal date, Duration duration, String local, String description) {
-        return new Slot(date,duration,local,description);
-    }
     public static Slot of (Long idSlot,Temporal date, Duration duration, String local, String description) {
         return new Slot(idSlot,date,duration,local,description);
     }
+
     public static Slot of (Slot s) {
         return new Slot(s);
-    }
-
-    protected Slot(Temporal date, Duration duration, String local, String description) {
-        this.idSlot = nextAvailableId;
-        this.date = date;
-        this.duration = duration;
-        this.local = local;
-        this.description = description;
-        setNextAvailableId(1);
     }
 
     protected Slot(Long idSlot, Temporal date, Duration duration, String local, String description) {
@@ -46,23 +34,6 @@ public class Slot implements Serializable {
         this.duration = s.getDuration();
         this.local = s.getLocal();
         this.description = s.getDescription();
-    }
-
-    public static long getNextAvailableId() {
-        return nextAvailableId;
-    }
-
-    public static void setNextAvailableId(long nextAvailableId) {
-        Slot.nextAvailableId += nextAvailableId;
-    }
-
-    public static void abortLastUpdateToNextId(){
-        if(nextAvailableId>0)
-                nextAvailableId --;
-    }
-
-    public static void loadAvailableId(long initValue){
-        nextAvailableId = initValue;
     }
 
     public long getIdSlot() {

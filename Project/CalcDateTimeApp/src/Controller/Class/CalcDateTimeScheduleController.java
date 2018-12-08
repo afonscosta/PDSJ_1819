@@ -147,9 +147,9 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         Duration duration = getDurationFromInput();
         String local = getLocalFromInput();
         String desc = getDescFromInput();
-        Slot newSlot = Slot.of(date, duration, local, desc);
+        Slot newSlot = Slot.of(model.getIdSlot(), date, duration, local, desc);
         boolean added = model.addSlot(newSlot);
-        if (added) { /*somar mais um ao id*/ }
+        if (added) { System.out.println("Entrou aqui!"); model.incNIdSlot(1); }
         return added;
     }
 
