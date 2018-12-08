@@ -1,6 +1,6 @@
 package Controller.Class;
 
-import Controller.Interface.InterfCalcDateTimeLocalController;
+import Controller.Interface.InterfCalcDateTimeController;
 import Model.Interface.InterfCalcDateTimeModel;
 import Utilities.ControllerUtils;
 import Utilities.Input;
@@ -19,7 +19,7 @@ import static java.lang.System.out;
 import static java.time.temporal.ChronoUnit.*;
 import static java.util.Arrays.asList;
 
-public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalController {
+public class CalcDateTimeLocalController implements InterfCalcDateTimeController {
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeView viewLocalTxt;
 
@@ -41,17 +41,12 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeLocalContr
         this.viewLocalTxt = viewLocal;
     }
 
-    @Override
-    public void withZone(String zid) {
-        model.withZoneLocal(zid);
-    }
-
     //------------------------
     // FlowLocal
     // início do fluxo de execução
     //------------------------
     @Override
-    public void flowLocal() {
+    public void startFlow() {
         Menu menu;
         String ld;
         String opcao;

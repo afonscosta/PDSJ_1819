@@ -1,9 +1,6 @@
 package Controller.Class;
 
 import Controller.Interface.InterfCalcDateTimeController;
-import Controller.Interface.InterfCalcDateTimeLocalController;
-import Controller.Interface.InterfCalcDateTimeScheduleController;
-import Controller.Interface.InterfCalcDateTimeZoneController;
 import Model.Class.RestrictSlot;
 import Model.Class.Slot;
 import Model.Interface.InterfCalcDateTimeModel;
@@ -30,19 +27,19 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
 
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeView viewMainTxt;
-    private InterfCalcDateTimeLocalController controlLocal;
-    private InterfCalcDateTimeZoneController controlZone;
-    private InterfCalcDateTimeScheduleController controlSchedule;
+    private InterfCalcDateTimeController controlLocal;
+    private InterfCalcDateTimeController controlZone;
+    private InterfCalcDateTimeController controlSchedule;
 
-    public static CalcDateTimeController of(InterfCalcDateTimeLocalController controlLocal,
-                                            InterfCalcDateTimeZoneController controlZone,
-                                            InterfCalcDateTimeScheduleController controlSchedule) {
+    public static CalcDateTimeController of(InterfCalcDateTimeController controlLocal,
+                                            InterfCalcDateTimeController controlZone,
+                                            InterfCalcDateTimeController controlSchedule) {
         return new CalcDateTimeController(controlLocal, controlZone, controlSchedule);
     }
 
-    private CalcDateTimeController(InterfCalcDateTimeLocalController controlLocal,
-                                   InterfCalcDateTimeZoneController controlZone,
-                                   InterfCalcDateTimeScheduleController controlSchedule) {
+    private CalcDateTimeController(InterfCalcDateTimeController controlLocal,
+                                   InterfCalcDateTimeController controlZone,
+                                   InterfCalcDateTimeController controlSchedule) {
         this.controlLocal = controlLocal;
         this.controlZone = controlZone;
         this.controlSchedule = controlSchedule;
@@ -74,9 +71,9 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
-                case "L" : controlLocal.flowLocal(); break;
-                case "Z" : controlZone.flowZone(); break;
-                case "A" : controlSchedule.flowSchedule(); break;
+                case "L" : controlLocal.startFlow(); break;
+                case "Z" : controlZone.startFlow(); break;
+                case "A" : controlSchedule.startFlow(); break;
                 case "C" : flowConfig(); break;
                 case "?" : helpMain(); break;
                 case "S": model.saveConfigs(); break;

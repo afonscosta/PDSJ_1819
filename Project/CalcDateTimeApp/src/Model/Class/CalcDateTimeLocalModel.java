@@ -27,7 +27,6 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
     @Override
     public void loadConfigs(Configs configs) {
         this.setZoneId(configs.getZoneId());
-
         // Reset do buffer para data atual
         this.ldt = ZonedDateTime.now(this.ldt.getZone());
     }
@@ -69,7 +68,7 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
         try {
             ldt = ldt.withZoneSameInstant(ZoneId.of(zid));
         } catch (ZoneRulesException e) {
-            // Zona inexistente? Ignorar..
+            // Se a zona não for válida, não efetuar a conversão
         }
     }
 

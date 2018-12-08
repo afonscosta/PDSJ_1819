@@ -3,9 +3,6 @@ import Controller.Class.CalcDateTimeLocalController;
 import Controller.Class.CalcDateTimeScheduleController;
 import Controller.Class.CalcDateTimeZoneController;
 import Controller.Interface.InterfCalcDateTimeController;
-import Controller.Interface.InterfCalcDateTimeLocalController;
-import Controller.Interface.InterfCalcDateTimeScheduleController;
-import Controller.Interface.InterfCalcDateTimeZoneController;
 import Model.Class.CalcDateTimeLocalModel;
 import Model.Class.CalcDateTimeModel;
 import Model.Class.CalcDateTimeScheduleModel;
@@ -24,19 +21,11 @@ import View.Interface.InterfCalcDateTimeView;
 
 public final class CalcDateTimeApp {
 
-    /*
-    TODO Zone:
-    "Esta é a data, quer guardar no buffer?"
-     */
-
     public static void main(String[] args) {
         Configs configs = Configs.of("./Configs");
 
         //--------------------------------
-        InterfCalcDateTimeLocalModel modelLocal = CalcDateTimeLocalModel.of();
-        InterfCalcDateTimeZoneModel modelZone = CalcDateTimeZoneModel.of();
-        InterfCalcDateTimeScheduleModel modelSchedule = CalcDateTimeScheduleModel.of();
-        InterfCalcDateTimeModel model = new CalcDateTimeModel(modelLocal, modelZone, modelSchedule, configs);
+        InterfCalcDateTimeModel model = new CalcDateTimeModel(configs);
 
         //--------------------------------
         InterfCalcDateTimeView viewLocal = new CalcDateTimeLocalView();
@@ -45,15 +34,15 @@ public final class CalcDateTimeApp {
         InterfCalcDateTimeView view = new CalcDateTimeView();
 
         //--------------------------------
-        InterfCalcDateTimeLocalController controlLocal = CalcDateTimeLocalController.of();
+        InterfCalcDateTimeController controlLocal = CalcDateTimeLocalController.of();
         controlLocal.setModel(model);
         controlLocal.setView(viewLocal);
 
-        InterfCalcDateTimeZoneController controlZone = CalcDateTimeZoneController.of();
+        InterfCalcDateTimeController controlZone = CalcDateTimeZoneController.of();
         controlZone.setModel(model);
         controlZone.setView(viewZone);
 
-        InterfCalcDateTimeScheduleController controlSchedule = CalcDateTimeScheduleController.of();
+        InterfCalcDateTimeController controlSchedule = CalcDateTimeScheduleController.of();
         controlSchedule.setModel(model);
         controlSchedule.setView(viewSchedule);
 

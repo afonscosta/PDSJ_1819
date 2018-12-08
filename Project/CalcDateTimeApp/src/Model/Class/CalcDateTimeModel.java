@@ -22,13 +22,10 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     private Configs configs;
 
 
-    public CalcDateTimeModel(InterfCalcDateTimeLocalModel modelLocal,
-                             InterfCalcDateTimeZoneModel modelZone,
-                             InterfCalcDateTimeScheduleModel modelSchedule,
-                             Configs configs) {
-        this.modelLocal = modelLocal;
-        this.modelZone = modelZone;
-        this.modelSchedule = modelSchedule;
+    public CalcDateTimeModel(Configs configs) {
+        this.modelLocal = CalcDateTimeLocalModel.of();
+        this.modelZone = CalcDateTimeZoneModel.of();
+        this.modelSchedule = CalcDateTimeScheduleModel.of();
         this.configs = configs;
 
         this.modelLocal.loadConfigs(configs);
@@ -40,6 +37,7 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     //------------------------
     // Métodos da facade
     //------------------------
+    @Override
     public Configs getConfigs() {
         return this.configs;
     }
@@ -219,16 +217,6 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
 
     @Override
     public RestrictSlot getRestrictSlot(Long infoSlot){ return modelSchedule.getRestrictSlot(infoSlot);}
-
-    @Override
-    public Collection getSchedule(){
-        return modelSchedule.getSchedule();
-    }
-
-    @Override
-    public Collection getScheduleRestrictions(){
-        return modelSchedule.getScheduleRestrictions();
-    }
 
     @Override
     public boolean removeSlot(Long s){

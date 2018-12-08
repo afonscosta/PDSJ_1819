@@ -2,17 +2,10 @@ package Model.Class;
 
 import Model.Interface.InterfCalcDateTimeZoneModel;
 import Utilities.Configs;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import java.io.FileReader;
-import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
 import java.time.zone.ZoneRulesException;
-import java.util.Comparator;
 
 public class CalcDateTimeZoneModel extends CalcDateTimeLocalModel implements InterfCalcDateTimeZoneModel {
 
@@ -42,7 +35,7 @@ public class CalcDateTimeZoneModel extends CalcDateTimeLocalModel implements Int
 
             super.fromDateTime(ZonedDateTime.now().withZoneSameInstant(chosenZoneId));
         } catch (ZoneRulesException e) {
-            // Zona inexistente? Ignorar..
+            // Se a zona não for válida, não efetuar a conversão
         }
     }
 
