@@ -195,6 +195,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeControl
                     slotsOfMode = partitionIntoPages(model.getModeSlots(modeNormalized,currentDateMode.getMonthValue(),referenceZonedId,dtfLocal,dtfZoned),25);
                     totalPages = slotsOfMode.size();
                     break;
+                    default: errorMessage = "Vista existentes sao /diaria /semanal /mensal"; modeNormalized=""; break;
             }
             try {
                 description = new ArrayList(slotsOfMode.get(pageIndex));
