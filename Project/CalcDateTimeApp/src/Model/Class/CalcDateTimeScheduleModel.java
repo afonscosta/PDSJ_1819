@@ -17,51 +17,48 @@ import static java.time.temporal.ChronoUnit.DAYS;
 public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleModel,Serializable {
     private Set<Slot> schedule;
     private List<RestrictSlot> scheduleRestrictions;
-
-    private final Comparator<Slot> slotComparator;
     static final long serialVersionUID = 1L;
-
-    private CalcDateTimeScheduleModel() {
-        slotComparator =
-                (Comparator<Slot> & Serializable)(Slot s1, Slot s2) -> {
-                    Temporal data1 = s1.getDate();
-                    Temporal data2 = s2.getDate();
-                    LocalDateTime ldt1 = LocalDateTime.from(data1);
-                    LocalDateTime ldt2 = LocalDateTime.from(data2);
-
-                    if (data1.equals(data2)) return 0;
-                    else {
-                        if (data1.getClass().getSimpleName().equals("ZonedDateTime")) {
-                            ldt1 = convertToZone(data1, ZoneId.systemDefault()).toLocalDateTime();
-                        }
-                        if (data2.getClass().getSimpleName().equals("ZonedDateTime")) {
-                            ldt2 = convertToZone(data2, ZoneId.systemDefault()).toLocalDateTime();
-                        }
-                        if (ldt1.isBefore(ldt2)) {
-                            Duration d1 = s1.getDuration();
-                            LocalDateTime data1Final = ldt1.plus(d1);
-                            if (data1Final.isBefore(ldt2))
-                                return -1;
-                            else {
-                                return 0;
-                            }
-                        } else {
-                            Duration d2 = s2.getDuration();
-                            LocalDateTime data2Final = ldt2.plus(d2);
-                            if (data2Final.isBefore(ldt1))
-                                return 1;
-                            else {
-                                return 0;
-                            }
-                        }
-                    }
-                };
-        this.schedule= new TreeSet<>(slotComparator);
-        this.scheduleRestrictions= new ArrayList<>();
-    }
 
     public static CalcDateTimeScheduleModel of() {
         return new CalcDateTimeScheduleModel();
+    }
+
+    private CalcDateTimeScheduleModel() {
+        Comparator<Slot> slotComparator = (Comparator<Slot> & Serializable) (Slot s1, Slot s2) -> {
+            Temporal data1 = s1.getDate();
+            Temporal data2 = s2.getDate();
+            LocalDateTime ldt1 = LocalDateTime.from(data1);
+            LocalDateTime ldt2 = LocalDateTime.from(data2);
+
+            if (data1.equals(data2)) return 0;
+            else {
+                if (data1.getClass().getSimpleName().equals("ZonedDateTime")) {
+                    ldt1 = convertToZone(data1, ZoneId.systemDefault()).toLocalDateTime();
+                }
+                if (data2.getClass().getSimpleName().equals("ZonedDateTime")) {
+                    ldt2 = convertToZone(data2, ZoneId.systemDefault()).toLocalDateTime();
+                }
+                if (ldt1.isBefore(ldt2)) {
+                    Duration d1 = s1.getDuration();
+                    LocalDateTime data1Final = ldt1.plus(d1);
+                    if (data1Final.isBefore(ldt2))
+                        return -1;
+                    else {
+                        return 0;
+                    }
+                } else {
+                    Duration d2 = s2.getDuration();
+                    LocalDateTime data2Final = ldt2.plus(d2);
+                    if (data2Final.isBefore(ldt1))
+                        return 1;
+                    else {
+                        return 0;
+                    }
+                }
+            }
+        };
+        this.schedule= new TreeSet<>(slotComparator);
+        this.scheduleRestrictions= new ArrayList<>();
     }
 
     @Override
@@ -82,11 +79,6 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     @Override
     public List<RestrictSlot> getScheduleRestrictions() {
         return scheduleRestrictions;
-    }
-
-    @Override
-    public void setSchedule(Set<Slot> schedule) {
-        this.schedule = schedule;
     }
 
     //------------------------

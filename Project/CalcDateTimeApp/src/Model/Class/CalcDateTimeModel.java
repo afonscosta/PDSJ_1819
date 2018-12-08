@@ -10,7 +10,6 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.*;
 
@@ -21,24 +20,19 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     private InterfCalcDateTimeScheduleModel modelSchedule;
     private Configs configs;
 
+    public static CalcDateTimeModel of() {
+        return new CalcDateTimeModel();
+    }
 
-    public CalcDateTimeModel(Configs configs) {
+    private CalcDateTimeModel() {
         this.modelLocal = CalcDateTimeLocalModel.of();
         this.modelZone = CalcDateTimeZoneModel.of();
         this.modelSchedule = CalcDateTimeScheduleModel.of();
-        this.configs = configs;
+        this.configs = Configs.of("./Configs");
 
         this.modelLocal.loadConfigs(configs);
         this.modelZone.loadConfigs(configs);
         this.modelSchedule.loadConfigs(configs);
-    }
-
-    //------------------------
-    // Métodos da facade
-    //------------------------
-    @Override
-    public Configs getConfigs() {
-        return this.configs;
     }
 
     @Override
@@ -55,7 +49,6 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     public void setZoneDateTimeFormat(String zoneDateTimeFormat) {
         configs.setZoneDateTimeFormat(zoneDateTimeFormat);
     }
-
 
     @Override
     public String getZoneDateTimeFormat() {
@@ -97,30 +90,9 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
         return modelLocal.getDateTime();
     }
 
-
     @Override
     public ZoneId getLocalZone() {
         return configs.getZoneId();
-    }
-
-    @Override
-    public void shiftDateTimeLocal(int n, ChronoUnit cu) {
-        modelLocal.shiftDateTime(n, cu);
-    }
-
-    @Override
-    public void shiftWorkDaysDateTimeLocal(int n) {
-        modelLocal.shiftWorkDaysDateTime(n);
-    }
-
-    @Override
-    public String diffDateTimeLocal(ZonedDateTime toDateTime) {
-        return modelLocal.diffDateTime(toDateTime);
-    }
-
-    @Override
-    public String diffWorkDaysDateTimeLocal(ZonedDateTime toDateTime) {
-        return modelLocal.diffWorkDaysDateTime(toDateTime);
     }
 
     @Override
@@ -137,7 +109,6 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     //------------------------
     // Métodos Model Zone
     //------------------------
-
     @Override
     public String getZoneZone() {
         return modelZone.getZone().toString();
@@ -149,26 +120,6 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     }
 
     @Override
-    public void shiftDateTimeZone(int n, ChronoUnit cu) {
-        modelZone.shiftDateTime(n, cu);
-    }
-
-    @Override
-    public void shiftWorkDaysDateTimeZone(int n) {
-        modelZone.shiftWorkDaysDateTime(n);
-    }
-
-    @Override
-    public String diffDateTimeZone(ZonedDateTime toDateTime) {
-        return modelZone.diffDateTime(toDateTime);
-    }
-
-    @Override
-    public String diffWorkDaysDateTimeZone(ZonedDateTime toDateTime) {
-        return modelZone.diffWorkDaysDateTime(toDateTime);
-    }
-
-    @Override
     public void fromDateTimeZone(ZonedDateTime zdt) {
         modelZone.fromDateTime(zdt);
     }
@@ -176,11 +127,6 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     @Override
     public void withZoneZone(String zoneId) {
         modelZone.withZone(zoneId);
-    }
-
-    @Override
-    public void changeToCurrentDateInZone(String zoneId) {
-        modelZone.changeToCurrentDateInZone(zoneId);
     }
 
     //------------------------
@@ -251,6 +197,4 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
 
     @Override
     public boolean existRestrictSlot(Long idSlot){return modelSchedule.existRestrictSlot(idSlot);}
-
-
 }

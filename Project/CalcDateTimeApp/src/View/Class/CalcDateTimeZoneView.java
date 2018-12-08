@@ -10,7 +10,11 @@ import java.util.List;
 public class CalcDateTimeZoneView implements InterfCalcDateTimeView {
     private Menus menuZoneViewTxt;
 
-    public CalcDateTimeZoneView() {
+    public static CalcDateTimeZoneView of() {
+        return new CalcDateTimeZoneView();
+    }
+
+    private CalcDateTimeZoneView() {
         menuZoneViewTxt = initView();
     }
 

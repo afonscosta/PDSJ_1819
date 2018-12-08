@@ -317,18 +317,6 @@ public class Utils {
     }
 
     /*
-     * Temporal -> DayOfWeek
-     * Dado um temporal dá o dia da semana.
-     * Caso não seja um ZonedDateTime ou LocalDateTime devolve null.
-     */
-    public static Integer getDayOfMonth(TemporalAccessor tacs) {
-        LocalDate ld;
-        try { ld = LocalDate.from(tacs); }
-        catch (DateTimeException e) { return null; }
-        return ld.getDayOfMonth();
-    }
-
-    /*
      * Temporal, int -> Temporal
      * Transita para a sexta feira anterior n vezes
      */

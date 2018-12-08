@@ -17,8 +17,6 @@ public interface InterfCalcDateTimeScheduleModel {
 
     Set<Slot> getSchedule();
 
-    void setSchedule(Set<Slot> schedule);
-
     List<RestrictSlot> getScheduleRestrictions();
 
     List<String> getMainInfoSlots(ZoneId referenceZoneId, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);

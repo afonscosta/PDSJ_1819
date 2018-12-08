@@ -10,7 +10,11 @@ import java.util.List;
 public class CalcDateTimeScheduleView implements InterfCalcDateTimeView {
     private Menus menuScheduleViewTxt;
 
-    public CalcDateTimeScheduleView() {
+    public static CalcDateTimeScheduleView of() {
+        return new CalcDateTimeScheduleView();
+    }
+
+    private CalcDateTimeScheduleView() {
         menuScheduleViewTxt = initView();
     }
 

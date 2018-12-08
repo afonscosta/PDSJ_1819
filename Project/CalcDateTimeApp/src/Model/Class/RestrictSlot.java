@@ -29,10 +29,6 @@ public class RestrictSlot extends Slot {
         return period;
     }
 
-    public void setPeriod(String period) {
-        this.period = period;
-    }
-
     public RestrictSlot clone(){
         RestrictSlot res = of(this);
         return res;

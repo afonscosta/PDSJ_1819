@@ -22,16 +22,14 @@ import View.Interface.InterfCalcDateTimeView;
 public final class CalcDateTimeApp {
 
     public static void main(String[] args) {
-        Configs configs = Configs.of("./Configs");
+        //--------------------------------
+        InterfCalcDateTimeModel model = CalcDateTimeModel.of();
 
         //--------------------------------
-        InterfCalcDateTimeModel model = new CalcDateTimeModel(configs);
-
-        //--------------------------------
-        InterfCalcDateTimeView viewLocal = new CalcDateTimeLocalView();
-        InterfCalcDateTimeView viewZone = new CalcDateTimeZoneView();
-        InterfCalcDateTimeView viewSchedule = new CalcDateTimeScheduleView();
-        InterfCalcDateTimeView view = new CalcDateTimeView();
+        InterfCalcDateTimeView viewLocal = CalcDateTimeLocalView.of();
+        InterfCalcDateTimeView viewZone = CalcDateTimeZoneView.of();
+        InterfCalcDateTimeView viewSchedule = CalcDateTimeScheduleView.of();
+        InterfCalcDateTimeView view = CalcDateTimeView.of();
 
         //--------------------------------
         InterfCalcDateTimeController controlLocal = CalcDateTimeLocalController.of();

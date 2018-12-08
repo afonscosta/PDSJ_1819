@@ -11,7 +11,11 @@ import java.util.List;
 public class CalcDateTimeLocalView implements InterfCalcDateTimeView {
     private Menus menuLocalViewTxt;
 
-    public CalcDateTimeLocalView() {
+    public static CalcDateTimeLocalView of() {
+        return new CalcDateTimeLocalView();
+    }
+
+    private CalcDateTimeLocalView() {
         menuLocalViewTxt = initView();
     }
 
@@ -39,19 +43,10 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeView {
         //------------------------
         // Menu Help
         //------------------------
-        op1 = new Opcao("Explicacao detalhada da opcao O", "O");
-        op2 = new Opcao("Sair", "S");
-        linhas = Arrays.asList(op1, op2);
-        Menu menuHelp = new Menu(linhas, "Menu Ajuda");
-        menusLocalTxt.addMenu(1, menuHelp);
-
-        //------------------------
-        // Menu Help Opcao O
-        //------------------------
         op1 = new Opcao("Sair", "S");
         linhas = Arrays.asList(op1);
-        Menu menuHelpOpcaoO = new Menu(linhas, "Menu Ajuda Opcao O");
-        menusLocalTxt.addMenu(2, menuHelpOpcaoO);
+        Menu menuHelp = new Menu(linhas, "Menu Ajuda");
+        menusLocalTxt.addMenu(1, menuHelp);
 
         //------------------------
         // Menu Shift DateTime
@@ -68,7 +63,7 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeView {
         op10 = new Opcao("Voltar a Calc. Local", "S");
         linhas = Arrays.asList(op1, op2, op3, op4, op5, op6, op7, op8, op9, op10);
         Menu menuShiftDateTime = new Menu(linhas, "Aritmetica de Datas");
-        menusLocalTxt.addMenu(3, menuShiftDateTime);
+        menusLocalTxt.addMenu(2, menuShiftDateTime);
 
         //------------------------
         // Menu Shift WorkDays DateTime
@@ -78,7 +73,7 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeView {
         op3 = new Opcao("Voltar a Calc. Local", "S");
         linhas = Arrays.asList(op1, op2, op3);
         Menu menuShiftWorkDaysDateTime = new Menu(linhas, "Aritmetica de Dias Uteis");
-        menusLocalTxt.addMenu(4, menuShiftWorkDaysDateTime);
+        menusLocalTxt.addMenu(3, menuShiftWorkDaysDateTime);
 
         //------------------------
         // Menu Diff DateTime
@@ -88,17 +83,18 @@ public class CalcDateTimeLocalView implements InterfCalcDateTimeView {
         op3 = new Opcao("Voltar a Calc. Local", "S");
         linhas = Arrays.asList(op1, op2, op3);
         Menu menuDiffDateTime = new Menu(linhas, "Diferenca entre Datas");
-        menusLocalTxt.addMenu(5, menuDiffDateTime);
+        menusLocalTxt.addMenu(4, menuDiffDateTime);
 
         //------------------------
         // Menu Obter DateTime
         //------------------------
         op1 = new Opcao("Obter um dia", "O");
-        op2 = new Opcao("Guardar data e voltar a Calc. Local", "G");
-        op3 = new Opcao("Voltar a Calc. Local", "S");
-        linhas = Arrays.asList(op1, op2, op3);
+        op2 = new Opcao("Ajuda", "?");
+        op3 = new Opcao("Guardar data e voltar a Calc. Local", "G");
+        op4 = new Opcao("Voltar a Calc. Local", "S");
+        linhas = Arrays.asList(op1, op2, op3, op4);
         Menu menuObterDateTime = new Menu(linhas, "Obter um dia");
-        menusLocalTxt.addMenu(6, menuObterDateTime);
+        menusLocalTxt.addMenu(5, menuObterDateTime);
 
         return menusLocalTxt;
     }

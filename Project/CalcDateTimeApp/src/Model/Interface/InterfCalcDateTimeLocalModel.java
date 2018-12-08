@@ -15,14 +15,6 @@ public interface InterfCalcDateTimeLocalModel {
 
     void fromDateTime(ZonedDateTime zdt);
 
-    void shiftDateTime(int n, ChronoUnit cu);
-
-    void shiftWorkDaysDateTime(int n);
-
-    String diffDateTime(ZonedDateTime toDateTime);
-
-    String diffWorkDaysDateTime(ZonedDateTime toDateTime);
-
     void withZone(String zid);
 
     void setZoneId(ZoneId zoneId);

@@ -8,7 +8,5 @@ public interface InterfCalcDateTimeZoneModel extends InterfCalcDateTimeLocalMode
 
     void loadConfigs(Configs configs);
 
-    void changeToCurrentDateInZone(String zoneIdTxt);
-
     ZoneId getZone();
 }
