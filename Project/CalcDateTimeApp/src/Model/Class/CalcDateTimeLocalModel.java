@@ -15,11 +15,9 @@ import static Utilities.Utils.*;
 public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 
     private ZonedDateTime ldt;
-    private String localDateTimeFormat;
 
     protected CalcDateTimeLocalModel() {
         this.ldt = ZonedDateTime.now();
-        this.localDateTimeFormat = "yyyy/MM/dd HH:mm";
     }
 
     public static CalcDateTimeLocalModel of () {
@@ -28,8 +26,7 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 
     @Override
     public void loadConfigs(Configs configs) {
-        this.setLocalDateTimeFormat(configs.getLocalDateTimeFormat());
-        this.setZoneId(ZoneId.of(configs.getZoneId()));
+        this.setZoneId(configs.getZoneId());
 
         // Reset do buffer para data atual
         this.ldt = ZonedDateTime.now(this.ldt.getZone());
@@ -77,23 +74,7 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
     }
 
     @Override
-    public void setLocalDateTimeFormat(String localDateTimeFormat) {
-        this.localDateTimeFormat = localDateTimeFormat;
-
-    }
-
-    @Override
     public void setZoneId(ZoneId zoneId) {
         ldt = ldt.withZoneSameLocal(zoneId);
-    }
-
-    @Override
-    public String getLocalDateTimeFormat() {
-        return this.localDateTimeFormat;
-    }
-
-    @Override
-    public ZoneId getZone() {
-       return ldt.getZone();
     }
 }

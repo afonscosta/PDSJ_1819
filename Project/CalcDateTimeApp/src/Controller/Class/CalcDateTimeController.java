@@ -341,7 +341,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                     statusMessage = "Formato de apresentacao local modificado";
                     break;
                 case "3":
-                    model.setLocalDateTimeFormat("dd-MM-yyyy HH:mm:ss:nn");
+                    model.setLocalDateTimeFormat("dd-MM-yyyy HH:mm:ss:nnnnnnnnn");
                     statusMessage = "Formato de apresentacao local modificado";
                     break;
                 case "S": break;

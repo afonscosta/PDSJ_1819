@@ -19,6 +19,7 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     private InterfCalcDateTimeLocalModel modelLocal;
     private InterfCalcDateTimeZoneModel modelZone;
     private InterfCalcDateTimeScheduleModel modelSchedule;
+    private Configs configs;
 
 
     public CalcDateTimeModel(InterfCalcDateTimeLocalModel modelLocal,
@@ -28,11 +29,47 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
         this.modelLocal = modelLocal;
         this.modelZone = modelZone;
         this.modelSchedule = modelSchedule;
+        this.configs = configs;
 
         this.modelLocal.loadConfigs(configs);
         this.modelZone.loadConfigs(configs);
         this.modelSchedule.loadConfigs(configs);
         this.modelSchedule.initNextAvailableID();
+    }
+
+    //------------------------
+    // Métodos da facade
+    //------------------------
+    public Configs getConfings() {
+        return this.configs;
+    }
+
+    @Override
+    public void setLocalDateTimeFormat(String localDateTimeFormat) {
+        configs.setLocalDateTimeFormat(localDateTimeFormat);
+    }
+
+    @Override
+    public String getLocalDateTimeFormat() {
+        return configs.getLocalDateTimeFormat();
+    }
+
+    @Override
+    public void setZoneDateTimeFormat(String zoneDateTimeFormat) {
+        configs.setZoneDateTimeFormat(zoneDateTimeFormat);
+    }
+
+
+    @Override
+    public String getZoneDateTimeFormat() {
+        return configs.getZoneDateTimeFormat();
+    }
+
+    @Override
+    public void saveConfigs() {
+        configs.setSchedule(modelSchedule.getSchedule());
+        configs.setScheduleRestrictions(modelSchedule.getScheduleRestrictions());
+        configs.saveConfigs("./Configs");
     }
 
     //------------------------
@@ -43,35 +80,10 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
         return modelLocal.getDateTime();
     }
 
-    @Override
-    public String getLocalDateTimeFormat() {
-        return modelLocal.getLocalDateTimeFormat();
-    }
-
-    @Override
-    public void setLocalDateTimeFormat(String localDateTimeFormat) {
-        modelLocal.setLocalDateTimeFormat(localDateTimeFormat);
-    }
-
-    @Override
-    public void saveConfigs() {
-        Configs configs = new Configs();
-
-        configs.setLocalDateTimeFormat(this.getLocalDateTimeFormat());
-        configs.setZoneDateTimeFormat(this.getZoneDateTimeFormat());
-        configs.setZoneId(this.getLocalZone().toString());
-
-        configs.setSchedule(new ArrayList(this.getSchedule()));
-
-        configs.setScheduleRestrictions(new ArrayList(this.getScheduleRestrictions()));
-
-        // re-writes over old file
-        configs.saveConfigs("./Configs");
-    }
 
     @Override
     public ZoneId getLocalZone() {
-        return modelLocal.getZone();
+        return configs.getZoneId();
     }
 
     @Override
@@ -101,6 +113,7 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
 
     @Override
     public void withZoneLocal(String zoneId) {
+        configs.setZoneId(ZoneId.of(zoneId));
         modelLocal.withZone(zoneId);
     }
 
@@ -109,18 +122,8 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     //------------------------
 
     @Override
-    public String getZoneDateTimeFormat() {
-        return modelZone.getZoneDateTimeFormat();
-    }
-
-    @Override
     public String getZoneZone() {
         return modelZone.getZone().toString();
-    }
-
-    @Override
-    public void setZoneDateTimeFormat(String zoneDateTimeFormat) {
-        modelZone.setZoneDateTimeFormat(zoneDateTimeFormat);
     }
 
     @Override
@@ -168,12 +171,12 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     //------------------------
     @Override
     public boolean addSlot(Slot newSlot){
-        return modelSchedule.addSlot(newSlot);
+        return modelSchedule.addSlot(newSlot,configs.getZoneId() );
     }
 
     @Override
     public int addRestrictSlot(RestrictSlot newSlot){
-        return modelSchedule.addRestrictSlot(newSlot);
+        return modelSchedule.addRestrictSlot(newSlot,configs.getZoneId());
     }
 
     @Override
@@ -228,12 +231,12 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     }
 
     @Override
-    public boolean editDurationSlot(Long idSlot, Duration d) { return modelSchedule.editDurationSlot(idSlot,d);
+    public boolean editDurationSlot(Long idSlot, Duration d) { return modelSchedule.editDurationSlot(idSlot,d,configs.getZoneId());
     }
 
     @Override
     public boolean editDateSLot(Long idSlot, Temporal data) {
-        return modelSchedule.editDateSlot(idSlot,data);
+        return modelSchedule.editDateSlot(idSlot,data,configs.getZoneId());
     }
 
     @Override

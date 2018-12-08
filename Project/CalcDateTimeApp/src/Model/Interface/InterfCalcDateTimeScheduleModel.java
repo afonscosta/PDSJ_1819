@@ -18,11 +18,11 @@ public interface InterfCalcDateTimeScheduleModel {
 
     void initNextAvailableID();
 
-    Collection getSchedule();
+    Set<Slot> getSchedule();
 
     void setSchedule(Set<Slot> schedule);
 
-    Collection getScheduleRestrictions();
+    List<RestrictSlot> getScheduleRestrictions();
 
     List<String> getMainInfoSlots(ZoneId referenceZoneId, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
 
@@ -30,27 +30,21 @@ public interface InterfCalcDateTimeScheduleModel {
 
     List<String> getRestrictSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
 
-    //------------------------
-    // Adicionar um evento ao schedule ou adicionar uma restrição ao scheduleRestrictions
-    // Só posso agendar um evento se não houver nenhuma restrição definida que sobreponha
-    // Só posso adicionar uma restrição se não houver nenhum evento já agendado que quebra a restrição que se pretenda adicionar
-    //------------------------
-    boolean addSlot(Slot newSlot);
+    boolean addSlot(Slot newSlot, ZoneId zoneId);
 
-    int addRestrictSlot(RestrictSlot newSlot);
+    int addRestrictSlot(RestrictSlot newSlot, ZoneId zoneId);
 
     boolean removeSlot(Long idSlot);
 
     boolean removeRestrictSlot(Long idRestrictSlot);
 
-    boolean editDurationSlot(Long idSlot, Duration d);
+    boolean editDurationSlot(Long idSelectSlot, Duration newDuration, ZoneId zoneId);
 
-    boolean editDateSlot(Long idSlot, Temporal data);
+    boolean editDateSlot(Long idSlot, Temporal data, ZoneId zoneId);
 
     Slot getSlot(Long infoSlot);
 
     RestrictSlot getRestrictSlot(Long infoSlot);
-
 
     void editLocalSlot(Long idSlot, String edit);
 

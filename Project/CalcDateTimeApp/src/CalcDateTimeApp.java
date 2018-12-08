@@ -25,10 +25,6 @@ import View.Interface.InterfCalcDateTimeView;
 public final class CalcDateTimeApp {
 
     /*
-    TODO Global:
-
-    ClearConsole cross-platform
-
     TODO Zone:
     "Esta é a data, quer guardar no buffer?"
      */

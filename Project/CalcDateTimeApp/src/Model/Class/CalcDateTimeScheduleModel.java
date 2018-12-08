@@ -32,15 +32,14 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                     Temporal data2 = s2.getDate();
                     LocalDateTime ldt1 = LocalDateTime.from(data1);
                     LocalDateTime ldt2 = LocalDateTime.from(data2);
-                    ZoneId referenceZone = getReferenceZone();
 
                     if (data1.equals(data2)) return 0;
                     else {
                         if (data1.getClass().getSimpleName().equals("ZonedDateTime")) {
-                            ldt1 = convertToZone(data1, referenceZone).toLocalDateTime();
+                            ldt1 = convertToZone(data1, ZoneId.systemDefault()).toLocalDateTime();
                         }
                         if (data2.getClass().getSimpleName().equals("ZonedDateTime")) {
-                            ldt2 = convertToZone(data2,referenceZone).toLocalDateTime();
+                            ldt2 = convertToZone(data2, ZoneId.systemDefault()).toLocalDateTime();
                         }
                         if (ldt1.isBefore(ldt2)) {
                             Duration d1 = s1.getDuration();
@@ -98,24 +97,6 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
             nRestrictSlot = 0;
         }
         RestrictSlot.loadAvailableId(nRestrictSlot);
-    }
-
-    //------------------------
-    // Retorna o ZonedId de definido no ficheiro de configurações
-    //------------------------
-    private ZoneId getReferenceZone(){
-        try {
-            FileInputStream fis = new FileInputStream("./Configs");
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            Configs configs = (Configs) ois.readObject();
-            ois.close();
-            fis.close();
-            return ZoneId.of(configs.getZoneId());
-
-        } catch (Exception e) {
-            return ZoneId.systemDefault();
-
-        }
     }
 
     @Override
@@ -197,11 +178,11 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     //Restrições que sejam definidas em que abrangem mais que um dia, teram de ser separadas, para cada dia ser tratado individualmente
     //------------------------
-    private List<Slot> partitionSlot(Slot newSlot) {
+    private List<Slot> partitionSlot(Slot newSlot, ZoneId zoneId) {
         List<Slot> slotsToAdd = new ArrayList<>();
 
         Duration durationNewSlot = newSlot.getDuration();
-        LocalDateTime ldtNewSlot = convertToZone(newSlot.getDate(), getReferenceZone()).toLocalDateTime();
+        LocalDateTime ldtNewSlot = convertToZone(newSlot.getDate(), zoneId).toLocalDateTime();
         Temporal finalDate = ldtNewSlot.plus(durationNewSlot);
         //A duracao definida faz com passe da meia noite
         if (!LocalDate.from(ldtNewSlot).equals(LocalDate.from(finalDate))) {
@@ -235,7 +216,7 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
                 else {
                     newSlot = slotFromMidnight.clone();
                     newSlot.setIdSlot(RestrictSlot.getAndSetNextAvailableId(1));
-                    ldtNewSlot = convertToZone(newSlot.getDate(), getReferenceZone()).toLocalDateTime();
+                    ldtNewSlot = convertToZone(newSlot.getDate(), zoneId).toLocalDateTime();
                     durationNewSlot = newSlot.getDuration();
                 }
             }
@@ -296,9 +277,9 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     // Só posso agendar um evento se não houver nenhuma restrição definida que sobreponha
     //------------------------
-    private boolean eventDoesNotBreakAnyRestrict(Slot newSlot){
+    private boolean eventDoesNotBreakAnyRestrict(Slot newSlot, ZoneId zoneId){
         boolean res;
-        LocalDateTime ldtNewSlot = convertToZone(newSlot.getDate(), getReferenceZone()).toLocalDateTime();
+        LocalDateTime ldtNewSlot = convertToZone(newSlot.getDate(), zoneId).toLocalDateTime();
         for(RestrictSlot s : scheduleRestrictions){
             LocalDateTime ldtRestrictSlot= LocalDateTime.from(s.getDate());
             if(s.getPeriod().equals("semanal")){
@@ -328,9 +309,9 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     //------------------------
     // Só posso agendar uma restrição se não houver nenhum evento definido que sobreponha
     //------------------------
-    private boolean restrictDoesNotOverlapAnyEvent(RestrictSlot newRestrictSlot){
+    private boolean restrictDoesNotOverlapAnyEvent(RestrictSlot newRestrictSlot,ZoneId zoneId){
         boolean res;
-        LocalDateTime ldtRestrictSlot = convertToZone(newRestrictSlot.getDate(), getReferenceZone()).toLocalDateTime();
+        LocalDateTime ldtRestrictSlot = convertToZone(newRestrictSlot.getDate(),zoneId).toLocalDateTime();
         for(Slot s : schedule){
             LocalDateTime ldtSlot= LocalDateTime.from(s.getDate());
             if(newRestrictSlot.getPeriod().equals("semanal")){
@@ -370,9 +351,9 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     // Só posso adicionar uma restrição se não houver nenhum evento já agendado que quebra a restrição que se pretenda adicionar
     //------------------------
     @Override
-    public boolean addSlot(Slot newSlot) {
+    public boolean addSlot(Slot newSlot, ZoneId zoneId) {
         boolean res = true;
-        if (eventDoesNotBreakAnyRestrict(newSlot) && eventDoesNotOverlapAnyEvent(newSlot)) {
+        if (eventDoesNotBreakAnyRestrict(newSlot,zoneId) && eventDoesNotOverlapAnyEvent(newSlot)) {
             schedule.add(newSlot);
         } else {
             res = false;
@@ -381,11 +362,11 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     }
 
     @Override
-    public int addRestrictSlot(RestrictSlot newSlot) {
+    public int addRestrictSlot(RestrictSlot newSlot, ZoneId zoneId) {
         int numAdded = 0;
-        List<Slot> slotsToAdd = partitionSlot(newSlot);
+        List<Slot> slotsToAdd = partitionSlot(newSlot,zoneId);
         for (Slot s : slotsToAdd) {
-            if (!restrictDoesNotOverlapAnyEvent((RestrictSlot) s)) {
+            if (!restrictDoesNotOverlapAnyEvent((RestrictSlot) s,zoneId)) {
                 numAdded = -1;
                 break;
             }
@@ -438,11 +419,21 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     // Remover o slot antigo -> adicionar um novo slot, com a mesma info excepto a duração.
     //------------------------
     @Override
-    public boolean editDurationSlot(Long idSelectSlot, Duration newDuration) {
+    public boolean editDurationSlot(Long idSelectSlot, Duration newDuration, ZoneId zoneId) {
         Slot s = getSlot(idSelectSlot);
         Slot temp = s.clone();
         temp.setDuration(newDuration);
-        return addSlot(temp);
+        return addSlot(temp,zoneId);
+        /*
+        removeSlot(s,schedule);
+        Slot newSlot = Slot.of(temp.getIdSlot(),temp.getData(),newDuration,temp.getLocal(),temp.getDescription());
+        boolean add = addSlot(newSlot,schedule,zoneId);
+        if(add==false) {
+            addSlot(temp,schedule,zoneId);
+            Slot.setNextAvailableId(1); //como o add falhou anteriormente, ele retrocede. Neste caso, não devia porque é um calculo intermédio.
+        }
+        return add;
+        */
     }
 
     //------------------------
@@ -451,11 +442,24 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     // Remover o slot antigo -> adicionar um novo slot, com a mesma info excepto a data.
     //------------------------
     @Override
-    public boolean editDateSlot(Long idSelectSlot, Temporal date){
+    public boolean editDateSlot(Long idSelectSlot, Temporal date, ZoneId zoneId){
         Slot s = getSlot(idSelectSlot);
         Slot temp = s.clone();
         temp.setDate(date);
-        return addSlot(temp);
+        return addSlot(temp,zoneId);
+        /*
+    public boolean editDateSLot(Long idSelectSlot, Temporal data, ZoneId zoneId){
+        Slot s = getSlot(idSelectSlot);
+        Slot temp = s.clone();
+        removeSlot(s,schedule);
+        Slot newSlot = Slot.of(temp.getIdSlot(),data, temp.getDuration(),temp.getLocal(),temp.getDescription());
+        boolean add = addSlot(newSlot,schedule,zoneId);
+        if(add==false){
+            addSlot(temp,schedule,zoneId);
+            Slot.setNextAvailableId(1); //como o add falhou anteriormente, ele retrocede. Neste caso, não devia porque é um calculo intermédio.
+        }
+        return add;
+        */
     }
 
     @Override
