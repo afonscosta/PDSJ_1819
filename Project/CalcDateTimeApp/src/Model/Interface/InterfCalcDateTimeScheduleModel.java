@@ -1,5 +1,6 @@
 package Model.Interface;
 
+import Model.Class.RestrictSlot;
 import Model.Class.Slot;
 import Utilities.Configs;
 
@@ -23,23 +24,33 @@ public interface InterfCalcDateTimeScheduleModel {
 
     Collection getScheduleRestrictions();
 
-    boolean addSlot(Slot newSlot, Collection c);
-
     List<String> getMainInfoSlots(ZoneId referenceZoneId, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
 
     List<String> getModeSlots(String modeNormalized, int want,ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
 
     List<String> getRestrictSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
 
-    boolean removeSlot(Slot s,Collection c);
+    //------------------------
+    // Adicionar um evento ao schedule ou adicionar uma restrição ao scheduleRestrictions
+    // Só posso agendar um evento se não houver nenhuma restrição definida que sobreponha
+    // Só posso adicionar uma restrição se não houver nenhum evento já agendado que quebra a restrição que se pretenda adicionar
+    //------------------------
+    boolean addSlot(Slot newSlot);
+
+    int addRestrictSlot(RestrictSlot newSlot);
+
+    boolean removeSlot(Long idSlot);
+
+    boolean removeRestrictSlot(Long idRestrictSlot);
 
     boolean editDurationSlot(Long idSlot, Duration d);
 
-    boolean editDateSLot(Long idSlot, Temporal data);
+    boolean editDateSlot(Long idSlot, Temporal data);
 
     Slot getSlot(Long infoSlot);
 
-    Slot getRestrictSlot(Long infoSlot);
+    RestrictSlot getRestrictSlot(Long infoSlot);
+
 
     void editLocalSlot(Long idSlot, String edit);
 

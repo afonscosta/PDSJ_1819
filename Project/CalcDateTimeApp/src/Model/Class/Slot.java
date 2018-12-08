@@ -7,34 +7,34 @@ import java.time.temporal.Temporal;
 public class Slot implements Serializable {
     private static long nextAvailableId;
     private long idSlot;
-    private Temporal data;
+    private Temporal date;
     private Duration duration;
     private String local;
     private String description;
     static final long serialVersionUID = 2L;
 
-    public static Slot of (Temporal data, Duration duration, String local, String description) {
-        return new Slot(data,duration,local,description);
+    public static Slot of (Temporal date, Duration duration, String local, String description) {
+        return new Slot(date,duration,local,description);
     }
-    public static Slot of (Long idSlot,Temporal data, Duration duration, String local, String description) {
-        return new Slot(idSlot,data,duration,local,description);
+    public static Slot of (Long idSlot,Temporal date, Duration duration, String local, String description) {
+        return new Slot(idSlot,date,duration,local,description);
     }
     public static Slot of (Slot s) {
         return new Slot(s);
     }
 
-    protected Slot(Temporal data, Duration duration, String local, String description) {
+    protected Slot(Temporal date, Duration duration, String local, String description) {
         this.idSlot = nextAvailableId;
-        this.data = data;
+        this.date = date;
         this.duration = duration;
         this.local = local;
         this.description = description;
         setNextAvailableId(1);
     }
 
-    protected Slot(Long idSlot, Temporal data, Duration duration, String local, String description) {
+    protected Slot(Long idSlot, Temporal date, Duration duration, String local, String description) {
         this.idSlot = idSlot;
-        this.data = data;
+        this.date = date;
         this.duration = duration;
         this.local = local;
         this.description = description;
@@ -42,7 +42,7 @@ public class Slot implements Serializable {
 
     protected Slot(Slot s) {
         this.idSlot= s.getIdSlot();
-        this.data = s.getData();
+        this.date = s.getDate();
         this.duration = s.getDuration();
         this.local = s.getLocal();
         this.description = s.getDescription();
@@ -73,12 +73,12 @@ public class Slot implements Serializable {
         this.idSlot = idSlot;
     }
 
-    public Temporal getData() {
-        return data;
+    public Temporal getDate() {
+        return date;
     }
 
-    public void setData(Temporal data) {
-        this.data = data;
+    public void setDate(Temporal date) {
+        this.date = date;
     }
 
     public Duration getDuration() {

@@ -137,6 +137,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 case "G": flowGlobalRestrictSchedule(); break;
                 case "V": flowShowRestrictSchedule(); break;
                 case "S": break;
+                default: errorMessage = "Opcao Invalida!"; break;
             }
             if(opcao.equals("E")){
                 if(res)
@@ -229,8 +230,9 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch (opcao){
-                case "R": model.removeSlot(model.getRestrictSlot(idSelectSlot),model.getScheduleRestrictions());break;
+                case "R": model.removeRestrictSlot(idSelectSlot);break;
                 case "S": break;
+                default: errorMessage = "Opcao Invalida!"; break;
 
             }
         }
@@ -254,6 +256,7 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
                 case "DIA": res = addRestrictSchedule("diaria"); break;
                 case "SEM": res = addRestrictSchedule("semanal"); break;
                 case "S": break;
+                default: errorMessage = "Opcao Invalida!"; break;
             }
             if(opcao.equals("DIA") | opcao.equals("SEM")){
                 if(res)
@@ -267,12 +270,15 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
     }
 
     private boolean addRestrictSchedule(String mode){
+        boolean res = false;
         ZonedDateTime zdt = ZonedDateTime.from(model.getDateTimeLocal());
         Temporal date = getDateTimeFromInput(zdt, zdt.getZone());
         Duration duration = getDurationFromInput();
         String desc = getDescFromInput();
         RestrictSlot newSlot = RestrictSlot.of(date, duration, null, desc, mode);
-        return model.addSlot(newSlot,model.getScheduleRestrictions());
+        int numAdded = model.addRestrictSlot(newSlot);
+        if (numAdded > 0) { res = true; /*somar numAdded ao id*/ }
+        return res;
     }
 
     private void flowSetZone() {

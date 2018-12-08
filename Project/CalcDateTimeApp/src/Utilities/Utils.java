@@ -498,7 +498,7 @@ public class Utils {
     //------------------------
     public static List<String> slotToString(Slot s, ZoneId referenceZone, DateTimeFormatter dtfLocal,
                                             DateTimeFormatter dtfZone, boolean subtitles){
-        ZonedDateTime date = ZonedDateTime.from(s.getData());
+        ZonedDateTime date = ZonedDateTime.from(s.getDate());
         boolean isLocal = isSlotfromReferenceZone(s,referenceZone);
         if(isLocal) {
             if (subtitles)
@@ -513,7 +513,7 @@ public class Utils {
     }
 
     public static boolean isSlotfromReferenceZone(Slot s, ZoneId referenceZone){
-        ZonedDateTime date = ZonedDateTime.from(s.getData());
+        ZonedDateTime date = ZonedDateTime.from(s.getDate());
         return date.getZone().equals(referenceZone);
     }
 

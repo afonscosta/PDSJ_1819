@@ -1,5 +1,6 @@
 package Model.Interface;
 
+import Model.Class.RestrictSlot;
 import Model.Class.Slot;
 
 import java.time.Duration;
@@ -57,10 +58,13 @@ public interface InterfCalcDateTimeModel {
 
     ZoneId getLocalZone();
 
-/*
-    Métodos de acesso ao Model Schedule
- */
-    boolean addSlot(Slot newSlot,Collection c);
+
+    //------------------------
+    // Métodos Model Schedule
+    //------------------------
+    boolean addSlot(Slot newSlot);
+
+    int addRestrictSlot(RestrictSlot newSlot);
 
     List<String> getMainInfoSlots(ZoneId referenceZoneId, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
 
@@ -68,7 +72,10 @@ public interface InterfCalcDateTimeModel {
 
     List<String> getRestrictSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
 
-    boolean removeSlot(Slot s,Collection c);
+
+    boolean removeSlot(Long s);
+
+    boolean removeRestrictSlot(Long s);
 
     void editLocalSlot(Long idSlot, String edit);
 
@@ -80,7 +87,7 @@ public interface InterfCalcDateTimeModel {
 
     Slot getSlot(Long infoSlot);
 
-    Slot getRestrictSlot(Long infoSlot);
+    RestrictSlot getRestrictSlot(Long infoSlot);
 
     Collection getSchedule();
 

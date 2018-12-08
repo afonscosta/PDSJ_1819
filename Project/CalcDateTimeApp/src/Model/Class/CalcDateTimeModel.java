@@ -167,8 +167,13 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     // Métodos Model Schedule
     //------------------------
     @Override
-    public boolean addSlot(Slot newSlot, Collection c){
-        return modelSchedule.addSlot(newSlot,c);
+    public boolean addSlot(Slot newSlot){
+        return modelSchedule.addSlot(newSlot);
+    }
+
+    @Override
+    public int addRestrictSlot(RestrictSlot newSlot){
+        return modelSchedule.addRestrictSlot(newSlot);
     }
 
     @Override
@@ -190,7 +195,7 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     public Slot getSlot(Long infoSlot){ return modelSchedule.getSlot(infoSlot);}
 
     @Override
-    public Slot getRestrictSlot(Long infoSlot){ return modelSchedule.getRestrictSlot(infoSlot);}
+    public RestrictSlot getRestrictSlot(Long infoSlot){ return modelSchedule.getRestrictSlot(infoSlot);}
 
     @Override
     public Collection getSchedule(){
@@ -203,8 +208,13 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     }
 
     @Override
-    public boolean removeSlot(Slot s, Collection c){
-        return modelSchedule.removeSlot(s,c);
+    public boolean removeSlot(Long s){
+        return modelSchedule.removeSlot(s);
+    }
+
+    @Override
+    public boolean removeRestrictSlot(Long s){
+        return modelSchedule.removeRestrictSlot(s);
     }
 
     @Override
@@ -223,7 +233,7 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
 
     @Override
     public boolean editDateSLot(Long idSlot, Temporal data) {
-        return modelSchedule.editDateSLot(idSlot,data);
+        return modelSchedule.editDateSlot(idSlot,data);
     }
 
     @Override

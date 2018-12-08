@@ -148,9 +148,10 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
         String local = getLocalFromInput();
         String desc = getDescFromInput();
         Slot newSlot = Slot.of(date, duration, local, desc);
-        return model.addSlot(newSlot, model.getSchedule());
+        boolean added = model.addSlot(newSlot);
+        if (added) { /*somar mais um ao id*/ }
+        return added;
     }
-
 
     //------------------------
     // Fluxo de visualizar eventos agendados
@@ -290,7 +291,7 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
                         flowEditSlot(idSelectSlot);
                         break;
                 case "R":
-                    model.removeSlot(model.getSlot(idSelectSlot), model.getSchedule());
+                    model.removeSlot(idSelectSlot);
                     break;
                 case "S":
                     break;
@@ -392,12 +393,12 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
             switch (opcao) {
                 case "M":
                     if (isSlotfromReferenceZone(s, model.getLocalZone())) {
-                        data = getDateTimeFromInput((ZonedDateTime) s.getData(), model.getLocalZone());
+                        data = getDateTimeFromInput((ZonedDateTime) s.getDate(), model.getLocalZone());
                         res =model.editDateSLot(idSelectSlot, data);
                     }
                     else {
                         //Utilizar o próprio para o zone
-                        data = getZoneDateTimeFromInput(viewScheduleTxt, 8, ((ZonedDateTime) s.getData()).getZone().getId(), (ZonedDateTime) s.getData());
+                        data = getZoneDateTimeFromInput(viewScheduleTxt, 8, ((ZonedDateTime) s.getDate()).getZone().getId(), (ZonedDateTime) s.getDate());
                         res = model.editDateSLot(idSelectSlot, data);
                     }
                     break;
