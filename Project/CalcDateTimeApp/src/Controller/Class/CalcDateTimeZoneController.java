@@ -6,6 +6,7 @@ import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeView;
 
+import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -126,45 +127,85 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeController 
             opcao = Input.lerString().toUpperCase();
             switch(opcao) {
                 case "ANO" :
-                    zdt = (ZonedDateTime) shiftDateTime(zdt, shift("anos"), YEARS);
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        zdt = (ZonedDateTime) shiftDateTime(zdt, shift("anos"), YEARS);
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "MES" :
-                    zdt = (ZonedDateTime) shiftDateTime(zdt, shift("meses"), MONTHS);
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        zdt = (ZonedDateTime) shiftDateTime(zdt, shift("meses"), MONTHS);
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "SEM" :
-                    zdt = (ZonedDateTime) shiftDateTime(zdt, shift("semanas"), WEEKS);
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        zdt = (ZonedDateTime) shiftDateTime(zdt, shift("semanas"), WEEKS);
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "DIA" :
-                    zdt = (ZonedDateTime) shiftDateTime(zdt, shift("dias"), DAYS);
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        zdt = (ZonedDateTime) shiftDateTime(zdt, shift("dias"), DAYS);
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "HOR" :
-                    zdt = (ZonedDateTime) shiftDateTime(zdt, shift("horas"), HOURS);
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        zdt = (ZonedDateTime) shiftDateTime(zdt, shift("horas"), HOURS);
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "MIN" :
-                    zdt = (ZonedDateTime) shiftDateTime(zdt, shift("minutos"), MINUTES);
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        zdt = (ZonedDateTime) shiftDateTime(zdt, shift("minutos"), MINUTES);
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "SEG" :
-                    zdt = (ZonedDateTime) shiftDateTime(zdt, shift("segundos"), SECONDS);
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        zdt = (ZonedDateTime) shiftDateTime(zdt, shift("segundos"), SECONDS);
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "NAN" :
-                    zdt = (ZonedDateTime) shiftDateTime(zdt, shift("nanosegundos"), NANOS);
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        zdt = (ZonedDateTime) shiftDateTime(zdt, shift("nanosegundos"), NANOS);
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "G":
                     model.fromDateTimeZone(zdt);
                     prefix = prefixTemp;
@@ -185,20 +226,28 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeController 
         Menu menu;
         String opcao;
         String errorMessage = "n/a";
+        String statusMessage = "n/a";
         ZonedDateTime zdt = (ZonedDateTime) model.getDateTimeZone();
         String prefixTemp = prefix;
         do {
             ld = zoneDateTimeToString(zdt, DateTimeFormatter.ofPattern(model.getZoneDateTimeFormat()));
-            menu = viewZoneTxt.getDynamicMenu(2,"n/a",errorMessage,Arrays.asList(BLUE_BOLD + prefixTemp + ld + RESET));
+            menu = viewZoneTxt.getDynamicMenu(2, statusMessage, errorMessage, Arrays.asList(BLUE_BOLD + prefixTemp + ld + RESET));
             errorMessage = "n/a";
+            statusMessage = "n/a";
             menu.show();
             opcao = Input.lerString();
             opcao = opcao.toUpperCase();
             switch(opcao) {
                 case "M" :
-                    zdt = (ZonedDateTime) shiftWorkDays(zdt, shift("dias uteis"));
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        zdt = (ZonedDateTime) shiftWorkDays(zdt, shift("dias uteis"));
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "G":
                     model.fromDateTimeZone(zdt);
                     prefix = prefixTemp;
@@ -299,7 +348,7 @@ public class CalcDateTimeZoneController implements InterfCalcDateTimeController 
             String answerZone = flowGetNZoneIds(1, viewZoneTxt, 4, model.getZoneZone()).get(0);
             model.withZoneZone(answerZone);
         }
-        catch (IndexOutOfBoundsException e){}
+        catch (IndexOutOfBoundsException ignored){}
     }
 
     //------------------------
