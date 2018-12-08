@@ -85,7 +85,7 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
         //------------------------
         op1 = new Opcao("dd-MM-yyy HH:mm", "1");
         op2 = new Opcao("dd-MM-yyy HH:mm:ss", "2");
-        op3 = new Opcao("dd-MM-yyy HH:mm:ss:nn","3");
+        op3 = new Opcao("dd-MM-yyy HH:mm:ss:nnnnnnnnn","3");
         op4 = new Opcao("Voltar ao Menu Configuracoes","S");
         linhas = Arrays.asList(op1, op2, op3, op4);
         Menu menuLocalFormatter = new Menu(linhas, "Escolha do formato da data local");
