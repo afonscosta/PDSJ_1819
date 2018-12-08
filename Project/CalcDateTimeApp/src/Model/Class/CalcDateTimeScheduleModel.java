@@ -339,26 +339,16 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     }
 
     //------------------------
-    // Só posso agendar um evento se não houver nenhum evento definido que sobreponha
-    //------------------------
-    private boolean eventDoesNotOverlapAnyEvent(Slot newSlot){
-        return !schedule.contains(newSlot);
-    }
-
-    //------------------------
     // Adicionar um evento ao schedule ou adicionar uma restrição ao scheduleRestrictions
     // Só posso agendar um evento se não houver nenhuma restrição definida que sobreponha
     // Só posso adicionar uma restrição se não houver nenhum evento já agendado que quebra a restrição que se pretenda adicionar
     //------------------------
     @Override
     public boolean addSlot(Slot newSlot, ZoneId zoneId) {
-        boolean res = true;
-        if (eventDoesNotBreakAnyRestrict(newSlot,zoneId) && eventDoesNotOverlapAnyEvent(newSlot)) {
-            schedule.add(newSlot);
-        } else {
-            res = false;
+        if (eventDoesNotBreakAnyRestrict(newSlot,zoneId)) {
+            return schedule.add(newSlot);
         }
-        return res;
+        return false;
     }
 
     @Override
@@ -421,19 +411,14 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     @Override
     public boolean editDurationSlot(Long idSelectSlot, Duration newDuration, ZoneId zoneId) {
         Slot s = getSlot(idSelectSlot);
+        removeSlot(idSelectSlot);
         Slot temp = s.clone();
         temp.setDuration(newDuration);
-        return addSlot(temp,zoneId);
-        /*
-        removeSlot(s,schedule);
-        Slot newSlot = Slot.of(temp.getIdSlot(),temp.getData(),newDuration,temp.getLocal(),temp.getDescription());
-        boolean add = addSlot(newSlot,schedule,zoneId);
-        if(add==false) {
-            addSlot(temp,schedule,zoneId);
-            Slot.setNextAvailableId(1); //como o add falhou anteriormente, ele retrocede. Neste caso, não devia porque é um calculo intermédio.
+        boolean added = addSlot(temp, zoneId);
+        if (!added) {
+            addSlot(s, zoneId);
         }
-        return add;
-        */
+        return added;
     }
 
     //------------------------
@@ -444,22 +429,14 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     @Override
     public boolean editDateSlot(Long idSelectSlot, Temporal date, ZoneId zoneId){
         Slot s = getSlot(idSelectSlot);
+        removeSlot(idSelectSlot);
         Slot temp = s.clone();
         temp.setDate(date);
-        return addSlot(temp,zoneId);
-        /*
-    public boolean editDateSLot(Long idSelectSlot, Temporal data, ZoneId zoneId){
-        Slot s = getSlot(idSelectSlot);
-        Slot temp = s.clone();
-        removeSlot(s,schedule);
-        Slot newSlot = Slot.of(temp.getIdSlot(),data, temp.getDuration(),temp.getLocal(),temp.getDescription());
-        boolean add = addSlot(newSlot,schedule,zoneId);
-        if(add==false){
-            addSlot(temp,schedule,zoneId);
-            Slot.setNextAvailableId(1); //como o add falhou anteriormente, ele retrocede. Neste caso, não devia porque é um calculo intermédio.
+        boolean added = addSlot(temp, zoneId);
+        if (!added) {
+            addSlot(s, zoneId);
         }
-        return add;
-        */
+        return added;
     }
 
     @Override
