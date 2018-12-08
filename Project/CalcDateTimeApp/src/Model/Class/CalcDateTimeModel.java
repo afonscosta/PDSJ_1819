@@ -40,7 +40,7 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
     //------------------------
     // Métodos da facade
     //------------------------
-    public Configs getConfings() {
+    public Configs getConfigs() {
         return this.configs;
     }
 
@@ -70,6 +70,26 @@ public class CalcDateTimeModel implements InterfCalcDateTimeModel {
         configs.setSchedule(modelSchedule.getSchedule());
         configs.setScheduleRestrictions(modelSchedule.getScheduleRestrictions());
         configs.saveConfigs("./Configs");
+    }
+
+    @Override
+    public long getIdSlot(){
+        return configs.getIdSlot();
+    }
+
+    @Override
+    public void incNIdSlot(int n){
+        configs.incNIdSlot(n);
+    }
+
+    @Override
+    public long getIdRestrictSlot(){
+        return configs.getIdRestrictSlot();
+    }
+
+    @Override
+    public void incNIdRestrictSlot(int n){
+        configs.incNIdRestrictSlot(n);
     }
 
     //------------------------

@@ -2,6 +2,7 @@ package Model.Interface;
 
 import Model.Class.RestrictSlot;
 import Model.Class.Slot;
+import Utilities.Configs;
 
 import java.time.Duration;
 import java.time.ZoneId;
@@ -14,9 +15,36 @@ import java.util.List;
 
 public interface InterfCalcDateTimeModel {
 
+    //------------------------
+    // Métodos Model Facade
+    //------------------------
+    long getIdSlot();
+
+    void incNIdSlot(int n);
+
+    long getIdRestrictSlot();
+
+    void incNIdRestrictSlot(int n);
+
+    void setZoneDateTimeFormat(String zoneDateTimeFormat);
+
+    void setLocalDateTimeFormat(String localDateTimeFormat);
+
+    void saveConfigs();
+
+    String getLocalDateTimeFormat();
+
+    String getZoneDateTimeFormat();
+
+    Configs getConfigs();
+
+    //------------------------
+    // Métodos Model Local
+    //------------------------
+
     Temporal getDateTimeLocal();
 
-    Temporal getDateTimeZone();
+    ZoneId getLocalZone();
 
     void shiftDateTimeLocal(int n, ChronoUnit cu);
 
@@ -26,38 +54,31 @@ public interface InterfCalcDateTimeModel {
 
     String diffWorkDaysDateTimeLocal(ZonedDateTime toDateTime);
 
-    void fromDateTimeLocal(ZonedDateTime ldt);
-
-    void shiftDateTimeZone(int n, ChronoUnit cu);
-
     void shiftWorkDaysDateTimeZone(int n);
 
     String diffDateTimeZone(ZonedDateTime toDateTime);
 
     String diffWorkDaysDateTimeZone(ZonedDateTime toDateTime);
 
-    void fromDateTimeZone(ZonedDateTime zdt);
+    void fromDateTimeLocal(ZonedDateTime ldt);
 
     void withZoneLocal(String zid);
+
+    //------------------------
+    // Métodos Model Zone
+    //------------------------
+
+    String getZoneZone();
+
+    Temporal getDateTimeZone();
+
+    void shiftDateTimeZone(int n, ChronoUnit cu);
 
     void withZoneZone(String zid);
 
     void changeToCurrentDateInZone(String zoneId);
 
-    String getLocalDateTimeFormat();
-
-    String getZoneDateTimeFormat();
-
-    String getZoneZone();
-
-    void setZoneDateTimeFormat(String zoneDateTimeFormat);
-
-    void setLocalDateTimeFormat(String localDateTimeFormat);
-
-    void saveConfigs();
-
-    ZoneId getLocalZone();
-
+    void fromDateTimeZone(ZonedDateTime zdt);
 
     //------------------------
     // Métodos Model Schedule

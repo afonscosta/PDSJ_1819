@@ -15,7 +15,8 @@ public class Configs implements Serializable{
     private String zoneDateTimeFormat;
     private String localDateTimeFormat;
     private ZoneId zoneId;
-
+    private Long idSlot;
+    private Long idRestrictSlot;
     public static Configs of (String pathToFile) {
         try {
             FileInputStream fis = new FileInputStream(pathToFile);
@@ -40,6 +41,8 @@ public class Configs implements Serializable{
         this.zoneDateTimeFormat = "yyyy/MM/dd HH:mm - VV";
         this.localDateTimeFormat = "yyyy/MM/dd HH:mm";
         this.zoneId = ZoneId.systemDefault();
+        this.idRestrictSlot = 0L;
+        this.idSlot = 0L;
     }
 
     public Set<Slot> getSchedule() {
@@ -93,5 +96,26 @@ public class Configs implements Serializable{
     public void setZoneId(ZoneId zoneId) {
         this.zoneId = zoneId;
     }
+
+    // devolve o proximo id disponivel para Slot mas não incrementa
+    public long getIdSlot(){
+        return idSlot;
+    }
+    // incrementa N vezes o id para os Slots
+    public void incNIdSlot(int n){
+        this.idSlot +=n;
+    }
+
+    // devolve o proximo id disponivel para RestrictSlot mas não incrementa
+    public long getIdRestrictSlot(){
+        return idRestrictSlot;
+    }
+
+    // incrementa N vezes o id para os RestrictSlots
+    public void incNIdRestrictSlot(int n){
+        this.idRestrictSlot += n;
+    }
+
+
 
 }
