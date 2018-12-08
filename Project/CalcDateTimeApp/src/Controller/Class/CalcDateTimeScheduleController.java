@@ -1,6 +1,6 @@
 package Controller.Class;
 
-import Controller.Interface.InterfCalcDateTimeScheduleController;
+import Controller.Interface.InterfCalcDateTimeController;
 import Model.Class.Slot;
 import Model.Interface.InterfCalcDateTimeModel;
 import Utilities.Input;
@@ -22,7 +22,7 @@ import static Utilities.ControllerUtils.*;
 import static java.time.temporal.ChronoUnit.*;
 import static java.util.Arrays.asList;
 
-public class CalcDateTimeScheduleController implements InterfCalcDateTimeScheduleController {
+public class CalcDateTimeScheduleController implements InterfCalcDateTimeController {
 
     private InterfCalcDateTimeModel model;
     private InterfCalcDateTimeView viewScheduleTxt;
@@ -33,10 +33,12 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
 
     private CalcDateTimeScheduleController() { }
 
+    @Override
     public void setView(InterfCalcDateTimeView viewSchedule) {
         this.viewScheduleTxt = viewSchedule;
     }
 
+    @Override
     public void setModel(InterfCalcDateTimeModel model) {
         this.model = model;
     }
@@ -66,7 +68,8 @@ public class CalcDateTimeScheduleController implements InterfCalcDateTimeSchedul
     //------------------------
     // Fluxo inicial do menu agenda
     //------------------------
-    public void flowSchedule(){
+    @Override
+    public void startFlow(){
         String opcao;
         String errorMessage = "n/a";
         Menu menu;

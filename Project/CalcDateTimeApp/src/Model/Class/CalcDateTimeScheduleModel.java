@@ -2,9 +2,6 @@ package Model.Class;
 
 import Model.Interface.InterfCalcDateTimeScheduleModel;
 import Utilities.Configs;
-
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -13,7 +10,6 @@ import java.time.temporal.Temporal;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
-
 import static Utilities.Utils.convertToZone;
 import static Utilities.Utils.slotToString;
 import static java.time.temporal.ChronoUnit.DAYS;

@@ -12,9 +12,9 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
-public interface InterfCalcDateTimeModel {
-
+public interface InterfCalcDateTimeModel{
     //------------------------
     // Métodos Model Facade
     //------------------------
@@ -93,7 +93,6 @@ public interface InterfCalcDateTimeModel {
 
     List<String> getRestrictSlots(ZoneId referenceZone, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
 
-
     boolean removeSlot(Long s);
 
     boolean removeRestrictSlot(Long s);
@@ -109,10 +108,6 @@ public interface InterfCalcDateTimeModel {
     Slot getSlot(Long infoSlot);
 
     RestrictSlot getRestrictSlot(Long infoSlot);
-
-    Collection getSchedule();
-
-    Collection getScheduleRestrictions();
 
     boolean existSlot(Long idSlot);
 
