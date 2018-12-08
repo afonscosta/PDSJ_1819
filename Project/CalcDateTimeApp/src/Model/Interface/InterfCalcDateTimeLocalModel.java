@@ -25,12 +25,5 @@ public interface InterfCalcDateTimeLocalModel {
 
     void withZone(String zid);
 
-    void setLocalDateTimeFormat(String localDateTimeFormat);
-
     void setZoneId(ZoneId zoneId);
-
-    String getLocalDateTimeFormat();
-
-    ZoneId getZone();
-
 }

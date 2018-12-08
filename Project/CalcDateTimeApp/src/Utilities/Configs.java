@@ -13,7 +13,7 @@ public class Configs implements Serializable{
     private List<RestrictSlot> scheduleRestrictions;
     private String zoneDateTimeFormat;
     private String localDateTimeFormat;
-    private String zoneId;
+    private ZoneId zoneId;
 
     public static Configs of (String pathToFile) {
         try {
@@ -38,7 +38,7 @@ public class Configs implements Serializable{
         this.scheduleRestrictions = null;
         this.zoneDateTimeFormat = "yyyy/MM/dd HH:mm - VV";
         this.localDateTimeFormat = "yyyy/MM/dd HH:mm";
-        this.zoneId = ZoneId.systemDefault().toString();
+        this.zoneId = ZoneId.systemDefault();
     }
 
     public List<Slot> getSchedule() {
@@ -57,7 +57,7 @@ public class Configs implements Serializable{
         return localDateTimeFormat;
     }
 
-    public String getZoneId() {
+    public ZoneId getZoneId() {
         return zoneId;
     }
 
@@ -89,7 +89,7 @@ public class Configs implements Serializable{
         this.localDateTimeFormat = localDateTimeFormat;
     }
 
-    public void setZoneId(String zoneId) {
+    public void setZoneId(ZoneId zoneId) {
         this.zoneId = zoneId;
     }
 

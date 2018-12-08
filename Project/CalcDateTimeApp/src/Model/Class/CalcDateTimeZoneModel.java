@@ -16,12 +16,9 @@ import java.util.Comparator;
 
 public class CalcDateTimeZoneModel extends CalcDateTimeLocalModel implements InterfCalcDateTimeZoneModel {
 
-    private String zoneDateTimeFormat;
-
 
     private CalcDateTimeZoneModel() {
         super();
-        this.zoneDateTimeFormat = "yyyy/MM/dd HH:mm - VV";
     }
 
     public static CalcDateTimeZoneModel of () {
@@ -31,7 +28,6 @@ public class CalcDateTimeZoneModel extends CalcDateTimeLocalModel implements Int
 
     public void loadConfigs(Configs configs) {
         super.loadConfigs(configs);
-        this.setZoneDateTimeFormat(configs.getZoneDateTimeFormat());
     }
 
     @Override
@@ -48,21 +44,10 @@ public class CalcDateTimeZoneModel extends CalcDateTimeLocalModel implements Int
         } catch (ZoneRulesException e) {
             // Zona inexistente? Ignorar..
         }
-
-    }
-
-/*    @Override
-    public String getLocalDateTimeFormat() {
-        return null;
-    }*/
-
-    @Override
-    public void setZoneDateTimeFormat(String zoneDateTimeFormat) {
-        this.zoneDateTimeFormat = zoneDateTimeFormat;
     }
 
     @Override
-    public String getZoneDateTimeFormat() {
-        return this.zoneDateTimeFormat;
+    public ZoneId getZone() {
+        return ((ZonedDateTime) super.getDateTime()).getZone();
     }
 }

@@ -23,7 +23,7 @@ public interface InterfCalcDateTimeScheduleModel {
 
     Collection getScheduleRestrictions();
 
-    boolean addSlot(Slot newSlot, Collection c);
+    boolean addSlot(Slot newSlot, Collection c, ZoneId zoneId);
 
     List<String> getMainInfoSlots(ZoneId referenceZoneId, DateTimeFormatter dtfLocal, DateTimeFormatter dtfZone);
 
@@ -33,9 +33,9 @@ public interface InterfCalcDateTimeScheduleModel {
 
     boolean removeSlot(Slot s,Collection c);
 
-    boolean editDurationSlot(Long idSlot, Duration d);
+    boolean editDurationSlot(Long idSelectSlot, Duration newDuration, ZoneId zoneId);
 
-    boolean editDateSLot(Long idSlot, Temporal data);
+    boolean editDateSLot(Long idSelectSlot, Temporal data, ZoneId zoneId);
 
     Slot getSlot(Long infoSlot);
 
