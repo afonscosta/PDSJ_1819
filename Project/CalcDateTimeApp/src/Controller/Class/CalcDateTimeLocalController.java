@@ -7,6 +7,7 @@ import Utilities.Input;
 import Utilities.Menu;
 import View.Interface.InterfCalcDateTimeView;
 
+import java.time.DateTimeException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
@@ -167,45 +168,85 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeController
             opcao = opcao.toUpperCase();
             switch(opcao) {
                 case "ANO" :
-                    ldt = shiftDateTime(ldt, shift("anos"), YEARS);
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        ldt = shiftDateTime(ldt, shift("anos"), YEARS);
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "MES" :
-                    ldt = shiftDateTime(ldt, shift("meses"), MONTHS);
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        ldt = shiftDateTime(ldt, shift("meses"), MONTHS);
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "SEM" :
-                    ldt = shiftDateTime(ldt, shift("semanas"), WEEKS);
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        ldt = shiftDateTime(ldt, shift("semanas"), WEEKS);
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "DIA" :
-                    ldt = shiftDateTime(ldt, shift("dias"), DAYS);
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        ldt = shiftDateTime(ldt, shift("dias"), DAYS);
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "HOR" :
-                    ldt = shiftDateTime(ldt, shift("horas"), HOURS);
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        ldt = shiftDateTime(ldt, shift("horas"), HOURS);
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "MIN" :
-                    ldt = shiftDateTime(ldt, shift("minutos"), MINUTES);
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        ldt = shiftDateTime(ldt, shift("minutos"), MINUTES);
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "SEG" :
-                    ldt = shiftDateTime(ldt, shift("segundos"), SECONDS);
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        ldt = shiftDateTime(ldt, shift("segundos"), SECONDS);
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "NAN" :
-                    ldt = shiftDateTime(ldt, shift("nanosegundos"), NANOS);
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        ldt = shiftDateTime(ldt, shift("nanosegundos"), NANOS);
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "G":
                     model.fromDateTimeLocal((ZonedDateTime) ldt);
                     prefix = prefixTemp;
@@ -239,10 +280,15 @@ public class CalcDateTimeLocalController implements InterfCalcDateTimeController
             opcao = opcao.toUpperCase();
             switch(opcao) {
                 case "A" :
-                    ldt = shiftWorkDays(ldt, shift("dias uteis"));
-                    statusMessage = "Data modificada com sucesso";
-                    prefixTemp = "Data acumulada: ";
-                    break;
+                    try {
+                        ldt = shiftWorkDays(ldt, shift("dias uteis"));
+                        statusMessage = "Data modificada com sucesso";
+                        prefixTemp = "Data acumulada: ";
+                        break;
+                    } catch (DateTimeException e) {
+                        errorMessage = "Numero inserido invalido.";
+                        break;
+                    }
                 case "G":
                     model.fromDateTimeLocal((ZonedDateTime) ldt);
                     prefix = prefixTemp;
