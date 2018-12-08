@@ -36,8 +36,6 @@ public interface InterfCalcDateTimeModel{
 
     String getZoneDateTimeFormat();
 
-    Configs getConfigs();
-
     //------------------------
     // Métodos Model Local
     //------------------------
@@ -45,20 +43,6 @@ public interface InterfCalcDateTimeModel{
     Temporal getDateTimeLocal();
 
     ZoneId getLocalZone();
-
-    void shiftDateTimeLocal(int n, ChronoUnit cu);
-
-    void shiftWorkDaysDateTimeLocal(int n);
-
-    String diffDateTimeLocal(ZonedDateTime toDateTime);
-
-    String diffWorkDaysDateTimeLocal(ZonedDateTime toDateTime);
-
-    void shiftWorkDaysDateTimeZone(int n);
-
-    String diffDateTimeZone(ZonedDateTime toDateTime);
-
-    String diffWorkDaysDateTimeZone(ZonedDateTime toDateTime);
 
     void fromDateTimeLocal(ZonedDateTime ldt);
 
@@ -72,11 +56,7 @@ public interface InterfCalcDateTimeModel{
 
     Temporal getDateTimeZone();
 
-    void shiftDateTimeZone(int n, ChronoUnit cu);
-
     void withZoneZone(String zid);
-
-    void changeToCurrentDateInZone(String zoneId);
 
     void fromDateTimeZone(ZonedDateTime zdt);
 

@@ -12,7 +12,11 @@ public class CalcDateTimeView implements InterfCalcDateTimeView {
 
     private Menus menuMainViewTxt;
 
-    public CalcDateTimeView() {
+    public static CalcDateTimeView of() {
+        return new CalcDateTimeView();
+    }
+
+    private CalcDateTimeView() {
         menuMainViewTxt = initView();
     }
 

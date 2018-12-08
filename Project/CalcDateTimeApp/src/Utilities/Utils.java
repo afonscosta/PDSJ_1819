@@ -42,7 +42,6 @@ public class Utils {
         return zdt.format(zonedDateTimeFormatter);
     }
 
-
     public static Temporal shiftDateTime(Temporal temp, int n, ChronoUnit cu) {
         return temp.plus(n, cu);
     }
@@ -305,7 +304,6 @@ public class Utils {
         return ld.getDayOfWeek().getValue() - start + 1;
     }
 
-
     /*
      * Temporal -> DayOfWeek
      * Dado um temporal dá o dia da semana.
@@ -316,18 +314,6 @@ public class Utils {
         try { ld = LocalDate.from(tacs); }
         catch (DateTimeException e) { return null; }
         return ld.getDayOfWeek();
-    }
-
-    /*
-     * Temporal -> DayOfWeek
-     * Dado um temporal dá o dia da semana.
-     * Caso não seja um ZonedDateTime ou LocalDateTime devolve null.
-     */
-    public static Integer getDayOfMonth(TemporalAccessor tacs) {
-        LocalDate ld;
-        try { ld = LocalDate.from(tacs); }
-        catch (DateTimeException e) { return null; }
-        return ld.getDayOfMonth();
     }
 
     /*

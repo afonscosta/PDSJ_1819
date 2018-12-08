@@ -272,9 +272,9 @@ public class CalcDateTimeController implements InterfCalcDateTimeController {
         Temporal date = getDateTimeFromInput(zdt, zdt.getZone());
         Duration duration = getDurationFromInput();
         String desc = getDescFromInput();
-        RestrictSlot newSlot = RestrictSlot.of(date, duration, null, desc, mode);
+        RestrictSlot newSlot = RestrictSlot.of(model.getIdRestrictSlot(), date, duration, null, desc, mode);
         int numAdded = model.addRestrictSlot(newSlot);
-        if (numAdded > 0) { res = true; /*somar numAdded ao id*/ }
+        if (numAdded > 0) { res = true; model.incNIdRestrictSlot(numAdded); }
         return res;
     }
 

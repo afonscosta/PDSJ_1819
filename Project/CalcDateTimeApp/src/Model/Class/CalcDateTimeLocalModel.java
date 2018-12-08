@@ -1,27 +1,23 @@
 package Model.Class;
 
 import Model.Interface.InterfCalcDateTimeLocalModel;
-import Utilities.Utils;
 import Utilities.Configs;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.zone.ZoneRulesException;
-
-import static Utilities.Utils.*;
 
 public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
 
     private ZonedDateTime ldt;
 
-    protected CalcDateTimeLocalModel() {
-        this.ldt = ZonedDateTime.now();
-    }
-
     public static CalcDateTimeLocalModel of () {
         return new CalcDateTimeLocalModel();
+    }
+
+    CalcDateTimeLocalModel() {
+        this.ldt = ZonedDateTime.now();
     }
 
     @Override
@@ -39,28 +35,6 @@ public class CalcDateTimeLocalModel implements InterfCalcDateTimeLocalModel {
     @Override
     public void fromDateTime(ZonedDateTime newLDT) {
         this.ldt = ZonedDateTime.from(newLDT);
-    }
-
-    @Override
-    public void shiftDateTime(int n, ChronoUnit cu) {
-        ldt = (ZonedDateTime) Utils.shiftDateTime(ldt, n, cu);
-    }
-
-    @Override
-    public void shiftWorkDaysDateTime(int n) {
-        ZonedDateTime newLDT = (ZonedDateTime) shiftWorkDays(ldt, n);
-        if (newLDT != null)
-            ldt = newLDT;
-    }
-
-    @Override
-    public String diffDateTime(ZonedDateTime toDateTime) {
-        return diffBetweenDateTime(ldt, toDateTime);
-    }
-
-    @Override
-    public String diffWorkDaysDateTime(ZonedDateTime toDateTime) {
-        return countWorkDays(ldt, toDateTime) + " dias úteis";
     }
 
     @Override
