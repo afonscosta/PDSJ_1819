@@ -244,34 +244,36 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
 
     //------------------------
     // Só posso agendar um evento se não houver nenhuma restrição definida que sobreponha
+    // Necessário particionar o slot a adicionar para o caso deste ocupada mais que um dia
     //------------------------
     private boolean eventDoesNotBreakAnyRestrict(Slot newSlot, ZoneId zoneId){
         boolean res;
-        LocalDateTime ldtNewSlot = convertToZone(newSlot.getDate(), zoneId).toLocalDateTime();
-        for(RestrictSlot s : scheduleRestrictions){
-            LocalDateTime ldtRestrictSlot= LocalDateTime.from(s.getDate());
-            if(s.getPeriod().equals("semanal")){
-               if(ldtNewSlot.getDayOfWeek().equals(ldtRestrictSlot.getDayOfWeek())){
-                   res = compareTime(LocalTime.from(ldtNewSlot),LocalTime.from(ldtRestrictSlot),newSlot,s);
-                   if(!res) {
-                       return false;
-                   }
-               }
-            }
-            else if(s.getPeriod().equals("pontual")){
-                res = compareLocalDateTime(ldtNewSlot,ldtRestrictSlot,newSlot,s);
-                if(!res) {
-                    return false;
-                }
-            }
-            else if(s.getPeriod().equals("diaria")){
-                res = compareTime(LocalTime.from(ldtNewSlot),LocalTime.from(ldtRestrictSlot),newSlot,s);
-                if(!res) {
-                    return false;
+        List<Slot> slotsAdd = partitionSlot(newSlot,zoneId);
+        for(Slot slotAdd: slotsAdd) {
+            LocalDateTime ldtNewSlot = convertToZone(slotAdd.getDate(), zoneId).toLocalDateTime();
+            for (RestrictSlot s : scheduleRestrictions) {
+                LocalDateTime ldtRestrictSlot = LocalDateTime.from(s.getDate());
+                if (s.getPeriod().equals("semanal")) {
+                    if (ldtNewSlot.getDayOfWeek().equals(ldtRestrictSlot.getDayOfWeek())) {
+                        res = compareTime(LocalTime.from(ldtNewSlot), LocalTime.from(ldtRestrictSlot), slotAdd, s);
+                        if (!res) {
+                            return false;
+                        }
+                    }
+                } else if (s.getPeriod().equals("pontual")) {
+                    res = compareLocalDateTime(ldtNewSlot, ldtRestrictSlot, newSlot, s);
+                    if (!res) {
+                        return false;
+                    }
+                } else if (s.getPeriod().equals("diaria")) {
+                    res = compareTime(LocalTime.from(ldtNewSlot), LocalTime.from(ldtRestrictSlot), slotAdd, s);
+                    if (!res) {
+                        return false;
+                    }
                 }
             }
         }
-        return true;
+            return true;
     }
 
     //------------------------
@@ -280,26 +282,28 @@ public class CalcDateTimeScheduleModel implements InterfCalcDateTimeScheduleMode
     private boolean restrictDoesNotOverlapAnyEvent(RestrictSlot newRestrictSlot,ZoneId zoneId){
         boolean res;
         LocalDateTime ldtRestrictSlot = convertToZone(newRestrictSlot.getDate(),zoneId).toLocalDateTime();
-        for(Slot s : schedule){
-            LocalDateTime ldtSlot= LocalDateTime.from(s.getDate());
-            if(newRestrictSlot.getPeriod().equals("semanal")){
-                if(ldtSlot.getDayOfWeek().equals(ldtRestrictSlot.getDayOfWeek())){
-                    res = compareTime(LocalTime.from(ldtRestrictSlot), LocalTime.from(ldtSlot), newRestrictSlot, s);
-                    if(!res) {
+        List<Slot> temp;
+        for(Slot slot : schedule){
+            temp = partitionSlot(slot,zoneId);
+            for(Slot s: temp) {
+                LocalDateTime ldtSlot = LocalDateTime.from(s.getDate());
+                if (newRestrictSlot.getPeriod().equals("semanal")) {
+                    if (ldtSlot.getDayOfWeek().equals(ldtRestrictSlot.getDayOfWeek())) {
+                        res = compareTime(LocalTime.from(ldtRestrictSlot), LocalTime.from(ldtSlot), newRestrictSlot, s);
+                        if (!res) {
+                            return false;
+                        }
+                    }
+                } else if (newRestrictSlot.getPeriod().equals("pontual")) {
+                    res = compareLocalDateTime(ldtRestrictSlot, ldtSlot, newRestrictSlot, s);
+                    if (!res) {
                         return false;
                     }
-                }
-            }
-            else if(newRestrictSlot.getPeriod().equals("pontual")){
-                res = compareLocalDateTime(ldtRestrictSlot, ldtSlot, newRestrictSlot,s);
-                if(!res) {
-                    return false;
-                }
-            }
-            else if(newRestrictSlot.getPeriod().equals("diaria")){
-                res = compareTime(LocalTime.from(ldtRestrictSlot), LocalTime.from(ldtSlot), newRestrictSlot, s);
-                if(!res) {
-                    return false;
+                } else if (newRestrictSlot.getPeriod().equals("diaria")) {
+                    res = compareTime(LocalTime.from(ldtRestrictSlot), LocalTime.from(ldtSlot), newRestrictSlot, s);
+                    if (!res) {
+                        return false;
+                    }
                 }
             }
         }
