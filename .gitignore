@@ -9,3 +9,4 @@ Project/CalcDateTimeApp/.editorconfig
 Project/CalcDateTimeApp/.gitattributes
 Project/CalcDateTimeApp/.gitignore
 Project/CalcDateTimeApp/.travis.yml
+BenchJavaStreams/.idea/
