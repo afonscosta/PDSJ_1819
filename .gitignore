@@ -11,3 +11,4 @@ Project/CalcDateTimeApp/.gitignore
 Project/CalcDateTimeApp/.travis.yml
 BenchJavaStreams/.idea/
 TransCaixa/
+BenchJavaStreams/target/

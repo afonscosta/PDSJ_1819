@@ -1,39 +1,26 @@
-/**
- *
- * @author fmm 2017
- */
-
 import java.io.IOException;
+import static java.lang.System.out;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.DoubleSummaryStatistics;
 import java.util.InputMismatchException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Supplier;
+import static java.util.stream.Collectors.toList;
 import java.util.stream.Stream;
 
-import static java.lang.System.out;
-import static java.util.stream.Collectors.toList;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 
-
-public class BenchJavaStreams {
-
-    public static void memoryUsage() {
-        final int mByte = 1024*1024;
-        // Parâmetros de RunTime
-        Runtime runtime = Runtime.getRuntime();
-        out.println("== Valores de Utilização da HEAP [MB] ==");
-        out.println("Memória Máxima RT:" + runtime.maxMemory()/mByte);
-        out.println("Total Memory:" + runtime.totalMemory()/mByte);
-        out.println("Memória Livre:" + runtime.freeMemory()/mByte);
-        out.println("Memoria Usada:" + (runtime.totalMemory() -
-                runtime.freeMemory())/mByte);
-    }
+/**
+ *
+ * @author fmm 2017
+ */
+public class Utils_TransCaixa {
 
     public static TransCaixa strToTransCaixa(String linha) {
         //
@@ -66,7 +53,7 @@ public class BenchJavaStreams {
     public static List<TransCaixa> setup(String nomeFich) {
         List<TransCaixa> ltc = new ArrayList<>();
         try (Stream<String> sTrans = Files.lines(Paths.get(nomeFich))) {
-            ltc = sTrans.map(linha -> strToTransCaixa(linha)).collect(toList());
+            ltc = sTrans.map(l -> strToTransCaixa(l)).collect(toList());
         }
         catch(IOException exc) { out.println(exc.getMessage()); }
         return ltc;
@@ -80,39 +67,5 @@ public class BenchJavaStreams {
         List<TransCaixa> lTrans = new ArrayList<>();
         lines.forEach(line -> lTrans.add(strToTransCaixa(line)));
         return lTrans;
-    }
-
-    public static <R> SimpleEntry<Double,R> testeBoxGen(Supplier<? extends R> supplier) {
-        Crono.start();
-        R resultado = supplier.get();
-        Double tempo = Crono.stop();
-        return new SimpleEntry<Double,R>(tempo, resultado);
-    }
-
-
-    public static void main(String[] args) throws InterruptedException, ExecutionException {
-
-        String nomeFich = "transCaixa1M.txt";
-        List<TransCaixa> ltc1;
-
-        // LE O FICHEIRO DE TRANSACÇOES PARA List<TransCaixa> sem Streams
-        Crono.start();
-        ltc1 = setup1(nomeFich);
-        out.println("Setup com List<String>: " + Crono.stop()*1000 + " ms");
-        out.println("Transacções lidas -  Listas: " + ltc1.size());
-        ltc1.clear();
-
-        // LE O FICHEIRO DE TRANSACÇOES PARA List<TransCaixa> com Streams
-        Crono.start();
-        ltc1 = setup(nomeFich);
-        out.println("Setup com Streams: " + Crono.stop()*1000 + " ms");
-        out.println("Transacções lidas - Streams: " + ltc1.size());
-        //memoryUsage();
-
-        final List<TransCaixa> ltc = new ArrayList<>(ltc1);
-
-        DoubleSummaryStatistics stats =
-                ltc.stream().mapToDouble(TransCaixa::getValor).summaryStatistics();
-        out.println("Stats: " + stats);
     }
 }
