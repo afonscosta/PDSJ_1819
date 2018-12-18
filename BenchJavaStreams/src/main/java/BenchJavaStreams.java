@@ -72,16 +72,6 @@ public class BenchJavaStreams {
         return ltc;
     }
 
-    public static List<TransCaixa> setup1(String nomeFich) {
-        List<String> lines = new ArrayList<>();
-        try { lines = Files.readAllLines(Paths.get(nomeFich), StandardCharsets.UTF_8); }
-        catch(IOException exc) { System.out.println(exc.getMessage()); }
-        // List<String> -> List<TransCaixa>
-        List<TransCaixa> lTrans = new ArrayList<>();
-        lines.forEach(line -> lTrans.add(strToTransCaixa(line)));
-        return lTrans;
-    }
-
     public static <R> SimpleEntry<Double,R> testeBoxGen(Supplier<? extends R> supplier) {
         Crono.start();
         R resultado = supplier.get();
@@ -89,30 +79,23 @@ public class BenchJavaStreams {
         return new SimpleEntry<Double,R>(tempo, resultado);
     }
 
-
     public static void main(String[] args) throws InterruptedException, ExecutionException {
 
-        String nomeFich = "transCaixa1M.txt";
+        String nomeFich = "TransCaixaResources/transCaixa1M.txt";
         List<TransCaixa> ltc1;
-
-        // LE O FICHEIRO DE TRANSACÇOES PARA List<TransCaixa> sem Streams
-        Crono.start();
-        ltc1 = setup1(nomeFich);
-        out.println("Setup com List<String>: " + Crono.stop()*1000 + " ms");
-        out.println("Transacções lidas -  Listas: " + ltc1.size());
-        ltc1.clear();
 
         // LE O FICHEIRO DE TRANSACÇOES PARA List<TransCaixa> com Streams
         Crono.start();
         ltc1 = setup(nomeFich);
         out.println("Setup com Streams: " + Crono.stop()*1000 + " ms");
         out.println("Transacções lidas - Streams: " + ltc1.size());
-        //memoryUsage();
 
         final List<TransCaixa> ltc = new ArrayList<>(ltc1);
 
-        DoubleSummaryStatistics stats =
-                ltc.stream().mapToDouble(TransCaixa::getValor).summaryStatistics();
-        out.println("Stats: " + stats);
+        Supplier<String> debug = () -> {
+            ltc.stream().limit(10).forEach(tc -> out.println(tc));
+            return null;
+        };
+        testeBoxGen(debug);
     }
 }
