@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
 import java.util.function.Function;
@@ -16,6 +18,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.lang.System.out;
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
 
@@ -96,85 +99,12 @@ public class BenchJavaStreams {
         }
     }
 
-    private static Comparator<TransCaixa> transCaixaComparator = (TransCaixa tc1, TransCaixa tc2) -> {
-        if (Objects.equals(tc1, tc2)) return 0;
-        else if(tc1 == null) return -1;
-        else if(tc2 == null) return +1;
-
-        if (tc1.getData().isBefore(tc2.getData())) {
-            return -1;
-        }
-        else if (tc1.getData().isAfter(tc2.getData())) {
-            return 1;
-        }
-        return tc1.getTrans().compareTo(tc2.getTrans());
-    };
-
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao2S = ltc -> {
-        Supplier<SimpleEntry> t2S = () -> {
-            int size = ltc.size();
-            List<TransCaixa> sortedList = ltc.stream()
-                                             .sorted(transCaixaComparator)
-                                             .collect(toList());
-            List<TransCaixa> l1 = sortedList.subList(0, size/3);
-            List<TransCaixa> l2 = sortedList.subList(size - size/3, size);
-            return new SimpleEntry<>(l1, l2);
-        };
-        return t2S;
-    };
-
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao2PS = ltc -> {
-        Supplier<SimpleEntry> t2PS = () -> {
-            int size = ltc.size();
-            List<TransCaixa> sortedList = ltc.parallelStream()
-                                             .sorted(transCaixaComparator)
-                                             .collect(toList());
-            List<TransCaixa> l1 = sortedList.subList(0, size/3);
-            List<TransCaixa> l2 = sortedList.subList(size - size/3, size);
-            return new SimpleEntry<>(l1, l2);
-        };
-        return t2PS;
-    };
-
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao2L = ltc -> {
-        Supplier<SimpleEntry> t2L = () -> {
-            int size = ltc.size();
-            ltc.sort(transCaixaComparator);
-            List<TransCaixa> l1 = ltc.subList(0, size/3);
-            List<TransCaixa> l2 = ltc.subList(size - size/3, size);
-            return new SimpleEntry<>(l1, l2);
-        };
-        return t2L;
-    };
-
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao2TS = ltc -> {
-        Supplier<SimpleEntry> t2TS = () -> {
-            TreeSet<TransCaixa> ts = new TreeSet<>(transCaixaComparator);
-            ts.addAll(ltc);
-            List<TransCaixa> l1 = new ArrayList<>();
-            List<TransCaixa> l2 = new ArrayList<>();
-            int size = ts.size();
-            int i = 0;
-            for (TransCaixa tc : ts) {
-                if (i < size / 3) {
-                    l1.add(tc);
-                } else break;
-                i++;
-            }
-            i = 0;
-            for (TransCaixa tc : ts.descendingSet()) {
-                if (i < size/3) {
-                    l2.add(tc);
-                } else break;
-                i++;
-            }
-            return new SimpleEntry<>(l1, l2);
-        };
-        return t2TS;
-    };
-
+    /*
+     * Função que dada uma lista de transCaixas e uma lista de soluções
+     * gera uma lista de suppliers para as respetivas soluções
+     */
     private static Function<List<TransCaixa>, Function<List<SimpleEntry<String, Function>>, List<SimpleEntry<String, Supplier<SimpleEntry>>>>>
-    createSuppliers = ltc -> (lsols -> {
+            createSuppliers = ltc -> (lsols -> {
         List<SimpleEntry<String, Supplier<SimpleEntry>>> lsups = new ArrayList<>();
         for (SimpleEntry<String, Function> sol : lsols) {
             lsups.add(new SimpleEntry<>(sol.getKey(), (Supplier<SimpleEntry>) sol.getValue().apply(ltc)));
@@ -182,16 +112,50 @@ public class BenchJavaStreams {
         return lsups;
     });
 
-    private static List<List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>>> runTestes(List<List<SimpleEntry<String, Function>>> respostas) {
+    /*
+     * Corre os testes.
+     * Cada teste tem uma ou mais soluções.
+     * Para cada ficheiro de dados de teste são executadas todas as soluções.
+     * Resultado:
+     *  Testes
+     *  ├── T1
+     *  │    ├── TransCaixa1M.txt
+     *  │    │    ├── solucao1
+     *  │    │    ├── solucao2
+     *  │    │    └── solucao3
+     *  │    │
+     *  │    ├── (...)
+     *  │    │
+     *  │    └── TransCaixa6M.txt
+     *  │         ├── solucao1
+     *  │         ├── solucao2
+     *  │         ├── solucao3
+     *  │         └── solucao4
+     *  │
+     *  ├── (...)
+     *  │
+     *  └── T12
+     *       ├── TransCaixa1M.txt
+     *       │    ├── solucao1
+     *       │    └── solucao2
+     *       │
+     *       ├── (...)
+     *       │
+     *       └── TransCaixa6M.txt
+     *            ├── solucao1
+     *            ├── solucao2
+     *            └── solucao3
+     */
+    private static List<List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>>> runTestes(List<List<SimpleEntry<String, Function>>> testes) {
         List<List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>>> resultados = new ArrayList<>();
-        for (List<SimpleEntry<String, Function>> respostasTi : respostas) {
+        for (List<SimpleEntry<String, Function>> solucoesTi : testes) {
             List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>> resultadosTi = new ArrayList<>();
             for (List<TransCaixa> ltc : ltcs) {
                 List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>> resultadosResourceI = new ArrayList<>();
-                List<SimpleEntry<String, Supplier<SimpleEntry>>> suppsRespostasTi = createSuppliers.apply(ltc).apply(respostasTi);
-                for (SimpleEntry<String, Supplier<SimpleEntry>> supResposta : suppsRespostasTi) {
-                    SimpleEntry<Double, SimpleEntry> res = testeBoxGenW(supResposta.getValue());
-                    resultadosResourceI.add(new SimpleEntry<>(supResposta.getKey(), res));
+                List<SimpleEntry<String, Supplier<SimpleEntry>>> suppsSolucoesTi = createSuppliers.apply(ltc).apply(solucoesTi);
+                for (SimpleEntry<String, Supplier<SimpleEntry>> supSolucao : suppsSolucoesTi) {
+                    SimpleEntry<Double, SimpleEntry> res = testeBoxGenW(supSolucao.getValue());
+                    resultadosResourceI.add(new SimpleEntry<>(supSolucao.getKey(), res));
                 }
                 resultadosTi.add(resultadosResourceI);
             }
@@ -200,6 +164,9 @@ public class BenchJavaStreams {
         return resultados;
     }
 
+    /*
+     * Gera ficheiros CSV a partir dos resultados dos testes
+     */
     private static void genCSVTable(String filename, List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>> resultadosTi) throws IOException {
         StringBuilder sb = new StringBuilder();
         FileWriter fileWriter = new FileWriter(filename + ".csv");
@@ -233,6 +200,325 @@ public class BenchJavaStreams {
     }
 
 
+    /*
+     *  SOLUÇÕES PARA O TESTE 2
+     */
+    private static Comparator<TransCaixa> transCaixaComparator = (TransCaixa tc1, TransCaixa tc2) -> {
+        if (Objects.equals(tc1, tc2)) return 0;
+        else if(tc1 == null) return -1;
+        else if(tc2 == null) return +1;
+
+        if (tc1.getData().isBefore(tc2.getData())) {
+            return -1;
+        }
+        else if (tc1.getData().isAfter(tc2.getData())) {
+            return 1;
+        }
+        return tc1.getTrans().compareTo(tc2.getTrans());
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao2S = ltc -> () -> {
+        int size = ltc.size();
+        List<TransCaixa> sortedList = ltc.stream()
+                                         .sorted(transCaixaComparator)
+                                         .collect(toList());
+        List<TransCaixa> l1 = sortedList.subList(0, size/3);
+        List<TransCaixa> l2 = sortedList.subList(size - size/3, size);
+        return new SimpleEntry<>(l1, l2);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao2PS = ltc -> () -> {
+        int size = ltc.size();
+        List<TransCaixa> sortedList = ltc.parallelStream()
+                                         .sorted(transCaixaComparator)
+                                         .collect(toList());
+        List<TransCaixa> l1 = sortedList.subList(0, size/3);
+        List<TransCaixa> l2 = sortedList.subList(size - size/3, size);
+        return new SimpleEntry<>(l1, l2);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao2L = ltc -> () -> {
+        int size = ltc.size();
+        ltc.sort(transCaixaComparator);
+        List<TransCaixa> l1 = ltc.subList(0, size/3);
+        List<TransCaixa> l2 = ltc.subList(size - size/3, size);
+        return new SimpleEntry<>(l1, l2);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao2TS = ltc -> () -> {
+        TreeSet<TransCaixa> ts = new TreeSet<>(transCaixaComparator);
+        ts.addAll(ltc);
+        List<TransCaixa> l1 = new ArrayList<>();
+        List<TransCaixa> l2 = new ArrayList<>();
+        int size = ts.size();
+        int i = 0;
+        for (TransCaixa tc : ts) {
+            if (i < size / 3) {
+                l1.add(tc);
+            } else break;
+            i++;
+        }
+        i = 0;
+        for (TransCaixa tc : ts.descendingSet()) {
+            if (i < size/3) {
+                l2.add(tc);
+            } else break;
+            i++;
+        }
+        return new SimpleEntry<>(l1, l2);
+    };
+
+
+    /*
+     *  SOLUÇÕES PARA O TESTE 6
+     */
+    // MES -> DIA -> HORA
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6MDHS = ltc -> () -> {
+        Map<Month, Map<Integer, Map<Integer, List<TransCaixa>>>> mapaTxPorMDH =
+                ltc.stream()
+                        .collect(groupingBy(t -> t.getData().getMonth(),
+                                                 groupingBy(t -> t.getData().getDayOfMonth(),
+                                                                 groupingBy(t -> t.getData().getHour()))));
+        return new SimpleEntry<>(mapaTxPorMDH, null);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6MDHPS = ltc -> () -> {
+        Map<Month, Map<Integer, Map<Integer, List<TransCaixa>>>> mapaTxPorMDH =
+                ltc.parallelStream()
+                        .collect(groupingBy(t -> t.getData().getMonth(),
+                                groupingBy(t -> t.getData().getDayOfMonth(),
+                                        groupingBy(t -> t.getData().getHour()))));
+        return new SimpleEntry<>(mapaTxPorMDH, null);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6MDHL = ltc -> () -> {
+        Map<Month, Map<Integer, Map<Integer, List<TransCaixa>>>> mapaTxPorMDH = new TreeMap<>();
+        for (TransCaixa tc : ltc) {
+            Month mes = tc.getData().getMonth();
+            int dia = tc.getData().getDayOfMonth();
+            int hora = tc.getData().getHour();
+            if (!mapaTxPorMDH.containsKey(mes)) {
+                mapaTxPorMDH.put(
+                        mes,
+                        new TreeMap<>());
+                mapaTxPorMDH.get(mes).put(
+                        dia,
+                        new TreeMap<>());
+                mapaTxPorMDH.get(mes).get(dia).put(
+                        hora,
+                        new ArrayList<>());
+            }
+            else if (!mapaTxPorMDH.get(mes).containsKey(dia)) {
+                mapaTxPorMDH.get(mes).put(
+                        dia,
+                        new TreeMap<>());
+                mapaTxPorMDH.get(mes).get(dia).put(
+                        hora,
+                        new ArrayList<>());
+            }
+            else if (!mapaTxPorMDH.get(mes).get(dia).containsKey(hora)) {
+                mapaTxPorMDH.get(mes).get(dia).put(
+                        hora,
+                        new ArrayList<>());
+            }
+            mapaTxPorMDH.get(mes).get(dia).get(hora).add(tc);
+        }
+        return new SimpleEntry<>(mapaTxPorMDH, null);
+    };
+
+    // DIA DA SEMANA -> HORA
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6DHS = ltc -> () -> {
+        Map<DayOfWeek, Map<Integer, List<TransCaixa>>> mapaTxPorDH =
+                ltc.stream()
+                        .collect(groupingBy(t -> t.getData().getDayOfWeek(),
+                                        groupingBy(t -> t.getData().getHour())));
+        return new SimpleEntry<>(mapaTxPorDH, null);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6DHPS = ltc -> () -> {
+        Map<DayOfWeek, Map<Integer, List<TransCaixa>>> mapaTxPorDH =
+                ltc.parallelStream()
+                        .collect(groupingBy(t -> t.getData().getDayOfWeek(),
+                                groupingBy(t -> t.getData().getHour())));
+        return new SimpleEntry<>(mapaTxPorDH, null);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6DHL = ltc -> () -> {
+        Map<DayOfWeek, Map<Integer, List<TransCaixa>>> mapaTxPorDH = new TreeMap<>();
+        for (TransCaixa tc : ltc) {
+            DayOfWeek dia = tc.getData().getDayOfWeek();
+            int hora = tc.getData().getHour();
+            if (!mapaTxPorDH.containsKey(dia)) {
+                mapaTxPorDH.put(
+                        dia,
+                        new TreeMap<>());
+                mapaTxPorDH.get(dia).put(
+                        hora,
+                        new ArrayList<>());
+            }
+            else if (!mapaTxPorDH.get(dia).containsKey(hora)) {
+                mapaTxPorDH.get(dia).put(
+                        hora,
+                        new ArrayList<>());
+            }
+            mapaTxPorDH.get(dia).get(hora).add(tc);
+        }
+        return new SimpleEntry<>(mapaTxPorDH, null);
+    };
+
+
+    /*
+     *  SOLUÇÕES PARA O TESTE 7
+     */
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7FullS = ltc -> () -> {
+        double total = ltc.stream().mapToDouble(TransCaixa::getValor).sum();
+        return new SimpleEntry<>(total, null);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7FullPS = ltc -> () -> {
+        double total = ltc.parallelStream().mapToDouble(TransCaixa::getValor).sum();
+        return new SimpleEntry<>(total, null);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7FullL = ltc -> () -> {
+        double total = 0;
+        for (TransCaixa tc : ltc) {
+            total += tc.getValor();
+        }
+        return new SimpleEntry<>(total, null);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitS = ltc -> () -> {
+        int size = ltc.size();
+        double total = 0;
+        List<TransCaixa> l1 = ltc.subList(0, size/4);
+        List<TransCaixa> l2 = ltc.subList(size/4, size/2);
+        List<TransCaixa> l3 = ltc.subList(size/2, (3*size)/4);
+        List<TransCaixa> l4 = ltc.subList((3*size)/4, size);
+        total += l1.stream().mapToDouble(TransCaixa::getValor).sum();
+        total += l2.stream().mapToDouble(TransCaixa::getValor).sum();
+        total += l3.stream().mapToDouble(TransCaixa::getValor).sum();
+        total += l4.stream().mapToDouble(TransCaixa::getValor).sum();
+        return new SimpleEntry<>(total, null);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitPS = ltc -> () -> {
+        int size = ltc.size();
+        double total = 0;
+
+        Spliterator<TransCaixa> splitTransCaixa = ltc.spliterator();
+        out.println("#: " + splitTransCaixa.estimateSize());
+        Spliterator<TransCaixa> splitTransCaixa1 = splitTransCaixa.trySplit();
+        out.println("#1: " + splitTransCaixa1.estimateSize());
+        Spliterator<TransCaixa> splitTransCaixa2 = splitTransCaixa.trySplit();
+        out.println("#2: " + splitTransCaixa2.estimateSize());
+        Spliterator<TransCaixa> splitTransCaixa3 = splitTransCaixa.trySplit();
+        out.println("#3: " + splitTransCaixa3.estimateSize());
+        Spliterator<TransCaixa> splitTransCaixa4 = splitTransCaixa.trySplit();
+        out.println("#4: " + splitTransCaixa4.estimateSize());
+
+//            total += l1.parallelStream().mapToDouble(TransCaixa::getValor).sum();
+//            total += l2.stream().mapToDouble(TransCaixa::getValor).sum();
+//            total += l3.stream().mapToDouble(TransCaixa::getValor).sum();
+//            total += l4.stream().mapToDouble(TransCaixa::getValor).sum();
+        return new SimpleEntry<>(total, null);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitLV1 = ltc -> () -> {
+        int size = ltc.size();
+        double total = 0;
+        List<List<TransCaixa>> lts = new ArrayList<>();
+        List<TransCaixa> l1 = ltc.subList(0, size/4);
+        List<TransCaixa> l2 = ltc.subList(size/4, size/2);
+        List<TransCaixa> l3 = ltc.subList(size/2, (3*size)/4);
+        List<TransCaixa> l4 = ltc.subList((3*size)/4, size);
+        lts.add(l1); lts.add(l2); lts.add(l3); lts.add(l4);
+        for (List<TransCaixa> l : lts) {
+            for (TransCaixa tc : l) {
+                total += tc.getValor();
+            }
+        }
+        return new SimpleEntry<>(total, null);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitLV2 = ltc -> () -> {
+        int size = ltc.size();
+        double total = 0;
+        List<TransCaixa> l1 = ltc.subList(0, size/4);
+        List<TransCaixa> l2 = ltc.subList(size/4, size/2);
+        List<TransCaixa> l3 = ltc.subList(size/2, (3*size)/4);
+        List<TransCaixa> l4 = ltc.subList((3*size)/4, size);
+        for (TransCaixa tc : l1) {
+            total += tc.getValor();
+        }
+        for (TransCaixa tc : l2) {
+            total += tc.getValor();
+        }
+        for (TransCaixa tc : l3) {
+            total += tc.getValor();
+        }
+        for (TransCaixa tc : l4) {
+            total += tc.getValor();
+        }
+        return new SimpleEntry<>(total, null);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitLFEV1 = ltc -> () -> {
+        int size = ltc.size();
+        final double[] total = {0};
+        List<List<TransCaixa>> lts = new ArrayList<>();
+        List<TransCaixa> l1 = ltc.subList(0, size/4);
+        List<TransCaixa> l2 = ltc.subList(size/4, size/2);
+        List<TransCaixa> l3 = ltc.subList(size/2, (3*size)/4);
+        List<TransCaixa> l4 = ltc.subList((3*size)/4, size);
+        lts.add(l1); lts.add(l2); lts.add(l3); lts.add(l4);
+        for (List<TransCaixa> l : lts) {
+            l.forEach(tc -> total[0] += tc.getValor());
+        }
+        return new SimpleEntry<>(total[0], null);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitLFEV2 = ltc -> () -> {
+        int size = ltc.size();
+        final double[] total = {0};
+        List<TransCaixa> l1 = ltc.subList(0, size/4);
+        List<TransCaixa> l2 = ltc.subList(size/4, size/2);
+        List<TransCaixa> l3 = ltc.subList(size/2, (3*size)/4);
+        List<TransCaixa> l4 = ltc.subList((3*size)/4, size);
+        l1.forEach(tc -> total[0] += tc.getValor());
+        l2.forEach(tc -> total[0] += tc.getValor());
+        l3.forEach(tc -> total[0] += tc.getValor());
+        l4.forEach(tc -> total[0] += tc.getValor());
+        return new SimpleEntry<>(total[0], null);
+    };
+
+    /*
+     *  SOLUÇÕES PARA O TESTE 8
+     */
+    private static Comparator<TransCaixa> transCaixaMaxValueComparator = (TransCaixa tc1, TransCaixa tc2) -> {
+        if (Objects.equals(tc1, tc2)) return 0;
+        else if(tc1 == null) return -1;
+        else if(tc2 == null) return +1;
+
+        if (tc1.getValor() > tc2.getValor())
+            return 1;
+        else if (tc1.getValor() < tc2.getValor())
+            return -1;
+        return 0;
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao8S = ltc -> () -> {
+        Optional<TransCaixa> res = ltc.stream()
+                                      .filter(tc -> tc.getData().getHour() >= 16 &&
+                                                    tc.getData().getHour() < 22)
+                                      .max(transCaixaMaxValueComparator);
+        return new SimpleEntry<>(res, null);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao8PS = ltc -> () -> {
+        Optional<TransCaixa> res = ltc.parallelStream()
+                                      .filter(tc -> tc.getData().getHour() >= 16 &&
+                                                    tc.getData().getHour() < 22)
+                                      .max(transCaixaMaxValueComparator);
+        return new SimpleEntry<>(res, null);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao8L = ltc -> () -> {
+        TransCaixa max = ltc.get(0);
+        for(TransCaixa tc : ltc) {
+            if (tc.getData().getHour() >= 16 && tc.getData().getHour() < 22) {
+                if (max.getValor() < tc.getValor())
+                    max = tc;
+            }
+        }
+        return new SimpleEntry<>(max, null);
+    };
+
+
+
+
+
     public static void main(String[] args) throws IOException {
 
         List<String> file = Arrays.asList("TransCaixaResources/transCaixa1M.txt");
@@ -243,20 +529,55 @@ public class BenchJavaStreams {
                                            "TransCaixaResources/transCaixa4M.txt",
                                            "TransCaixaResources/transCaixa6M.txt");
         // Load dos dados
-        loadFiles(files);
+        loadFiles(file);
 
         List<List<SimpleEntry<String, Function>>> testes = new ArrayList<>();
-        List<SimpleEntry<String, Function>> respostasT2 = Arrays.asList(new SimpleEntry<>("List", solucao2L),
-                                                                        new SimpleEntry<>("TreeSet", solucao2TS),
-                                                                        new SimpleEntry<>("Streams", solucao2S),
-                                                                        new SimpleEntry<>("Parallel Streams", solucao2PS));
-        testes.add(respostasT2);
+
+        // TESTE 2
+        List<SimpleEntry<String, Function>> solucoesT2 = Arrays.asList(
+                new SimpleEntry<>("List", solucao2L),
+                new SimpleEntry<>("TreeSet", solucao2TS),
+                new SimpleEntry<>("Streams", solucao2S),
+                new SimpleEntry<>("Parallel Streams", solucao2PS));
+        testes.add(solucoesT2);
+
+        // TESTE 6
+        List<SimpleEntry<String, Function>> solucoesT6 = Arrays.asList(
+                new SimpleEntry<>("List (Mes -> Dia -> Hora)", solucao6MDHL),
+                new SimpleEntry<>("Streams (Mes -> Dia -> Hora)", solucao6MDHS),
+                new SimpleEntry<>("Parallel Streams (Mes -> Dia -> Hora)", solucao6MDHPS),
+                new SimpleEntry<>("List (Dia da semana -> Hora)", solucao6DHL),
+                new SimpleEntry<>("Streams (Dia da semana -> Hora)", solucao6DHS),
+                new SimpleEntry<>("Parallel Streams (Dia da semana -> Hora)", solucao6DHPS));
+        testes.add(solucoesT6);
+
+        // TESTE 7
+        List<SimpleEntry<String, Function>> solucoesT7 = Arrays.asList(
+                new SimpleEntry<>("Streams (Completo)", solucao7FullS),
+                new SimpleEntry<>("Parallel Streams (Completo)", solucao7FullPS),
+                new SimpleEntry<>("List (Completo)", solucao7FullL),
+                new SimpleEntry<>("List V1 (Partições)", solucao7SplitLV1),
+                new SimpleEntry<>("List V2 (Partições)", solucao7SplitLV2),
+                new SimpleEntry<>("List + ForEach V1 (Partições)", solucao7SplitLFEV1),
+                new SimpleEntry<>("List + ForEach V2 (Partições)", solucao7SplitLFEV2));
+//                new SimpleEntry<>("Streams", solucao7SplitS),
+//                new SimpleEntry<>("Parallel Streams", solucao7SplitPS));
+        testes.add(solucoesT7);
+
+        // TESTE 8
+        List<SimpleEntry<String, Function>> solucoesT8 = Arrays.asList(
+                new SimpleEntry<>("List", solucao8L),
+                new SimpleEntry<>("Streams", solucao8S),
+                new SimpleEntry<>("Parallel Streams", solucao8PS));
+        testes.add(solucoesT8);
 
         List<List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>>> resultados = runTestes(testes);
 
-        int testeNum = 1;
+        String[] nomeTestes = {"2", "6", "7", "8"};
+        int n = 0;
         for (List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>> resultadosTi : resultados) {
-            genCSVTable("t" + testeNum, resultadosTi);
+            genCSVTable("t" + nomeTestes[n], resultadosTi);
+            n++;
         }
     }
 }
