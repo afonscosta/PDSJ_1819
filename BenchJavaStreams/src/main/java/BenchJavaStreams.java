@@ -3,6 +3,8 @@
  * @author fmm 2017
  */
 
+import sun.java2d.pipe.SpanShapeRenderer;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -103,7 +105,7 @@ public class BenchJavaStreams {
      * Função que dada uma lista de transCaixas e uma lista de soluções
      * gera uma lista de suppliers para as respetivas soluções
      */
-    private static Function<List<TransCaixa>, Function<List<SimpleEntry<String, Function>>, List<SimpleEntry<String, Supplier<SimpleEntry>>>>>
+    private static Function<List<?>, Function<List<SimpleEntry<String, Function>>, List<SimpleEntry<String, Supplier<SimpleEntry>>>>>
             createSuppliers = ltc -> (lsols -> {
         List<SimpleEntry<String, Supplier<SimpleEntry>>> lsups = new ArrayList<>();
         for (SimpleEntry<String, Function> sol : lsols) {
@@ -529,7 +531,7 @@ public class BenchJavaStreams {
                                            "TransCaixaResources/transCaixa4M.txt",
                                            "TransCaixaResources/transCaixa6M.txt");
         // Load dos dados
-        loadFiles(file);
+        loadFiles(files);
 
         List<List<SimpleEntry<String, Function>>> testes = new ArrayList<>();
 
