@@ -6,6 +6,7 @@
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.DayOfWeek;
@@ -13,8 +14,10 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.lang.System.out;
@@ -264,6 +267,81 @@ public class BenchJavaStreams {
         return new SimpleEntry<>(l1, l2);
     };
 
+    /*
+     * SOLUÇÕES PARA O TESTE 3
+     */
+
+     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao3intStream = ltc -> () -> {
+         IntStream array = new Random().ints(100000, 0, 9999).distinct();
+         return new SimpleEntry<>(array, null);
+     };
+
+    public static int randomFill(){
+        Random rand = new Random();
+        int randomNum = rand.nextInt();
+        return randomNum;
+    }
+
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao3intArray = ltc -> () -> {
+        int[] randomArray = new int[10];
+        int positionNumber;
+        boolean duplicate= false;
+        for(int i=0;i<randomArray.length;i++)
+        {
+            randomArray[i]= randomFill();
+        }
+        int finalSize = randomArray.length;
+         for(int i=0; i< finalSize; i++){
+            for(int j= i+1; j< finalSize; j++){
+                if(randomArray[i]== randomArray[j]){
+                   randomArray[j]=randomArray[finalSize-1];
+                   finalSize --;
+                   j--;
+                }
+            }
+        }
+        randomArray = Arrays.copyOf(randomArray, finalSize);
+        return new SimpleEntry<>(randomArray,null);
+    };
+
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>>  solucao3listInteger = ltc -> () -> {
+        List<Integer> randomList = new ArrayList<>();
+        for(int i=0;i<10 ; i++){
+            randomList.add(randomFill());
+        }
+        int finalSize = randomList.size();
+        int initSize = randomList.size();
+        int tempNumber;
+
+        for (int i = 0; i < initSize; i++) {
+            if(randomList.contains(randomList.get(i))) {
+                for (int j = i + 1; j < randomList.lastIndexOf(randomList.get(i)); j++) {
+                    if (randomList.get(i) == randomList.get(j)) {
+                        tempNumber = randomList.get(initSize-1);
+                        randomList.set(j,tempNumber);
+                        randomList.remove(initSize-1);
+                        initSize--;
+                        j--; //preciso de voltar a repetir nesta posição
+                        finalSize--;
+                    }
+                }
+            }
+        }
+        return new SimpleEntry<>(randomList,null);
+    };
+
+    /*
+     * SOLUÇÕES PARA O TESTE 4
+     */
+
+    private static BiFunction<Integer, Integer, Integer> multBifunction =
+            (i1, i2) -> i1 * i2;
+
+    private static Integer multstatic(Integer i1, Integer i2){
+        return i1*i2;
+    }
+
+
 
     /*
      *  SOLUÇÕES PARA O TESTE 6
@@ -303,7 +381,7 @@ public class BenchJavaStreams {
                         new ArrayList<>());
             }
             else if (!mapaTxPorMDH.get(mes).containsKey(dia)) {
-                mapaTxPorMDH.get(mes).put(
+                mapaTxPorMDH.get(mes).put(                          
                         dia,
                         new TreeMap<>());
                 mapaTxPorMDH.get(mes).get(dia).put(
@@ -529,7 +607,7 @@ public class BenchJavaStreams {
                                            "TransCaixaResources/transCaixa4M.txt",
                                            "TransCaixaResources/transCaixa6M.txt");
         // Load dos dados
-        loadFiles(file);
+        loadFiles(files);
 
         List<List<SimpleEntry<String, Function>>> testes = new ArrayList<>();
 
@@ -540,6 +618,13 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("Streams", solucao2S),
                 new SimpleEntry<>("Parallel Streams", solucao2PS));
         testes.add(solucoesT2);
+
+        // TESTE 3
+        List<SimpleEntry<String, Function>> solucoesT3 = Arrays.asList(
+                new SimpleEntry<>("Array", solucao3intArray),
+                new SimpleEntry<>("IntStream", solucao3intStream),
+                new SimpleEntry<>("List", solucao3listInteger));
+        testes.add(solucoesT3);
 
         // TESTE 6
         List<SimpleEntry<String, Function>> solucoesT6 = Arrays.asList(
@@ -573,7 +658,7 @@ public class BenchJavaStreams {
 
         List<List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>>> resultados = runTestes(testes);
 
-        String[] nomeTestes = {"2", "6", "7", "8"};
+        String[] nomeTestes = {"2","3", "6", "7", "8"};
         int n = 0;
         for (List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>> resultadosTi : resultados) {
             genCSVTable("t" + nomeTestes[n], resultadosTi);
