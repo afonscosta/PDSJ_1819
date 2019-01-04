@@ -440,7 +440,7 @@ public class BenchJavaStreams {
                         new ArrayList<>());
             }
             else if (!mapaTxPorMDH.get(mes).containsKey(dia)) {
-                mapaTxPorMDH.get(mes).put(                          
+                mapaTxPorMDH.get(mes).put(
                         dia,
                         new TreeMap<>());
                 mapaTxPorMDH.get(mes).get(dia).put(
