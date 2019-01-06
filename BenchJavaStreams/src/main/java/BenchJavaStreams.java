@@ -15,6 +15,9 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -290,7 +293,6 @@ public class BenchJavaStreams {
     /*
      * SOLUÇÕES PARA O TESTE 3
      */
-
     private static Function<List<Integer>, Supplier<SimpleEntry>> solucao3intStream = arg -> () -> {
          IntStream array = new Random().ints(arg.get(0), 0, 9999).distinct();
          return new SimpleEntry<>(array, null);
@@ -385,7 +387,6 @@ public class BenchJavaStreams {
     /*
      * SOLUÇÕES PARA O TESTE 4
      */
-
     private static BiFunction<Double, Double, Double> multBifunction =
             (i1, i2) -> i1 * i2;
 
@@ -532,6 +533,7 @@ public class BenchJavaStreams {
     /*
      *  SOLUÇÕES PARA O TESTE 7
      */
+    //Full
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7FullS = ltc -> () -> {
         double total = ltc.stream().mapToDouble(TransCaixa::getValor).sum();
         return new SimpleEntry<>(total, null);
@@ -547,104 +549,226 @@ public class BenchJavaStreams {
         }
         return new SimpleEntry<>(total, null);
     };
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitS = ltc -> () -> {
-        int size = ltc.size();
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7FullLFE = ltc -> () -> {
+        final double[] total = {0};
+        ltc.forEach(tc -> total[0] += tc.getValor());
+        return new SimpleEntry<>(total[0], null);
+    };
+
+    //Split with sublist
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitListS = ltc -> () -> {
         double total = 0;
+        int size = ltc.size();
         List<TransCaixa> l1 = ltc.subList(0, size/4);
         List<TransCaixa> l2 = ltc.subList(size/4, size/2);
         List<TransCaixa> l3 = ltc.subList(size/2, (3*size)/4);
         List<TransCaixa> l4 = ltc.subList((3*size)/4, size);
-        total += l1.stream().mapToDouble(TransCaixa::getValor).sum();
-        total += l2.stream().mapToDouble(TransCaixa::getValor).sum();
-        total += l3.stream().mapToDouble(TransCaixa::getValor).sum();
-        total += l4.stream().mapToDouble(TransCaixa::getValor).sum();
+
+        Callable<Double> t1 = () -> l1.stream().mapToDouble(TransCaixa::getValor).sum();
+        Callable<Double> t2 = () -> l2.stream().mapToDouble(TransCaixa::getValor).sum();
+        Callable<Double> t3 = () -> l3.stream().mapToDouble(TransCaixa::getValor).sum();
+        Callable<Double> t4 = () -> l4.stream().mapToDouble(TransCaixa::getValor).sum();
+
+        ExecutorService executor = Executors.newWorkStealingPool();
+        try {
+            total = executor.invokeAll(Arrays.asList(t1, t2, t3, t4))
+                            .stream()
+                            .map(future -> {
+                                try {
+                                    return future.get();
+                                }
+                                catch (Exception e) {
+                                    throw new IllegalStateException(e);
+                                }
+                            })
+                            .mapToDouble(d -> d).sum();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return new SimpleEntry<>(total, null);
     };
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitPS = ltc -> () -> {
-        int size = ltc.size();
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitListPS = ltc -> () -> {
         double total = 0;
-
-        Spliterator<TransCaixa> splitTransCaixa = ltc.spliterator();
-        out.println("#: " + splitTransCaixa.estimateSize());
-        Spliterator<TransCaixa> splitTransCaixa1 = splitTransCaixa.trySplit();
-        out.println("#1: " + splitTransCaixa1.estimateSize());
-        Spliterator<TransCaixa> splitTransCaixa2 = splitTransCaixa.trySplit();
-        out.println("#2: " + splitTransCaixa2.estimateSize());
-        Spliterator<TransCaixa> splitTransCaixa3 = splitTransCaixa.trySplit();
-        out.println("#3: " + splitTransCaixa3.estimateSize());
-        Spliterator<TransCaixa> splitTransCaixa4 = splitTransCaixa.trySplit();
-        out.println("#4: " + splitTransCaixa4.estimateSize());
-
-//            total += l1.parallelStream().mapToDouble(TransCaixa::getValor).sum();
-//            total += l2.stream().mapToDouble(TransCaixa::getValor).sum();
-//            total += l3.stream().mapToDouble(TransCaixa::getValor).sum();
-//            total += l4.stream().mapToDouble(TransCaixa::getValor).sum();
-        return new SimpleEntry<>(total, null);
-    };
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitLV1 = ltc -> () -> {
         int size = ltc.size();
-        double total = 0;
-        List<List<TransCaixa>> lts = new ArrayList<>();
         List<TransCaixa> l1 = ltc.subList(0, size/4);
         List<TransCaixa> l2 = ltc.subList(size/4, size/2);
         List<TransCaixa> l3 = ltc.subList(size/2, (3*size)/4);
         List<TransCaixa> l4 = ltc.subList((3*size)/4, size);
-        lts.add(l1); lts.add(l2); lts.add(l3); lts.add(l4);
-        for (List<TransCaixa> l : lts) {
-            for (TransCaixa tc : l) {
-                total += tc.getValor();
+
+        Callable<Double> t1 = () -> l1.parallelStream().mapToDouble(TransCaixa::getValor).sum();
+        Callable<Double> t2 = () -> l2.parallelStream().mapToDouble(TransCaixa::getValor).sum();
+        Callable<Double> t3 = () -> l3.parallelStream().mapToDouble(TransCaixa::getValor).sum();
+        Callable<Double> t4 = () -> l4.parallelStream().mapToDouble(TransCaixa::getValor).sum();
+
+        ExecutorService executor = Executors.newWorkStealingPool();
+        try {
+            total = executor.invokeAll(Arrays.asList(t1, t2, t3, t4))
+                    .parallelStream()
+                    .map(future -> {
+                        try {
+                            return future.get();
+                        }
+                        catch (Exception e) {
+                            throw new IllegalStateException(e);
+                        }
+                    })
+                    .mapToDouble(d -> d).sum();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return new SimpleEntry<>(total, null);
+    };
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitListL = ltc -> () -> {
+        double total = 0;
+        int size = ltc.size();
+        List<TransCaixa> l1 = ltc.subList(0, size/4);
+        List<TransCaixa> l2 = ltc.subList(size/4, size/2);
+        List<TransCaixa> l3 = ltc.subList(size/2, (3*size)/4);
+        List<TransCaixa> l4 = ltc.subList((3*size)/4, size);
+
+        Callable<Double> t1 = () -> {
+            double total1 = 0;
+            for (TransCaixa tc : l1) {
+                total1 += tc.getValor();
             }
+            return total1;
+        };
+        Callable<Double> t2 = () -> {
+            double total2 = 0;
+            for (TransCaixa tc : l2) {
+                total2 += tc.getValor();
+            }
+            return total2;
+        };
+        Callable<Double> t3 = () -> {
+            double total3 = 0;
+            for (TransCaixa tc : l3) {
+                total3 += tc.getValor();
+            }
+            return total3;
+        };
+        Callable<Double> t4 = () -> {
+            double total4 = 0;
+            for (TransCaixa tc : l4) {
+                total4 += tc.getValor();
+            }
+            return total4;
+        };
+
+        ExecutorService executor = Executors.newWorkStealingPool();
+        try {
+            total = executor.invokeAll(Arrays.asList(t1, t2, t3, t4))
+                    .stream()
+                    .map(future -> {
+                        try {
+                            return future.get();
+                        }
+                        catch (Exception e) {
+                            throw new IllegalStateException(e);
+                        }
+                    })
+                    .mapToDouble(d -> d).sum();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         return new SimpleEntry<>(total, null);
     };
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitLV2 = ltc -> () -> {
-        int size = ltc.size();
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitListLFE = ltc -> () -> {
         double total = 0;
+        int size = ltc.size();
         List<TransCaixa> l1 = ltc.subList(0, size/4);
         List<TransCaixa> l2 = ltc.subList(size/4, size/2);
         List<TransCaixa> l3 = ltc.subList(size/2, (3*size)/4);
         List<TransCaixa> l4 = ltc.subList((3*size)/4, size);
-        for (TransCaixa tc : l1) {
-            total += tc.getValor();
-        }
-        for (TransCaixa tc : l2) {
-            total += tc.getValor();
-        }
-        for (TransCaixa tc : l3) {
-            total += tc.getValor();
-        }
-        for (TransCaixa tc : l4) {
-            total += tc.getValor();
+
+        Callable<Double> t1 = () -> {
+            final double[] total1 = {0};
+            l1.forEach(tc -> total1[0] += tc.getValor());
+            return total1[0];
+        };
+        Callable<Double> t2 = () -> {
+            final double[] total2 = {0};
+            l2.forEach(tc -> total2[0] += tc.getValor());
+            return total2[0];
+        };
+        Callable<Double> t3 = () -> {
+            final double[] total3 = {0};
+            l3.forEach(tc -> total3[0] += tc.getValor());
+            return total3[0];
+        };
+        Callable<Double> t4 = () -> {
+            final double[] total4 = {0};
+            l4.forEach(tc -> total4[0] += tc.getValor());
+            return total4[0];
+        };
+
+        ExecutorService executor = Executors.newWorkStealingPool();
+        try {
+            total = executor.invokeAll(Arrays.asList(t1, t2, t3, t4))
+                    .stream()
+                    .map(future -> {
+                        try {
+                            return future.get();
+                        }
+                        catch (Exception e) {
+                            throw new IllegalStateException(e);
+                        }
+                    })
+                    .mapToDouble(d -> d).sum();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         return new SimpleEntry<>(total, null);
     };
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitLFEV1 = ltc -> () -> {
-        int size = ltc.size();
-        final double[] total = {0};
-        List<List<TransCaixa>> lts = new ArrayList<>();
-        List<TransCaixa> l1 = ltc.subList(0, size/4);
-        List<TransCaixa> l2 = ltc.subList(size/4, size/2);
-        List<TransCaixa> l3 = ltc.subList(size/2, (3*size)/4);
-        List<TransCaixa> l4 = ltc.subList((3*size)/4, size);
-        lts.add(l1); lts.add(l2); lts.add(l3); lts.add(l4);
-        for (List<TransCaixa> l : lts) {
-            l.forEach(tc -> total[0] += tc.getValor());
+
+    //Spliterator
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitSplit = ltc -> () -> {
+        double total = 0;
+        Spliterator<TransCaixa> stc1 = ltc.spliterator();
+        Spliterator<TransCaixa> stc3 = stc1.trySplit();
+        Spliterator<TransCaixa> stc2 = stc1.trySplit();
+        Spliterator<TransCaixa> stc4 = stc3.trySplit();
+
+        Callable<Double> t1 = () -> {
+            final double[] total1 = {0};
+            stc1.forEachRemaining(tc -> total1[0] += tc.getValor());
+            return total1[0];
+        };
+        Callable<Double> t2 = () -> {
+            final double[] total2 = {0};
+            stc2.forEachRemaining(tc -> total2[0] += tc.getValor());
+            return total2[0];
+        };
+        Callable<Double> t3 = () -> {
+            final double[] total3 = {0};
+            stc3.forEachRemaining(tc -> total3[0] += tc.getValor());
+            return total3[0];
+        };
+        Callable<Double> t4 = () -> {
+            final double[] total4 = {0};
+            stc4.forEachRemaining(tc -> total4[0] += tc.getValor());
+            return total4[0];
+        };
+
+        ExecutorService executor = Executors.newWorkStealingPool();
+        try {
+            total = executor.invokeAll(Arrays.asList(t1, t2, t3, t4))
+                    .stream()
+                    .map(future -> {
+                        try {
+                            return future.get();
+                        }
+                        catch (Exception e) {
+                            throw new IllegalStateException(e);
+                        }
+                    })
+                    .mapToDouble(d -> d).sum();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        return new SimpleEntry<>(total[0], null);
+        return new SimpleEntry<>(total, null);
     };
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitLFEV2 = ltc -> () -> {
-        int size = ltc.size();
-        final double[] total = {0};
-        List<TransCaixa> l1 = ltc.subList(0, size/4);
-        List<TransCaixa> l2 = ltc.subList(size/4, size/2);
-        List<TransCaixa> l3 = ltc.subList(size/2, (3*size)/4);
-        List<TransCaixa> l4 = ltc.subList((3*size)/4, size);
-        l1.forEach(tc -> total[0] += tc.getValor());
-        l2.forEach(tc -> total[0] += tc.getValor());
-        l3.forEach(tc -> total[0] += tc.getValor());
-        l4.forEach(tc -> total[0] += tc.getValor());
-        return new SimpleEntry<>(total[0], null);
-    };
+
 
     /*
      *  SOLUÇÕES PARA O TESTE 8
@@ -688,7 +812,6 @@ public class BenchJavaStreams {
     /*
      * SOLUÇÕES PARA O TESTE 12
      */
-
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao12Map = ltc -> () ->{
         //Map<nCaixa, Map<Mes,List<Transcaixa>>
         Map<String, Map<Integer,List<TransCaixa>>> tabelas= ltc.stream().collect(groupingBy(TransCaixa::getCaixa,
@@ -785,15 +908,15 @@ public class BenchJavaStreams {
 
         // TESTE 7
         List<SimpleEntry<String, Function>> solucoesT7 = Arrays.asList(
+                new SimpleEntry<>("List (Completo)", solucao7FullL),
+                new SimpleEntry<>("List + ForEach (Completo)", solucao7FullLFE),
                 new SimpleEntry<>("Streams (Completo)", solucao7FullS),
                 new SimpleEntry<>("Parallel Streams (Completo)", solucao7FullPS),
-                new SimpleEntry<>("List (Completo)", solucao7FullL),
-                new SimpleEntry<>("List V1 (Partições)", solucao7SplitLV1),
-                new SimpleEntry<>("List V2 (Partições)", solucao7SplitLV2),
-                new SimpleEntry<>("List + ForEach V1 (Partições)", solucao7SplitLFEV1),
-                new SimpleEntry<>("List + ForEach V2 (Partições)", solucao7SplitLFEV2));
-//                new SimpleEntry<>("Streams", solucao7SplitS),
-//                new SimpleEntry<>("Parallel Streams", solucao7SplitPS));
+                new SimpleEntry<>("List (Partições)", solucao7SplitListL),
+                new SimpleEntry<>("List + ForEach (Partições)", solucao7SplitListLFE),
+                new SimpleEntry<>("Stream (Partições)", solucao7SplitListS),
+                new SimpleEntry<>("Parallel Streams (Partições)", solucao7SplitListPS),
+                new SimpleEntry<>("Spliterator (Partições)", solucao7SplitSplit));
         testes.add(solucoesT7);
 
         // TESTE 8
