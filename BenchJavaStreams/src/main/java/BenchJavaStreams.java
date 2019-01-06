@@ -158,8 +158,8 @@ public class BenchJavaStreams {
                 for(int i=1; i<= 8 ; i++) {
                     List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>> resultadosResourceI = new ArrayList<>();
                     for (SimpleEntry<String, Function> supSolucao : solucoesTi) {
-                        System.out.println("A fazer para " + i * 1000000 + "...");
-                        SimpleEntry<Double, SimpleEntry> res = testeBoxGenW((Supplier<SimpleEntry>) supSolucao.getValue().apply(List.of(i * 1000000)));
+                        System.out.println("T3: A fazer para " + i * 1000000 + "...");
+                        SimpleEntry<Double, SimpleEntry> res = testeBoxGenW((Supplier<SimpleEntry>) supSolucao.getValue().apply(Arrays.asList(i * 1000000)));
                         resultadosResourceI.add(new SimpleEntry<>(supSolucao.getKey(), res));
                     }
                     resultadosTi.add(resultadosResourceI);
@@ -291,19 +291,18 @@ public class BenchJavaStreams {
      * SOLUÇÕES PARA O TESTE 3
      */
 
-    private static Function<List<Integer>, Supplier<SimpleEntry>> solucao3intStream = ltc -> () -> {
-         IntStream array = new Random().ints(ltc.get(0), 0, 9999).distinct();
+    private static Function<List<Integer>, Supplier<SimpleEntry>> solucao3intStream = arg -> () -> {
+         IntStream array = new Random().ints(arg.get(0), 0, 9999).distinct();
          return new SimpleEntry<>(array, null);
      };
 
-    public static int randomFill(){
+    private static int randomFill(){
         Random rand = new Random();
-        int randomNum = rand.nextInt(9999);
-        return randomNum;
+        return  rand.nextInt(9999);
     }
 
-    private static Function<List<Integer>, Supplier<SimpleEntry>> solucao3intArray = ltc -> () -> {
-        int[] randomArray = new int[ltc.get(0)];
+    private static Function<List<Integer>, Supplier<SimpleEntry>> solucao3intArray = arg -> () -> {
+        int[] randomArray = new int[arg.get(0)];
 
         for(int i=0;i<randomArray.length;i++){
             randomArray[i]= randomFill();
@@ -311,15 +310,31 @@ public class BenchJavaStreams {
         int finalSize = randomArray.length;
          for(int i=0; i< finalSize; i++){
             for(int j= i+1; j< finalSize; j++){
-                if(randomArray[i]== randomArray[j]){
-                   randomArray[j]=randomArray[finalSize-1];
+                if(randomArray[i] == randomArray[j]){
+                   randomArray[j] = randomArray[finalSize-1];
                    finalSize --;
                    j--;
                 }
             }
         }
         randomArray = Arrays.copyOf(randomArray, finalSize);
-        //testUniqueValuesArray(randomArray);
+        return new SimpleEntry<>(randomArray,null);
+    };
+
+    private static Function<List<Integer>, Supplier<SimpleEntry>> solucao3intArrayWithSort = arg -> () -> {
+        int[] randomArray = new int[arg.get(0)];
+
+        for(int i=0;i<randomArray.length;i++){
+            randomArray[i]= randomFill();
+        }
+        Arrays.sort(randomArray);
+        int target, i;
+        for(i=0,target=0;i<randomArray.length-1;i++) {
+            if (randomArray[i] != randomArray[i + 1]) {
+                randomArray[target++] = randomArray[i];
+            }
+        }
+        randomArray = Arrays.copyOf(randomArray,target);
         return new SimpleEntry<>(randomArray,null);
     };
 
@@ -343,39 +358,28 @@ public class BenchJavaStreams {
         }
     }
 
-    private static Function<List<Integer>, Supplier<SimpleEntry>>  solucao3listIntegerWithSet = ltc -> () -> {
+    private static Function<List<Integer>, Supplier<SimpleEntry>>  solucao3listIntegerWithSet = arg -> () -> {
         List<Integer> randomList = new ArrayList<>();
-        for (int i = 0; i < ltc.get(0); i++) {
+        for (int i = 0; i < arg.get(0); i++) {
             randomList.add(randomFill());
         }
         Set<Integer> set = new TreeSet<>(randomList);
         randomList.clear();
         randomList.addAll(set);
-        //testUniqueValuesList(randomList,"WithSet");
         return new SimpleEntry<>(randomList, null);
     };
 
-    private static Function<List<Integer>, Supplier<SimpleEntry>>  solucao3listInteger = ltc -> () -> {
+    private static Function<List<Integer>, Supplier<SimpleEntry>>  solucao3listInteger = arg -> () -> {
         List<Integer> randomList = new ArrayList<>();
-        for(int i=0;i<ltc.get(0) ; i++){
+        for(int i=0;i<arg.get(0) ; i++){
             randomList.add(randomFill());
         }
-        int initSize = randomList.size();
-        int tempNumber;
-
-        for (int i = 0; i < initSize; i++) {
-            for (int j = i + 1; j <= randomList.lastIndexOf(randomList.get(i)); j++) {
-                if (randomList.get(i).equals(randomList.get(j))) {
-                    tempNumber = randomList.get(initSize-1);
-                    randomList.set(j,tempNumber);
-                    randomList.remove(initSize-1);
-                    initSize--;
-                    j--; //preciso de voltar a repetir nesta posição
-                }
-            }
+        List<Integer> noDuplicates = new ArrayList<>();
+        for(Integer i : randomList){
+            if(!noDuplicates.contains(i))
+                noDuplicates.add(i);
         }
-        //testUniqueValuesList(randomList, "SEMSET");
-        return new SimpleEntry<>(randomList,null);
+        return new SimpleEntry<>(noDuplicates,null);
     };
 
     /*
@@ -384,10 +388,6 @@ public class BenchJavaStreams {
 
     private static BiFunction<Double, Double, Double> multBifunction =
             (i1, i2) -> i1 * i2;
-
-    private static Double multstatic(Double i1, Double i2){
-        return i1*i2;
-    }
 
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao4multBiFStreamSeq = ltc -> () -> {
         double[] transcaixa= ltc.stream().mapToDouble(TransCaixa::getValor).toArray();
@@ -403,6 +403,9 @@ public class BenchJavaStreams {
         return new SimpleEntry<>(transcaixa,null);
     };
 
+    private static Double multstatic(Double i1, Double i2){
+        return i1*i2;
+    }
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao4multMethodStreamSeq = ltc -> () -> {
         double[] transcaixa= ltc.stream().mapToDouble(TransCaixa::getValor).toArray();
         double iva = 0.23;
@@ -748,14 +751,15 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("TreeSet", solucao2TS),
                 new SimpleEntry<>("Streams", solucao2S),
                 new SimpleEntry<>("Parallel Streams", solucao2PS));
-        //testes.add(solucoesT2);
+        testes.add(solucoesT2);
 
         // TESTE 3
         List<SimpleEntry<String, Function>> solucoesT3 = Arrays.asList(
                 new SimpleEntry<>("solucao3Array", solucao3intArray),
+                new SimpleEntry<>("solucao3ArraySorted",solucao3intArrayWithSort),
                 new SimpleEntry<>("solucao3IntStream", solucao3intStream),
                 new SimpleEntry<>("solucao3List", solucao3listInteger),
-                new SimpleEntry<>("solucao3List", solucao3listIntegerWithSet));
+                new SimpleEntry<>("solucao3ListWithSet", solucao3listIntegerWithSet));
         testes.add(solucoesT3);
 
         //TESTE 4
@@ -777,7 +781,7 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("List (Dia da semana -> Hora)", solucao6DHL),
                 new SimpleEntry<>("Streams (Dia da semana -> Hora)", solucao6DHS),
                 new SimpleEntry<>("Parallel Streams (Dia da semana -> Hora)", solucao6DHPS));
-        //testes.add(solucoesT6);
+        testes.add(solucoesT6);
 
         // TESTE 7
         List<SimpleEntry<String, Function>> solucoesT7 = Arrays.asList(
@@ -790,14 +794,14 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("List + ForEach V2 (Partições)", solucao7SplitLFEV2));
 //                new SimpleEntry<>("Streams", solucao7SplitS),
 //                new SimpleEntry<>("Parallel Streams", solucao7SplitPS));
-        //testes.add(solucoesT7);
+        testes.add(solucoesT7);
 
         // TESTE 8
         List<SimpleEntry<String, Function>> solucoesT8 = Arrays.asList(
                 new SimpleEntry<>("List", solucao8L),
                 new SimpleEntry<>("Streams", solucao8S),
                 new SimpleEntry<>("Parallel Streams", solucao8PS));
-        //testes.add(solucoesT8);
+        testes.add(solucoesT8);
 
         // TESTE 12
         List<SimpleEntry<String, Function>> solucoesT12 = Arrays.asList(
@@ -808,8 +812,7 @@ public class BenchJavaStreams {
 
         List<List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>>> resultados = runTestes(testes);
 
-        //String[] nomeTestes = {"2","3", "6", "7", "8"};
-        String[] nomeTestes = {"3","4","12"};
+        String[] nomeTestes = {"2","3","4", "6", "7", "8","12"};
         int n = 0;
         for (List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>> resultadosTi : resultados) {
             genCSVTable("t" + nomeTestes[n], resultadosTi);
