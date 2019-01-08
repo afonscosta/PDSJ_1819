@@ -464,19 +464,19 @@ public class BenchJavaStreams {
 
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao4multBiFStreamSeq = ltc -> () -> {
         double[] transcaixa= ltc.stream().mapToDouble(TransCaixa::getValor).toArray();
-        /*
+        
         double iva = 0.23;
         transcaixa = Arrays.stream(transcaixa).map(a -> multBifunction.apply(a,iva)).toArray();
-    */
+
         return new SimpleEntry<>(transcaixa,null);
     };
 
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao4multBiFStreamParallel = ltc -> () -> {
         double[] transcaixa= ltc.stream().mapToDouble(TransCaixa::getValor).toArray();
-        /*
+
         double iva = 0.23;
         Arrays.parallelSetAll(transcaixa, a -> multBifunction.apply((double) a,iva));
-        */
+
         return new SimpleEntry<>(transcaixa,null);
     };
 
@@ -486,37 +486,37 @@ public class BenchJavaStreams {
 
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao4multMethodStreamSeq = ltc -> () -> {
         double[] transcaixa= ltc.stream().mapToDouble(TransCaixa::getValor).toArray();
-        /*
+
         double iva = 0.23;
         transcaixa = Arrays.stream(transcaixa).map(a -> multstatic(a,iva)).toArray();
-        */
+
         return new SimpleEntry<>(transcaixa,null);
     };
 
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao4multMethodStreamParallel = ltc -> () -> {
         double[] transcaixa= ltc.stream().mapToDouble(TransCaixa::getValor).toArray();
-        /*
+
         double iva = 0.23;
         Arrays.parallelSetAll(transcaixa, a -> multstatic((double)a,iva));
-        */
+
         return new SimpleEntry<>(transcaixa,null);
     };
 
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao4multLambStreamSeq = ltc -> () -> {
         double[] transcaixa= ltc.stream().mapToDouble(TransCaixa::getValor).toArray();
-        /*
+
         double iva= 0.23;
         transcaixa = Arrays.stream(transcaixa).map(a -> a * iva).toArray();
-        */
+
         return new SimpleEntry<>(transcaixa,null);
     };
 
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao4multLambStreamParallel = ltc -> () -> {
         double[] transcaixa= ltc.stream().mapToDouble(TransCaixa::getValor).toArray();
-        /*
+
         double iva = 0.23;
         Arrays.parallelSetAll(transcaixa, a -> a * iva);
-        */
+
         return new SimpleEntry<>(transcaixa,null);
     };
 
@@ -1005,7 +1005,7 @@ public class BenchJavaStreams {
         //Map<nCaixa, Map<Mes,List<Transcaixa>>
         Map<String, Map<Integer,List<TransCaixa>>> tabelas= ltc.stream().collect(groupingBy(TransCaixa::getCaixa,
                 groupingBy(t -> t.getData().getMonth().getValue())));
-        /*
+
         Map<String,Double> totalFaturado = tabelas.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
                 elem -> elem.getValue()
                         .entrySet()
@@ -1018,9 +1018,6 @@ public class BenchJavaStreams {
                 )
         );
         return new SimpleEntry<>(totalFaturado,null);
-        */
-        return new SimpleEntry<>(tabelas,null);
-
 
     };
 
@@ -1028,7 +1025,7 @@ public class BenchJavaStreams {
         //Map<nCaixa, Map<Mes,List<Transcaixa>>
         ConcurrentMap<String, ConcurrentMap<Integer,List<TransCaixa>>> tabelas= ltc.stream().collect(groupingByConcurrent(TransCaixa::getCaixa,
                 groupingByConcurrent(t-> t.getData().getMonth().getValue())));
-        /*
+
         ConcurrentMap<String,Double> totalFaturado = tabelas.entrySet().stream()
                 .collect(Collectors.toConcurrentMap(Map.Entry::getKey,
                         elem -> elem.getValue()
@@ -1043,8 +1040,6 @@ public class BenchJavaStreams {
                 );
 
         return new SimpleEntry<>(totalFaturado,null);
-        */
-        return new SimpleEntry<>(tabelas,null);
 
     };
 
@@ -1079,7 +1074,7 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("solucao1ParallelStreamSum", solucao1ParallelStreamSum),
                 new SimpleEntry<>("solucao1ParallelStreamSum", solucao1ParallelStreamAvg)
         );
-        //testes.add(solucoesT1);
+        testes.add(solucoesT1);
 
         // TESTE 2
         List<SimpleEntry<String, Function>> solucoesT2 = Arrays.asList(
@@ -1096,7 +1091,7 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("solucao3IntStream", solucao3intStream),
                 new SimpleEntry<>("solucao3List", solucao3listInteger),
                 new SimpleEntry<>("solucao3ListWithSet", solucao3listIntegerWithSet));
-        //testes.add(solucoesT3);
+        testes.add(solucoesT3);
 
         //TESTE 4
 
@@ -1107,7 +1102,7 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("Exp-Lambda parallel", solucao4multLambStreamParallel),
                 new SimpleEntry<>("Metodo Static seq", solucao4multMethodStreamSeq),
                 new SimpleEntry<>("Metodo Static parallel", solucao4multMethodStreamParallel));
-        testes.add(solucoesT4);
+        //testes.add(solucoesT4);
 
         // TESTE 5
         List<SimpleEntry<String, Function>> solucoesT5 = Arrays.asList(
@@ -1136,7 +1131,7 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("Stream (Partições)", solucao7SplitListS),
                 new SimpleEntry<>("Parallel Streams (Partições)", solucao7SplitListPS),
                 new SimpleEntry<>("Spliterator (Partições)", solucao7SplitSplit));
-        //testes.add(solucoesT7);
+        testes.add(solucoesT7);
 
         // TESTE 8
         List<SimpleEntry<String, Function>> solucoesT8 = Arrays.asList(
@@ -1150,7 +1145,7 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("solucao9SemStreams", solucao9SemStreams),
                 new SimpleEntry<>("solucao9ComUmStream", solucao9ComUmStream),
                 new SimpleEntry<>("solucao9ComDoisStreams", solucao9ComDoisStreams));
-        //testes.add(solucoesT9);
+        testes.add(solucoesT9);
 
         // TESTE 10
         List<SimpleEntry<String, Function>> solucoesT10 = Arrays.asList(
@@ -1166,12 +1161,12 @@ public class BenchJavaStreams {
         List<SimpleEntry<String, Function>> solucoesT12 = Arrays.asList(
                 new SimpleEntry<>("Total faturado->ConcurrentMap", solucao12ConcurrentMap),
                 new SimpleEntry<>("Total faturado-> Map", solucao12Map));
-        testes.add(solucoesT12);
+        //testes.add(solucoesT12);
 
 
         List<List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>>> resultados = runTestes(testes);
 
-        String[] nomeTestes = {"4","12"};
+        String[] nomeTestes = {"1","3","7","9"};
         int n = 0;
         for (List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>> resultadosTi : resultados) {
             genCSVTable("t" + nomeTestes[n], resultadosTi);
