@@ -1005,7 +1005,6 @@ public class BenchJavaStreams {
         //Map<nCaixa, Map<Mes,List<Transcaixa>>
         Map<String, Map<Integer,List<TransCaixa>>> tabelas= ltc.stream().collect(groupingBy(TransCaixa::getCaixa,
                 groupingBy(t -> t.getData().getMonth().getValue())));
-        /*
         Map<String,Double> totalFaturado = tabelas.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
                 elem -> elem.getValue()
                         .entrySet()
@@ -1018,24 +1017,21 @@ public class BenchJavaStreams {
                 )
         );
         return new SimpleEntry<>(totalFaturado,null);
-        */
-        return new SimpleEntry<>(tabelas,null);
-
 
     };
 
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao12ConcurrentMap = ltc -> () ->{
         //Map<nCaixa, Map<Mes,List<Transcaixa>>
-        ConcurrentMap<String, ConcurrentMap<Integer,List<TransCaixa>>> tabelas= ltc.stream().collect(groupingByConcurrent(TransCaixa::getCaixa,
+        ConcurrentMap<String, ConcurrentMap<Integer,List<TransCaixa>>> tabelas= ltc.parallelStream().collect(groupingByConcurrent(TransCaixa::getCaixa,
                 groupingByConcurrent(t-> t.getData().getMonth().getValue())));
-        /*
-        ConcurrentMap<String,Double> totalFaturado = tabelas.entrySet().stream()
+
+        ConcurrentMap<String,Double> totalFaturado = tabelas.entrySet().parallelStream()
                 .collect(Collectors.toConcurrentMap(Map.Entry::getKey,
                         elem -> elem.getValue()
                                 .entrySet()
-                                .stream()
+                                .parallelStream()
                                 .mapToDouble(list-> list.getValue()
-                                        .stream()
+                                        .parallelStream()
                                         .mapToDouble(TransCaixa::getValor)
                                         .sum()
                                 ).sum()
@@ -1043,9 +1039,6 @@ public class BenchJavaStreams {
                 );
 
         return new SimpleEntry<>(totalFaturado,null);
-        */
-        return new SimpleEntry<>(tabelas,null);
-
     };
 
 
@@ -1060,7 +1053,7 @@ public class BenchJavaStreams {
                 "TransCaixaResources/transCaixa4M.txt",
                 "TransCaixaResources/transCaixa6M.txt");
         // Load dos dados
-        loadFiles(files);
+        loadFiles(file);
 
         List<List<SimpleEntry<String, Function>>> testes = new ArrayList<>();
 
@@ -1107,7 +1100,7 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("Exp-Lambda parallel", solucao4multLambStreamParallel),
                 new SimpleEntry<>("Metodo Static seq", solucao4multMethodStreamSeq),
                 new SimpleEntry<>("Metodo Static parallel", solucao4multMethodStreamParallel));
-        testes.add(solucoesT4);
+        //testes.add(solucoesT4);
 
         // TESTE 5
         List<SimpleEntry<String, Function>> solucoesT5 = Arrays.asList(
@@ -1171,7 +1164,7 @@ public class BenchJavaStreams {
 
         List<List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>>> resultados = runTestes(testes);
 
-        String[] nomeTestes = {"4","12"};
+        String[] nomeTestes = {"12"};
         int n = 0;
         for (List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>> resultadosTi : resultados) {
             genCSVTable("t" + nomeTestes[n], resultadosTi);
