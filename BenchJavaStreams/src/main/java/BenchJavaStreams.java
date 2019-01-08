@@ -1082,7 +1082,7 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("TreeSet", solucao2TS),
                 new SimpleEntry<>("Streams", solucao2S),
                 new SimpleEntry<>("Parallel Streams", solucao2PS));
-        //testes.add(solucoesT2);
+        testes.add(solucoesT2);
 
         // TESTE 3
         List<SimpleEntry<String, Function>> solucoesT3 = Arrays.asList(
@@ -1091,7 +1091,7 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("solucao3IntStream", solucao3intStream),
                 new SimpleEntry<>("solucao3List", solucao3listInteger),
                 new SimpleEntry<>("solucao3ListWithSet", solucao3listIntegerWithSet));
-        testes.add(solucoesT3);
+        //testes.add(solucoesT3);
 
         //TESTE 4
 
@@ -1166,7 +1166,7 @@ public class BenchJavaStreams {
 
         List<List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>>> resultados = runTestes(testes);
 
-        String[] nomeTestes = {"1","3","7","9"};
+        String[] nomeTestes = {"1","2","7","9"};
         int n = 0;
         for (List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>> resultadosTi : resultados) {
             genCSVTable("t" + nomeTestes[n], resultadosTi);
