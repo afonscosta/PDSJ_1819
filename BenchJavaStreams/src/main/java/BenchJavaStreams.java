@@ -13,13 +13,11 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.*;
 import java.util.function.BiFunction;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -249,7 +247,7 @@ public class BenchJavaStreams {
                                          .collect(toList());
         List<TransCaixa> l1 = sortedList.subList(0, size/3);
         List<TransCaixa> l2 = sortedList.subList(size - size/3, size);
-        return new SimpleEntry<>(l1, l2);
+        return new SimpleEntry<>(sortedList, null);//l1, l2);
     };
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao2PS = ltc -> () -> {
         int size = ltc.size();
@@ -289,6 +287,7 @@ public class BenchJavaStreams {
         }
         return new SimpleEntry<>(l1, l2);
     };
+
 
     /*
      * SOLUÇÕES PARA O TESTE 3
@@ -449,11 +448,11 @@ public class BenchJavaStreams {
         return new SimpleEntry<>(mapaTxPorMDH, null);
     };
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6MDHPS = ltc -> () -> {
-        Map<Month, Map<Integer, Map<Integer, List<TransCaixa>>>> mapaTxPorMDH =
+        Map<Month, ConcurrentMap<Integer, ConcurrentMap<Integer, List<TransCaixa>>>> mapaTxPorMDH =
                 ltc.parallelStream()
-                        .collect(groupingBy(t -> t.getData().getMonth(),
-                                groupingBy(t -> t.getData().getDayOfMonth(),
-                                        groupingBy(t -> t.getData().getHour()))));
+                        .collect(groupingByConcurrent(t -> t.getData().getMonth(),
+                                groupingByConcurrent(t -> t.getData().getDayOfMonth(),
+                                        groupingByConcurrent(t -> t.getData().getHour()))));
         return new SimpleEntry<>(mapaTxPorMDH, null);
     };
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6MDHL = ltc -> () -> {
@@ -462,30 +461,9 @@ public class BenchJavaStreams {
             Month mes = tc.getData().getMonth();
             int dia = tc.getData().getDayOfMonth();
             int hora = tc.getData().getHour();
-            if (!mapaTxPorMDH.containsKey(mes)) {
-                mapaTxPorMDH.put(
-                        mes,
-                        new TreeMap<>());
-                mapaTxPorMDH.get(mes).put(
-                        dia,
-                        new TreeMap<>());
-                mapaTxPorMDH.get(mes).get(dia).put(
-                        hora,
-                        new ArrayList<>());
-            }
-            else if (!mapaTxPorMDH.get(mes).containsKey(dia)) {
-                mapaTxPorMDH.get(mes).put(
-                        dia,
-                        new TreeMap<>());
-                mapaTxPorMDH.get(mes).get(dia).put(
-                        hora,
-                        new ArrayList<>());
-            }
-            else if (!mapaTxPorMDH.get(mes).get(dia).containsKey(hora)) {
-                mapaTxPorMDH.get(mes).get(dia).put(
-                        hora,
-                        new ArrayList<>());
-            }
+            mapaTxPorMDH.computeIfAbsent(mes, k -> new HashMap<>());
+            mapaTxPorMDH.get(mes).computeIfAbsent(dia, k -> new HashMap<>());
+            mapaTxPorMDH.get(mes).get(dia).computeIfAbsent(hora, k -> new ArrayList<>());
             mapaTxPorMDH.get(mes).get(dia).get(hora).add(tc);
         }
         return new SimpleEntry<>(mapaTxPorMDH, null);
@@ -502,8 +480,8 @@ public class BenchJavaStreams {
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6DHPS = ltc -> () -> {
         Map<DayOfWeek, Map<Integer, List<TransCaixa>>> mapaTxPorDH =
                 ltc.parallelStream()
-                        .collect(groupingBy(t -> t.getData().getDayOfWeek(),
-                                groupingBy(t -> t.getData().getHour())));
+                   .collect(groupingBy(t -> t.getData().getDayOfWeek(),
+                                       groupingBy(t -> t.getData().getHour())));
         return new SimpleEntry<>(mapaTxPorDH, null);
     };
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6DHL = ltc -> () -> {
@@ -511,19 +489,8 @@ public class BenchJavaStreams {
         for (TransCaixa tc : ltc) {
             DayOfWeek dia = tc.getData().getDayOfWeek();
             int hora = tc.getData().getHour();
-            if (!mapaTxPorDH.containsKey(dia)) {
-                mapaTxPorDH.put(
-                        dia,
-                        new TreeMap<>());
-                mapaTxPorDH.get(dia).put(
-                        hora,
-                        new ArrayList<>());
-            }
-            else if (!mapaTxPorDH.get(dia).containsKey(hora)) {
-                mapaTxPorDH.get(dia).put(
-                        hora,
-                        new ArrayList<>());
-            }
+            mapaTxPorDH.computeIfAbsent(dia, k -> new HashMap<>());
+            mapaTxPorDH.get(dia).computeIfAbsent(hora, k -> new ArrayList<>());
             mapaTxPorDH.get(dia).get(hora).add(tc);
         }
         return new SimpleEntry<>(mapaTxPorDH, null);
@@ -569,22 +536,18 @@ public class BenchJavaStreams {
         Callable<Double> t3 = () -> l3.stream().mapToDouble(TransCaixa::getValor).sum();
         Callable<Double> t4 = () -> l4.stream().mapToDouble(TransCaixa::getValor).sum();
 
-        ExecutorService executor = Executors.newWorkStealingPool();
-        try {
-            total = executor.invokeAll(Arrays.asList(t1, t2, t3, t4))
-                            .stream()
-                            .map(future -> {
-                                try {
-                                    return future.get();
-                                }
-                                catch (Exception e) {
-                                    throw new IllegalStateException(e);
-                                }
-                            })
-                            .mapToDouble(d -> d).sum();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ForkJoinPool fjp = ForkJoinPool.commonPool();
+        total = fjp.invokeAll(Arrays.asList(t1, t2, t3, t4))
+                   .stream()
+                   .map(future -> {
+                       try {
+                           return future.get();
+                       }
+                       catch (Exception e) {
+                           throw new IllegalStateException(e);
+                       }
+                   })
+                   .mapToDouble(d -> d).sum();
         return new SimpleEntry<>(total, null);
     };
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitListPS = ltc -> () -> {
@@ -600,22 +563,18 @@ public class BenchJavaStreams {
         Callable<Double> t3 = () -> l3.parallelStream().mapToDouble(TransCaixa::getValor).sum();
         Callable<Double> t4 = () -> l4.parallelStream().mapToDouble(TransCaixa::getValor).sum();
 
-        ExecutorService executor = Executors.newWorkStealingPool();
-        try {
-            total = executor.invokeAll(Arrays.asList(t1, t2, t3, t4))
-                    .parallelStream()
-                    .map(future -> {
-                        try {
-                            return future.get();
-                        }
-                        catch (Exception e) {
-                            throw new IllegalStateException(e);
-                        }
-                    })
-                    .mapToDouble(d -> d).sum();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ForkJoinPool fjp = ForkJoinPool.commonPool();
+        total = fjp.invokeAll(Arrays.asList(t1, t2, t3, t4))
+                   .parallelStream()
+                   .map(future -> {
+                       try {
+                           return future.get();
+                       }
+                       catch (Exception e) {
+                           throw new IllegalStateException(e);
+                       }
+                   })
+                   .mapToDouble(d -> d).sum();
         return new SimpleEntry<>(total, null);
     };
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitListL = ltc -> () -> {
@@ -655,22 +614,18 @@ public class BenchJavaStreams {
             return total4;
         };
 
-        ExecutorService executor = Executors.newWorkStealingPool();
-        try {
-            total = executor.invokeAll(Arrays.asList(t1, t2, t3, t4))
-                    .stream()
-                    .map(future -> {
-                        try {
-                            return future.get();
-                        }
-                        catch (Exception e) {
-                            throw new IllegalStateException(e);
-                        }
-                    })
-                    .mapToDouble(d -> d).sum();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ForkJoinPool fjp = ForkJoinPool.commonPool();
+        total = fjp.invokeAll(Arrays.asList(t1, t2, t3, t4))
+                   .stream()
+                   .map(future -> {
+                       try {
+                           return future.get();
+                       }
+                       catch (Exception e) {
+                           throw new IllegalStateException(e);
+                       }
+                   })
+                   .mapToDouble(d -> d).sum();
         return new SimpleEntry<>(total, null);
     };
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao7SplitListLFE = ltc -> () -> {
@@ -702,22 +657,18 @@ public class BenchJavaStreams {
             return total4[0];
         };
 
-        ExecutorService executor = Executors.newWorkStealingPool();
-        try {
-            total = executor.invokeAll(Arrays.asList(t1, t2, t3, t4))
-                    .stream()
-                    .map(future -> {
-                        try {
-                            return future.get();
-                        }
-                        catch (Exception e) {
-                            throw new IllegalStateException(e);
-                        }
-                    })
-                    .mapToDouble(d -> d).sum();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ForkJoinPool fjp = ForkJoinPool.commonPool();
+        total = fjp.invokeAll(Arrays.asList(t1, t2, t3, t4))
+                   .stream()
+                   .map(future -> {
+                       try {
+                           return future.get();
+                       }
+                       catch (Exception e) {
+                           throw new IllegalStateException(e);
+                       }
+                   })
+                   .mapToDouble(d -> d).sum();
         return new SimpleEntry<>(total, null);
     };
 
@@ -750,22 +701,18 @@ public class BenchJavaStreams {
             return total4[0];
         };
 
-        ExecutorService executor = Executors.newWorkStealingPool();
-        try {
-            total = executor.invokeAll(Arrays.asList(t1, t2, t3, t4))
-                    .stream()
-                    .map(future -> {
-                        try {
-                            return future.get();
-                        }
-                        catch (Exception e) {
-                            throw new IllegalStateException(e);
-                        }
-                    })
-                    .mapToDouble(d -> d).sum();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ForkJoinPool fjp = ForkJoinPool.commonPool();
+        total = fjp.invokeAll(Arrays.asList(t1, t2, t3, t4))
+                   .stream()
+                   .map(future -> {
+                       try {
+                           return future.get();
+                       }
+                       catch (Exception e) {
+                           throw new IllegalStateException(e);
+                       }
+                   })
+                   .mapToDouble(d -> d).sum();
         return new SimpleEntry<>(total, null);
     };
 
@@ -864,7 +811,7 @@ public class BenchJavaStreams {
                                            "TransCaixaResources/transCaixa4M.txt",
                                            "TransCaixaResources/transCaixa6M.txt");
         // Load dos dados
-        loadFiles(file);
+        loadFiles(files);
 
         List<List<SimpleEntry<String, Function>>> testes = new ArrayList<>();
 
@@ -874,7 +821,7 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("TreeSet", solucao2TS),
                 new SimpleEntry<>("Streams", solucao2S),
                 new SimpleEntry<>("Parallel Streams", solucao2PS));
-        testes.add(solucoesT2);
+        //testes.add(solucoesT2);
 
         // TESTE 3
         List<SimpleEntry<String, Function>> solucoesT3 = Arrays.asList(
@@ -883,7 +830,7 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("solucao3IntStream", solucao3intStream),
                 new SimpleEntry<>("solucao3List", solucao3listInteger),
                 new SimpleEntry<>("solucao3ListWithSet", solucao3listIntegerWithSet));
-        testes.add(solucoesT3);
+//        testes.add(solucoesT3);
 
         //TESTE 4
 
@@ -894,7 +841,7 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("Exp-Lambda parallel", solucao4multLambStreamParallel),
                 new SimpleEntry<>("Metodo Static seq", solucao4multMethodStreamSeq),
                 new SimpleEntry<>("Metodo Static parallel", solucao4multMethodStreamParallel));
-        testes.add(solucoesT4);
+//        testes.add(solucoesT4);
 
         // TESTE 6
         List<SimpleEntry<String, Function>> solucoesT6 = Arrays.asList(
@@ -917,25 +864,26 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("Stream (Partições)", solucao7SplitListS),
                 new SimpleEntry<>("Parallel Streams (Partições)", solucao7SplitListPS),
                 new SimpleEntry<>("Spliterator (Partições)", solucao7SplitSplit));
-        testes.add(solucoesT7);
+//        testes.add(solucoesT7);
 
         // TESTE 8
         List<SimpleEntry<String, Function>> solucoesT8 = Arrays.asList(
                 new SimpleEntry<>("List", solucao8L),
                 new SimpleEntry<>("Streams", solucao8S),
                 new SimpleEntry<>("Parallel Streams", solucao8PS));
-        testes.add(solucoesT8);
+//        testes.add(solucoesT8);
 
         // TESTE 12
         List<SimpleEntry<String, Function>> solucoesT12 = Arrays.asList(
                 new SimpleEntry<>("Total faturado->ConcurrentMap", solucao12ConcurrentMap),
                 new SimpleEntry<>("Total faturado-> Map", solucao12Map));
-        testes.add(solucoesT12);
+//        testes.add(solucoesT12);
 
 
         List<List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>>> resultados = runTestes(testes);
 
-        String[] nomeTestes = {"2","3","4", "6", "7", "8","12"};
+//        String[] nomeTestes = {"2","3","4", "6", "7", "8","12"};
+        String[] nomeTestes = {"6"};
         int n = 0;
         for (List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>> resultadosTi : resultados) {
             genCSVTable("t" + nomeTestes[n], resultadosTi);
