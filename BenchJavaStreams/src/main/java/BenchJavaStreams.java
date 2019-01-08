@@ -480,6 +480,7 @@ public class BenchJavaStreams {
     private static Double multstatic(Double i1, Double i2){
         return i1*i2;
     }
+
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao4multMethodStreamSeq = ltc -> () -> {
         double[] transcaixa= ltc.stream().mapToDouble(TransCaixa::getValor).toArray();
         double iva = 0.23;
@@ -899,6 +900,94 @@ public class BenchJavaStreams {
     };
 
     /*
+     *  SOLUÇÕES PARA O TESTE 9
+     */
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao9SemStreams = ltc -> () -> {
+        Map<Long, List<TransCaixa>> grupo = ltc.stream().collect(
+                groupingBy((TransCaixa t1) -> ChronoUnit.WEEKS.between(LocalDateTime.now().with(firstDayOfYear()),t1.getData())));
+
+        Map<Long, Double> totalFaturado = new HashMap<>();
+        for (Map.Entry<Long,List<TransCaixa>> entry : grupo.entrySet()) {
+            List<TransCaixa> caixasDaSemana = entry.getValue();
+            double faturaDaSemana = 0;
+
+            for (TransCaixa caixa : caixasDaSemana) {
+                faturaDaSemana += caixa.getValor();
+            }
+
+            totalFaturado.put(entry.getKey(), faturaDaSemana);
+        }
+
+        return new SimpleEntry<>(totalFaturado, null);
+    };
+
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao9ComUmStream = ltc -> () -> {
+        Map<Long, List<TransCaixa>> grupo = ltc.stream().collect(
+                groupingBy((TransCaixa t1) -> ChronoUnit.WEEKS.between(LocalDateTime.now().with(firstDayOfYear()),t1.getData())));
+
+        Map<Long,Double> totalFaturado = new HashMap<>();
+        grupo.entrySet().forEach((Map.Entry<Long,List<TransCaixa>> e) -> totalFaturado.put(e.getKey(), e.getValue().stream().mapToDouble(TransCaixa::getValor).sum()));
+
+        return new SimpleEntry<>(totalFaturado, null);
+    };
+
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao9ComDoisStreams = ltc -> () -> {
+        Map<Long, List<TransCaixa>> grupo = ltc.stream().collect(
+                groupingBy((TransCaixa t1) -> ChronoUnit.WEEKS.between(LocalDateTime.now().with(firstDayOfYear()),t1.getData())));
+
+        return new SimpleEntry<>(grupo.entrySet()
+                .stream()
+                .map((Map.Entry<Long,List<TransCaixa>> e)
+                        -> new SimpleEntry<>(e.getKey(), e.getValue().stream().mapToDouble(TransCaixa::getValor).sum()))
+                .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)), null);
+    };
+
+    /*
+     *  SOLUÇÕES PARA O TESTE 10
+     */
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao10ComStream = ltc -> () ->
+            new SimpleEntry<>(ltc.stream().collect(groupingBy((TransCaixa t) -> t.getData().getMonth(),
+                    summingDouble((TransCaixa t) -> { double val = t.getValor();
+                        return (val < 20) ? ( val*0.12 ) : ( val >= 20 && val <= 29 ) ? ( val * 0.2 ) : ( val * 0.23);
+                    }))) , null);
+
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao10Iterativo = ltc -> () -> {
+        HashMap<Month,Double> pagamentosIvasMeses = new HashMap<>();
+        pagamentosIvasMeses.put(Month.JANUARY, 0.0);
+        pagamentosIvasMeses.put(Month.FEBRUARY, 0.0);
+        pagamentosIvasMeses.put(Month.MARCH, 0.0);
+        pagamentosIvasMeses.put(Month.APRIL, 0.0);
+        pagamentosIvasMeses.put(Month.MAY, 0.0);
+        pagamentosIvasMeses.put(Month.JUNE, 0.0);
+        pagamentosIvasMeses.put(Month.JULY, 0.0);
+        pagamentosIvasMeses.put(Month.AUGUST, 0.0);
+        pagamentosIvasMeses.put(Month.SEPTEMBER, 0.0);
+        pagamentosIvasMeses.put(Month.OCTOBER, 0.0);
+        pagamentosIvasMeses.put(Month.NOVEMBER, 0.0);
+        pagamentosIvasMeses.put(Month.DECEMBER, 0.0);
+
+        for (TransCaixa tc : ltc) {
+            Month currMont = tc.getData().getMonth();
+            Double currValor = tc.getValor();
+            Double currTotalIva = pagamentosIvasMeses.get(currMont);
+            Double ivaToPay = 0.0;
+
+            if (currValor < 20) {
+                ivaToPay = currValor * 0.12;
+            } else if (currValor >= 20 && currValor <= 29) {
+                ivaToPay = currValor * 0.2 ;
+            } else {
+                ivaToPay = currValor * 0.23;
+            }
+
+            pagamentosIvasMeses.put(currMont,currTotalIva + ivaToPay);
+        }
+
+        return new SimpleEntry<>(pagamentosIvasMeses, null);
+    };
+
+
+    /*
      * SOLUÇÕES PARA O TESTE 12
      */
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao12Map = ltc -> () ->{
@@ -939,92 +1028,6 @@ public class BenchJavaStreams {
                 );
 
         return new SimpleEntry<>(totalFaturado,null);
-    };
-    /*
-     *  SOLUÇÕES PARA O TESTE 9
-     */
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao9SemStreams = ltc -> () -> {
-        Map<Long, List<TransCaixa>> grupo = ltc.stream().collect(
-                groupingBy((TransCaixa t1) -> ChronoUnit.WEEKS.between(LocalDateTime.now().with(firstDayOfYear()),t1.getData())));
-
-        Map<Long, Double> totalFaturado = new HashMap<>();
-        for (Map.Entry<Long,List<TransCaixa>> entry : grupo.entrySet()) {
-            List<TransCaixa> caixasDaSemana = entry.getValue();
-            double faturaDaSemana = 0;
-
-            for (TransCaixa caixa : caixasDaSemana) {
-                faturaDaSemana += caixa.getValor();
-            }
-
-            totalFaturado.put(entry.getKey(), faturaDaSemana);
-        }
-
-        return new SimpleEntry<>(totalFaturado, null);
-    };
-
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao9ComUmStream = ltc -> () -> {
-        Map<Long, List<TransCaixa>> grupo = ltc.stream().collect(
-                groupingBy((TransCaixa t1) -> ChronoUnit.WEEKS.between(LocalDateTime.now().with(firstDayOfYear()),t1.getData())));
-
-        Map<Long,Double> totalFaturado = new HashMap<>();
-        grupo.entrySet().forEach((Map.Entry<Long,List<TransCaixa>> e) -> totalFaturado.put(e.getKey(), e.getValue().stream().mapToDouble(TransCaixa::getValor).sum()));
-
-        return new SimpleEntry<>(totalFaturado, null);
-    };
-
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao9ComDoisStreams = ltc -> () -> {
-        Map<Long, List<TransCaixa>> grupo = ltc.stream().collect(
-                groupingBy((TransCaixa t1) -> ChronoUnit.WEEKS.between(LocalDateTime.now().with(firstDayOfYear()),t1.getData())));
-
-        return new SimpleEntry<>(grupo.entrySet()
-                                 .stream()
-                                 .map((Map.Entry<Long,List<TransCaixa>> e)
-                                             -> new SimpleEntry<>(e.getKey(), e.getValue().stream().mapToDouble(TransCaixa::getValor).sum()))
-                                 .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue)), null);
-    };
-
-    /*
-     *  SOLUÇÕES PARA O TESTE 10
-     */
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao10ComStream = ltc -> () ->
-            new SimpleEntry<>(ltc.stream().collect(groupingBy((TransCaixa t) -> t.getData().getMonth(),
-                                    summingDouble((TransCaixa t) -> { double val = t.getValor();
-                                                  return (val < 20) ? ( val*0.12 ) : ( val >= 20 && val <= 29 ) ? ( val * 0.2 ) : ( val * 0.23);
-                                                                    }))) , null);
-
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao10Iterativo = ltc -> () -> {
-        HashMap<Month,Double> pagamentosIvasMeses = new HashMap<>();
-        pagamentosIvasMeses.put(Month.JANUARY, 0.0);
-        pagamentosIvasMeses.put(Month.FEBRUARY, 0.0);
-        pagamentosIvasMeses.put(Month.MARCH, 0.0);
-        pagamentosIvasMeses.put(Month.APRIL, 0.0);
-        pagamentosIvasMeses.put(Month.MAY, 0.0);
-        pagamentosIvasMeses.put(Month.JUNE, 0.0);
-        pagamentosIvasMeses.put(Month.JULY, 0.0);
-        pagamentosIvasMeses.put(Month.AUGUST, 0.0);
-        pagamentosIvasMeses.put(Month.SEPTEMBER, 0.0);
-        pagamentosIvasMeses.put(Month.OCTOBER, 0.0);
-        pagamentosIvasMeses.put(Month.NOVEMBER, 0.0);
-        pagamentosIvasMeses.put(Month.DECEMBER, 0.0);
-
-        for (TransCaixa tc : ltc) {
-            Month currMont = tc.getData().getMonth();
-            Double currValor = tc.getValor();
-            Double currTotalIva = pagamentosIvasMeses.get(currMont);
-            Double ivaToPay = 0.0;
-
-            if (currValor < 20) {
-                ivaToPay = currValor * 0.12;
-            } else if (currValor >= 20 && currValor <= 29) {
-                ivaToPay = currValor * 0.2 ;
-            } else {
-                ivaToPay = currValor * 0.23;
-            }
-
-            pagamentosIvasMeses.put(currMont,currTotalIva + ivaToPay);
-        }
-
-        return new SimpleEntry<>(pagamentosIvasMeses, null);
     };
 
 
@@ -1124,6 +1127,23 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("Parallel Streams", solucao8PS));
         testes.add(solucoesT8);
 
+        // TESTE 9
+        List<SimpleEntry<String, Function>> solucoesT9 = Arrays.asList(
+                new SimpleEntry<>("solucao9SemStreams", solucao9SemStreams),
+                new SimpleEntry<>("solucao9ComUmStream", solucao9ComUmStream),
+                new SimpleEntry<>("solucao9ComDoisStreams", solucao9ComDoisStreams));
+        testes.add(solucoesT9);
+
+        // TESTE 10
+        List<SimpleEntry<String, Function>> solucoesT10 = Arrays.asList(
+                new SimpleEntry<>("solucao10ComStream", solucao10ComStream),
+                new SimpleEntry<>("solucao10Iterativo", solucao10Iterativo));
+        testes.add(solucoesT10);
+
+        // TESTE 11
+        //Aplicar para T1,T3,T7,T9
+
+
         // TESTE 12
         List<SimpleEntry<String, Function>> solucoesT12 = Arrays.asList(
                 new SimpleEntry<>("Total faturado->ConcurrentMap", solucao12ConcurrentMap),
@@ -1131,23 +1151,9 @@ public class BenchJavaStreams {
         testes.add(solucoesT12);
 
 
-
-        // TESTE 9
-        List<SimpleEntry<String, Function>> solucoesT9 = Arrays.asList(
-                new SimpleEntry<>("solucao9SemStreams", solucao9SemStreams),
-                new SimpleEntry<>("solucao9ComUmStream", solucao9ComUmStream),
-                new SimpleEntry<>("solucao9ComDoisStreams", solucao9ComDoisStreams));
-        //testes.add(solucoesT9);
-
-        // TESTE 10
-        List<SimpleEntry<String, Function>> solucoesT10 = Arrays.asList(
-                new SimpleEntry<>("solucao10ComStream", solucao10ComStream),
-                new SimpleEntry<>("solucao10Iterativo", solucao10Iterativo));
-        //testes.add(solucoesT10);
-
         List<List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>>> resultados = runTestes(testes);
 
-        String[] nomeTestes = {"2","3","4", "6", "7", "8","12"};
+        String[] nomeTestes = {"1","2","3","4","5", "6", "7", "8","9","10","12"};
         int n = 0;
         for (List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>> resultadosTi : resultados) {
             genCSVTable("t" + nomeTestes[n], resultadosTi);
