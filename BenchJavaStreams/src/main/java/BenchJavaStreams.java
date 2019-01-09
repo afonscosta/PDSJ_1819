@@ -439,6 +439,7 @@ public class BenchJavaStreams {
      *  SOLUÇÕES PARA O TESTE 6
      */
     // MES -> DIA -> HORA
+
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6MDHS = ltc -> () -> {
         Map<Month, Map<Integer, Map<Integer, List<TransCaixa>>>> mapaTxPorMDH =
                 ltc.stream()
@@ -447,6 +448,7 @@ public class BenchJavaStreams {
                                                                  groupingBy(t -> t.getData().getHour()))));
         return new SimpleEntry<>(mapaTxPorMDH, null);
     };
+
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6MDHPS = ltc -> () -> {
         Map<Month, ConcurrentMap<Integer, ConcurrentMap<Integer, List<TransCaixa>>>> mapaTxPorMDH =
                 ltc.parallelStream()
@@ -455,6 +457,7 @@ public class BenchJavaStreams {
                                         groupingByConcurrent(t -> t.getData().getHour()))));
         return new SimpleEntry<>(mapaTxPorMDH, null);
     };
+
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6MDHL = ltc -> () -> {
         Map<Month, Map<Integer, Map<Integer, List<TransCaixa>>>> mapaTxPorMDH = new TreeMap<>();
         for (TransCaixa tc : ltc) {
@@ -478,10 +481,10 @@ public class BenchJavaStreams {
         return new SimpleEntry<>(mapaTxPorDH, null);
     };
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6DHPS = ltc -> () -> {
-        Map<DayOfWeek, Map<Integer, List<TransCaixa>>> mapaTxPorDH =
+        Map<DayOfWeek, ConcurrentMap<Integer, List<TransCaixa>>> mapaTxPorDH =
                 ltc.parallelStream()
-                   .collect(groupingBy(t -> t.getData().getDayOfWeek(),
-                                       groupingBy(t -> t.getData().getHour())));
+                   .collect(groupingByConcurrent(t -> t.getData().getDayOfWeek(),
+                                       groupingByConcurrent(t -> t.getData().getHour())));
         return new SimpleEntry<>(mapaTxPorDH, null);
     };
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6DHL = ltc -> () -> {
@@ -740,6 +743,7 @@ public class BenchJavaStreams {
     };
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao8PS = ltc -> () -> {
         Optional<TransCaixa> res = ltc.parallelStream()
+                                      .peek(e -> out.println(Thread.activeCount()))
                                       .filter(tc -> tc.getData().getHour() >= 16 &&
                                                     tc.getData().getHour() < 22)
                                       .max(transCaixaMaxValueComparator);
@@ -821,7 +825,7 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("TreeSet", solucao2TS),
                 new SimpleEntry<>("Streams", solucao2S),
                 new SimpleEntry<>("Parallel Streams", solucao2PS));
-        //testes.add(solucoesT2);
+        testes.add(solucoesT2);
 
         // TESTE 3
         List<SimpleEntry<String, Function>> solucoesT3 = Arrays.asList(
@@ -830,7 +834,7 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("solucao3IntStream", solucao3intStream),
                 new SimpleEntry<>("solucao3List", solucao3listInteger),
                 new SimpleEntry<>("solucao3ListWithSet", solucao3listIntegerWithSet));
-//        testes.add(solucoesT3);
+        testes.add(solucoesT3);
 
         //TESTE 4
 
@@ -841,7 +845,7 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("Exp-Lambda parallel", solucao4multLambStreamParallel),
                 new SimpleEntry<>("Metodo Static seq", solucao4multMethodStreamSeq),
                 new SimpleEntry<>("Metodo Static parallel", solucao4multMethodStreamParallel));
-//        testes.add(solucoesT4);
+        testes.add(solucoesT4);
 
         // TESTE 6
         List<SimpleEntry<String, Function>> solucoesT6 = Arrays.asList(
@@ -864,26 +868,25 @@ public class BenchJavaStreams {
                 new SimpleEntry<>("Stream (Partições)", solucao7SplitListS),
                 new SimpleEntry<>("Parallel Streams (Partições)", solucao7SplitListPS),
                 new SimpleEntry<>("Spliterator (Partições)", solucao7SplitSplit));
-//        testes.add(solucoesT7);
+        testes.add(solucoesT7);
 
         // TESTE 8
         List<SimpleEntry<String, Function>> solucoesT8 = Arrays.asList(
                 new SimpleEntry<>("List", solucao8L),
                 new SimpleEntry<>("Streams", solucao8S),
                 new SimpleEntry<>("Parallel Streams", solucao8PS));
-//        testes.add(solucoesT8);
+        testes.add(solucoesT8);
 
         // TESTE 12
         List<SimpleEntry<String, Function>> solucoesT12 = Arrays.asList(
                 new SimpleEntry<>("Total faturado->ConcurrentMap", solucao12ConcurrentMap),
                 new SimpleEntry<>("Total faturado-> Map", solucao12Map));
-//        testes.add(solucoesT12);
+        testes.add(solucoesT12);
 
 
         List<List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>>> resultados = runTestes(testes);
 
-//        String[] nomeTestes = {"2","3","4", "6", "7", "8","12"};
-        String[] nomeTestes = {"6"};
+        String[] nomeTestes = {"2","3","4", "6", "7", "8","12"};
         int n = 0;
         for (List<List<SimpleEntry<String, SimpleEntry<Double, SimpleEntry>>>> resultadosTi : resultados) {
             genCSVTable("t" + nomeTestes[n], resultadosTi);
