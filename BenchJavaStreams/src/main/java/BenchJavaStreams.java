@@ -265,13 +265,25 @@ public class BenchJavaStreams {
         return new SimpleEntry<>(sum/count, null);
     };
 
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao1DoubleStreamSum = ltc -> () -> new SimpleEntry<>(ltc.stream().mapToDouble(TransCaixa::getValor).sum(), null);
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao1DoubleStreamAvg = ltc -> () -> new SimpleEntry<>(ltc.stream().mapToDouble(TransCaixa::getValor).average().getAsDouble(), null);
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao1DoubleStreamSum = ltc -> () -> {
+        return new SimpleEntry<>(ltc.stream().mapToDouble(TransCaixa::getValor).sum(), null);
+    };
 
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao1ParallelDoubleStreamSum = ltc -> () -> new SimpleEntry<>(ltc.parallelStream().mapToDouble(TransCaixa::getValor).sum(), null);
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao1ParallelDoubleStreamAvg = ltc -> () -> new SimpleEntry<>(ltc.parallelStream().mapToDouble(TransCaixa::getValor).average().getAsDouble(), null);
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao1DoubleStreamAvg = ltc -> () -> {
+        return new SimpleEntry<>(ltc.stream().mapToDouble(TransCaixa::getValor).average().getAsDouble(), null);
+    };
 
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao1StreamSum = ltc -> () -> new SimpleEntry<>(ltc.stream().map(TransCaixa::getValor).reduce(0.0, (x1, x2) -> (Double) x1 + (Double) x2), null);
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao1ParallelDoubleStreamSum = ltc -> () -> {
+        return new SimpleEntry<>(ltc.parallelStream().mapToDouble(TransCaixa::getValor).sum(), null);
+    };
+
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao1ParallelDoubleStreamAvg = ltc -> () -> {
+        return new SimpleEntry<>(ltc.parallelStream().mapToDouble(TransCaixa::getValor).average().getAsDouble(), null);
+    };
+
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao1StreamSum = ltc -> () -> {
+        return new SimpleEntry<>(ltc.stream().map(TransCaixa::getValor).reduce(0.0, (x1, x2) -> (Double) x1 + (Double) x2), null);
+    };
 
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao1StreamAvg = ltc -> () -> {
         AtomicReference<Double> sum = new AtomicReference<>((double) 0);
@@ -282,7 +294,9 @@ public class BenchJavaStreams {
         return new SimpleEntry<>(sum.get() / count.get(), null);
     };
 
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao1ParallelStreamSum = ltc -> () -> new SimpleEntry<>(ltc.parallelStream().map(TransCaixa::getValor).reduce(0.0, (x1, x2) -> (Double) x1 + (Double) x2), null);
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao1ParallelStreamSum = ltc -> () -> {
+        return new SimpleEntry<>(ltc.parallelStream().map(TransCaixa::getValor).reduce(0.0, (x1, x2) -> (Double) x1 + (Double) x2), null);
+    };
 
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao1ParallelStreamAvg = ltc -> () -> {
         SimpleEntry<Double,Double> countAndSum = ltc.parallelStream().map((TransCaixa t) -> new SimpleEntry<>(1.0, t.getValor())).reduce(new SimpleEntry<>(0.0,0.0),
@@ -458,8 +472,7 @@ public class BenchJavaStreams {
     /*
      * SOLUÇÕES PARA O TESTE 4
      */
-    private static BiFunction<Double, Double, Double> multBifunction =
-            (i1, i2) -> i1 * i2;
+    private static BiFunction<Double, Double, Double> multBifunction = (i1, i2) -> i1 * i2;
 
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao4multBiFStreamSeq = ltc -> () -> {
         double[] transcaixa= ltc.stream().mapToDouble(TransCaixa::getValor).toArray();
@@ -511,7 +524,6 @@ public class BenchJavaStreams {
     /*
      *  SOLUÇÕES PARA O TESTE 5
      */
-
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao5TreeSet = ltc -> () -> {
         Comparator<TransCaixa> compexc2 = Comparator.comparing(TransCaixa::getTrans);
 
@@ -519,7 +531,6 @@ public class BenchJavaStreams {
 
         return new SimpleEntry<>(ltc.stream().collect(toCollection(supplyTreeSet)), null);
     };
-
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao5SortedList = ltc -> () -> {
         Comparator<TransCaixa> compexc2 = Comparator.comparing(TransCaixa::getTrans);
         return new SimpleEntry<>(ltc.stream().sorted(compexc2).collect(Collectors.toList()), null);
@@ -529,7 +540,6 @@ public class BenchJavaStreams {
      *  SOLUÇÕES PARA O TESTE 6
      */
     // MES -> DIA -> HORA
-
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6MDHS = ltc -> () -> {
         Map<Month, Map<Integer, Map<Integer, List<TransCaixa>>>> mapaTxPorMDH =
                 ltc.stream()
@@ -538,7 +548,6 @@ public class BenchJavaStreams {
                                         groupingBy(t -> t.getData().getHour()))));
         return new SimpleEntry<>(mapaTxPorMDH, null);
     };
-
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6MDHPS = ltc -> () -> {
         Map<Month, ConcurrentMap<Integer, ConcurrentMap<Integer, List<TransCaixa>>>> mapaTxPorMDH =
                 ltc.parallelStream()
@@ -547,7 +556,6 @@ public class BenchJavaStreams {
                                         groupingByConcurrent(t -> t.getData().getHour()))));
         return new SimpleEntry<>(mapaTxPorMDH, null);
     };
-
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao6MDHL = ltc -> () -> {
         Map<Month, Map<Integer, Map<Integer, List<TransCaixa>>>> mapaTxPorMDH = new TreeMap<>();
         for (TransCaixa tc : ltc) {
@@ -895,11 +903,13 @@ public class BenchJavaStreams {
     /*
      *  SOLUÇÕES PARA O TESTE 10
      */
-    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao10ComStream = ltc -> () ->
-            new SimpleEntry<>(ltc.stream().collect(groupingBy((TransCaixa t) -> t.getData().getMonth(),
-                    summingDouble((TransCaixa t) -> { double val = t.getValor();
-                        return (val < 20) ? ( val*0.12 ) : ( val >= 20 && val <= 29 ) ? ( val * 0.2 ) : ( val * 0.23);
-                    }))) , null);
+    private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao10ComStream = ltc -> () -> {
+        return new SimpleEntry<>(ltc.stream().collect(groupingBy((TransCaixa t) -> t.getData().getMonth(),
+                summingDouble((TransCaixa t) -> {
+                    double val = t.getValor();
+                    return (val < 20) ? (val * 0.12) : (val >= 20 && val <= 29) ? (val * 0.2) : (val * 0.23);
+                }))), null);
+    };
 
     private static Function<List<TransCaixa>, Supplier<SimpleEntry>> solucao10Iterativo = ltc -> () -> {
         HashMap<Month,Double> pagamentosIvasMeses = new HashMap<>();
